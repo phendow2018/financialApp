@@ -1,6 +1,6 @@
 <template>
   <div class="big-container">
-    <div class="company-search " :class="{'init-status': !isSearched, 'animation': isSearched}">
+    <div class="company-search">
       <div>
         <span class="company-search-title">企业查询：</span>
         <el-autocomplete
@@ -55,7 +55,6 @@ export default {
       queryString: "",
       companyLoading: false,
       companyList: [],
-      isSearched: false
     };
   },
   mounted() {
@@ -100,7 +99,6 @@ export default {
           `${_.preName}/company/companyEdit?companyId=${item.id}`
         );
       } else {
-          this.isSearched = true
         _.http
           .get(
             `${_.preApiName}/financial/company-manage/companies?FuzzyQuery=${item.value}&Page=1&PerPage=20`
