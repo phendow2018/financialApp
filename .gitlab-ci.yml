@@ -1,0 +1,17 @@
+stages:
+    - build
+    - deploy
+build:
+  stage: build
+  script:
+    - ssh root@192.168.1.135 "cd /home/aomweb/;sh build.sh;rm -rf dist"
+  only:
+    - master
+  tags:
+    - shell
+deploy:
+  stage: deploy
+  script:
+    - ssh root@192.168.1.136 "cd /home/node-dockerfile/;docker stack deploy -c aom.yml aom"
+  tags:
+    - shell

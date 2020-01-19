@@ -1,0 +1,35 @@
+.aomInfo(@backcolor, @fontcolor){    
+    .aom-info-wrapper{
+      display: flex;
+      justify-content: space-between;
+      margin-top: 30px;
+
+      .wrapper-left{
+        display: flex;
+
+        .left-img .circle{
+          font-size: 14px;
+          display: inline-block;
+          width: 44px;
+          height:44px;
+          line-height: 44px;
+          text-align: center;
+          border-radius: 50%;
+        }
+ 
+      }
+      .button-add{
+        width: 120px;
+        // background-color: @fontcolor;
+      }
+      .wrapper-right{
+        .button-edit,.button-delete{
+          width:100px;
+        }
+        
+        .button-delete{
+          background-color:#cc0000;
+        }
+      }
+    }       
+}

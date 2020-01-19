@@ -1,0 +1,75 @@
+//全局修改element组件的颜色
+.elUI(@backcolor, @fontcolor){
+    .el-button--primary{
+        border-color: @fontcolor;
+        background-color: @fontcolor;
+    }
+    .el-button--primary.is-disabled{
+        border-color: #a0cfff;
+        background-color: #a0cfff;
+    }
+    .el-tabs__active-bar{
+        background-color: @fontcolor;
+    }
+
+    .el-tabs__item,.el-tabs__item.is-active{
+        font-size: 16px;
+        font-family: 'microsoft yahei';
+        color: #515151;
+    }
+
+    .el-tabs__item.is-active, 
+    .el-tabs__item:hover,
+    .el-button--default:active,
+    .el-button--default:focus, 
+    .el-button--default:hover{
+        color: @fontcolor !important;
+        font-weight: 700;
+    }
+
+    .el-tabs__item:hover{
+        border-bottom: 2px solid @fontcolor;
+    }
+
+    .el-button:active{
+        border-color:@fontcolor;
+    }
+
+    .el-input.is-active, 
+    .el-input__inner:focus,
+    
+    .el-textarea__inner:focus,
+    .el-checkbox__inner:hover,
+    .el-select .el-input.is-focus .el-input__inner,
+    .el-range-editor.is-active, .el-range-editor.is-active:hover{
+        border-color:@fontcolor;
+    }
+
+    .el-loading-spinner .path{
+        stroke: @fontcolor;
+    }
+
+    .el-menu-item.is-active{
+        color:@fontcolor;
+    }
+
+    .el-radio__input.is-checked+.el-radio__label,
+    .el-checkbox__input.is-checked+.el-checkbox__label,
+    .el-form-item.is-required:not(.is-no-asterisk) > .el-form-item__label:before{
+        color: @fontcolor;
+    }
+    .el-radio__input.is-checked .el-radio__inner,
+    .el-checkbox__input.is-checked .el-checkbox__inner, .el-checkbox__input.is-indeterminate .el-checkbox__inner{
+        color:@fontcolor;
+        border-color:@fontcolor;
+        background: @fontcolor;
+    }
+    .el-input-number .el-input__inner{
+        text-align: right;
+    }
+    .el-collapse-item__header{
+        font-size: 18px;
+        font-weight: 700px;
+    }
+
+}

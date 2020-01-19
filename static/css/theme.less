@@ -1,0 +1,29 @@
+.theme(@backcolor:#409EFF,@fcolor:#fff,@borderColor:#8e8f8f) {
+   .testFontColor{
+    background:@backcolor;
+    color: @fcolor;
+   }
+   .el-select-dropdown__item.selected{
+    color: @backcolor;
+  } 
+   .el-select .el-input.is-focus .el-input__inner {
+        border-color: @backcolor;
+    }
+    .el-input__inner:focus{
+      border-color: @backcolor;
+    }
+    .el-checkbox__input.is-checked+.el-checkbox__label{
+      color: @backcolor;
+    }
+    .el-checkbox__input.is-checked .el-checkbox__inner, .el-checkbox__input.is-indeterminate .el-checkbox__inner{
+      background-color: @backcolor;
+      border-color:@backcolor;
+    }
+    .el-checkbox__inner{
+      border-color:@borderColor;
+    }
+    .el-range-editor.is-active, .el-range-editor.is-active:hover{
+      border-color:@backcolor;
+    }
+   
+  }

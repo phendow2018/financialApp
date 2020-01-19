@@ -1,0 +1,97 @@
+.company(@backcolor, @fontcolor) {
+  @preCls: ~"company";
+
+  .company-search {
+    position: relative;
+    color: #949393;
+    z-index: 999;
+    background: #fff;
+    width: 100%;
+    display: grid;
+    align-items: start;
+    justify-items: center;
+    // 
+
+    input {
+      width: 300px;
+    }
+
+    .company-search-title {
+      height: 40px;
+      font-size: 20px;
+    }
+  }
+
+  .init-status {
+    margin-top: 30px;
+  }
+
+  .animation {
+      margin-top: 10px;
+      transition: 'margin-top' 1s;
+    // animation: moveTo 1s;
+  }
+
+  @keyframes moveTo {
+    to {
+      margin-top: 10px;
+    }
+  }
+
+  @-moz-keyframes moveTo {
+    to {
+      margin-top: 10px;
+    }
+  }
+
+  @-webkit-keyframes moveTo {
+    to {
+      margin-top: 10px;
+    }
+  }
+
+  .company-container {
+
+    margin-top: 20px;
+    height: calc(100vh - 60px - 20px - 90px);
+
+
+    .company-main {
+      display: grid;
+      grid-template-columns: 300px 300px 300px auto;
+    }
+
+    .company-item {
+      color: #000;
+      height: 50px;
+
+      .name {
+        height: 25px;
+        line-height: 25px;
+      }
+
+      .number {
+        font-size: 14px;
+        height: 15px;
+        line-height: 15px;
+        color: #aaa;
+      }
+
+      &:hover {
+        color: #409EFF;
+        cursor: pointer;
+        text-decoration: underline;
+
+        .number {
+          color: #409EFF;
+        }
+      }
+    }
+  }
+
+  .@{preCls} {
+    &-header-filter-left {
+      width: 350px;
+    }
+  }
+}

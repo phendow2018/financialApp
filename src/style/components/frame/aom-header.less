@@ -1,0 +1,93 @@
+.aom-header(@backcolor, @fontcolor){
+    .aom-header-container{
+        display: -webkit-box;
+        display: -ms-flexbox;
+        display: flex;
+        -webkit-box-pack: justify;
+        -ms-flex-pack: justify;
+        justify-content: space-between;
+        align-items: center;
+        border-bottom: solid 1px #ebeef5;
+        font-family: 微软雅黑 Bold, 微软雅黑 Regular, 微软雅黑;
+        font-weight: 700;
+        font-style: normal;
+        height: 40px;
+        
+        & .aom-header-content{
+            display: -webkit-box;
+            display: -ms-flexbox;
+            display: flex;
+            -webkit-box-align: center;
+            -ms-flex-align: center;
+            align-items: center;
+            -ms-flex-line-pack: center;
+            align-content: center;
+            -webkit-box-pack: justify;
+            -ms-flex-pack: justify;
+            justify-content: space-between;
+            & .header-title-left{
+                color: #AEAEAE;
+                box-sizing: border-box;
+                // height: 22px;
+                &.link-title{
+                    cursor: pointer;
+                    &:hover{
+                        // border-bottom: solid #AEAEAE 1px;
+                        color:#545454;
+                        text-decoration: underline;
+                    }
+                }
+            }
+             & .header-title-right{
+                color: #545454;
+            }
+        }
+        & .back-button{
+            display: -webkit-box;
+            display: -ms-flexbox;
+            display: flex;
+            // -webkit-box-align: center;
+            // -ms-flex-align: center;
+            // align-items: center;
+            // -ms-flex-line-pack: center;
+            // align-content: center;
+            -webkit-box-pack: justify;
+            -ms-flex-pack: justify;
+            justify-content: space-between;
+            .header-back-button{
+                width: 58px;
+                height: 30px;
+                border: solid 1px #d2d9e7;
+                line-height: 30px;
+                // float: right;
+                // margin-top: 30px;
+                &:hover{
+                    color:@fontcolor;
+                    border: solid 1px @fontcolor;
+                    background-color: #fff;
+                }
+            }
+            .header-back-button.el-button--info:focus,
+            .header-back-button.el-button--info:hover,
+            .header-back-button.el-button--info.is-active,
+            .header-back-button.el-button--info:active,
+            .header-back-button.el-button--info:focus{
+                color:@fontcolor!important;
+                border: solid 1px @fontcolor !important;
+                background-color: #fff !important;
+            }
+            .header-back-button.el-button--info{
+                background: #fff;
+                color: #4a4a4a;
+                margin-top: 2px;
+                & span{
+                    line-height: 16px;
+                    font-size: 15px;
+                }
+            }
+        }
+        & .el-button{
+            padding: 0;
+        }
+    }
+}

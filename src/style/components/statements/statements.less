@@ -1,0 +1,222 @@
+.statement(@backcolor, @fontcolor) {
+    @preCls: ~'statements';
+    .fontBlodStyle(){
+        font-family: ~'微软雅黑 Bold', ~'微软雅黑 Regular', ~'微软雅黑';
+        font-weight: 700;
+        font-style: normal;
+        font-size: 20px;
+        color: #515151;
+    }
+    
+    .@{preCls} {
+        height: 100%;
+        width: 100%;
+        @searchButtonWidth: 120px;
+        @inputHeight: 40px;
+        @maginHeight: 10px;
+
+
+        &-tabs{
+            position: relative;
+            height: calc(~"100% - @{inputHeight} - 2 * @{maginHeight}");
+            @tabsHeight: 40px;
+            @tabsMB: 15px;
+            .el-tabs__header{
+                height: 40px;
+            }
+
+            .el-tabs__item{
+                .fontBlodStyle();
+                font-size: 16px;
+                font-weight: 400;
+                color: #999999;
+            }
+            .is-active{
+                font-size: 16px;
+                font-weight: 700;
+                color: #515151;
+
+                .report-item {
+                    font-size: 16px;
+                    font-weight: 200;
+                }
+                .report-small-item {
+                    font-size: 14px;
+                    font-weight: 1;
+                    line-height: 25px;
+                }
+            }
+
+            .main-header {
+                .company-header, .order-header {
+                    display: grid;
+                    grid-template-columns: 512px auto 164px;
+        
+                    .header-item {
+                        padding: 5px;
+                    }
+                }
+                
+                border: 1px solid #dadada;
+                padding: 10px 20px;
+                margin-top: 10px;
+                margin-bottom: 20px;
+                border-left: 10px solid #dadada;
+
+                .small-btn {
+                    text-decoration: underline;
+                    margin-right: 5px;
+
+                    &:hover{
+                        color: @fontcolor;
+                        cursor: pointer;
+                    }
+                }
+            }
+
+            .main-content {
+                position: relative;
+
+                .opertion-buttons {
+                    position: absolute;
+                    right: 30px;
+                    top: -8px;
+                    z-index: 2000;
+                }
+            }
+
+            .add-company-container {
+                display: block;
+                position: absolute;
+                width: 350px;
+                height: 100px;
+                top: 200px;
+                margin: 0 35%;
+
+                .add-company-desc{
+                    height: 40px;
+                    line-height: 40px;
+                    font-size: 16px;
+                    color: #444;
+                }
+
+                .add-company-btn {
+                    position: relative;
+                    width: 130px;
+                    height: 50px;
+                    margin: 0 auto;
+                    border: 1px solid #eee;
+                    border-radius: 10px;
+                    text-align: center;
+                    line-height: 50px;
+                    background-color: #409EFF;
+                    font-size: 20px;
+                    color: #fff;
+                    cursor: pointer;
+
+                    :hover{
+                        background-color: #1762af;
+                        border: 1px solid #1762af;
+                    }
+                }
+            }
+
+            .assets-container {
+                position: relative;
+                height: calc(100vh - 60px - 84px - 40px - 40px);
+
+                .header-icon {
+                    font-size: 18px;
+                    padding: 0 5px;
+                }
+            }
+            .report-item-container {
+                height: 50px;
+                line-height: 50px;
+                color: #000;
+                
+                display: grid;
+                justify-items: stretch;
+            }
+            .report-item-container1 {
+                grid-template-columns: 210px 200px;
+            }
+            .report-item-container2 {
+                grid-template-columns: 210px 200px 200px;
+            }
+            .report-item-container3 {
+                grid-template-columns: 200px 200px 200px 200px;
+            }
+            .report-item-container4 {
+                grid-template-columns: 200px 200px 200px 200px 200px;
+            }
+            .report-item-container5 {
+                grid-template-columns: 200px 200px 200px 200px 200px 200px;
+            }
+            .report-item-container6 {
+                grid-template-columns: 200px 200px 200px 200px 200px 200px 200px;
+            }
+            .report-item-container7 {
+                grid-template-columns: 280px 200px 200px 200px 200px 200px 200px 200px;
+            }
+            .report-item-container8 {
+                grid-template-columns: 200px 200px 200px 200px 200px 200px 200px 200px 200px;
+            }
+            .report-item-container9 {
+                grid-template-columns: 200px 200px 200px 200px 200px 200px 200px 200px 200px 200px;
+            }
+            .report-item-container10 {
+                grid-template-columns: 200px 200px 200px 200px 200px 200px 200px 200px 200px 200px 200px;
+            }
+            .report-item-container:nth-child(1) {
+                border-top: 1px solid #eee;
+            }
+            .report-item-container:nth-child(even) {
+                background-color: #f8f8f8;
+            }
+            .report-item-container-suggestion {
+                text-align: right;
+                padding-right: 10px;
+                color: red;
+            }
+            .assets-container-focus {
+                background-color: #e0e5ea !important;
+            }
+        
+            .report-date-item {
+                font-weight: 700px;
+                font-size: 18px;
+                border-bottom: 1px solid #eee;
+            }
+            
+            .report-item {
+                text-align: center;
+                font-size: 16px;
+                font-weight: 200px;
+                border-right: 1px solid #eee;
+                border-bottom: 1px solid #eee;
+
+                .suggestion-label{
+                    text-align: right;
+                    padding-right: 10px;
+                    color: red;
+                }
+            }
+
+            .report-item-name {
+                border-left: 1px solid #eee;
+                text-align: left;
+                padding-left: 10px;
+            }
+
+            &-content{
+                width: 100%;
+            }
+        }
+
+        .el-tabs__nav-wrap::after{
+            height: 1px;
+        }
+    }    
+}
+

@@ -1,0 +1,184 @@
+.login(@bgroundcolor, @fontcolor){
+    .contract-login{
+        width:100vw;
+        height:100vh;
+        background:rgb(245,244,244);
+    }
+    .contract-login-content{
+        width:502px;
+        height:428px;
+        margin: 0 auto;
+        padding-top: 110px;
+    }
+    .icon-gefei-logo-login{
+        font-size: 56px;
+        color: #4b95ef;
+    }
+
+    .login-content-title{
+        display: flex;
+        flex-direction: row;
+        height:84px;
+        font-size: 38px;
+        color:rgb(72,72,79);
+        padding-left: 132px;
+    }
+    .title-right{
+        margin-left:12px;
+    }
+    .login-content-form{
+        background-color:#fff;
+        height:344px;
+        border-radius: 4px;
+        box-shadow: 0px 0px 10px 0px rgba(203,203,206,0.5);
+    }
+    .form-login{
+        width:460px;
+        border-bottom:1px solid rgb(234,234,234);
+        height:70px;
+        font-size: 22px;
+        color:rgb(72,72,79);
+        margin-left: 21px;
+        margin-bottom: 29px;
+    }
+    .login-number{
+        padding-left:10px;
+        padding-top:29px;
+    }
+    .content-user,.content-password{
+        width:420px;
+        height:44px;
+        
+        border-radius: 4px;
+        margin-left:calc(~"(502px - 420px)/2");
+        display: flex;
+        flex-direction: row;
+        height:44px;
+        line-height: 44px;
+    }
+
+    .normal-input-border-class{
+        border:1px solid rgb(234,234,234);
+    }
+
+    .focus-input-border-class{
+        border: 1px solid @fontcolor;
+    }
+    .user-password-div{
+        padding: 0px 11px;
+        color: #7c7c7c;
+    }
+    .content-password{
+        margin-top:16px;
+    }
+    .content-input{
+        border:none!important;
+        outline:none!important;
+        width: calc(~"100% - 75px");
+        padding-left: 10px;
+        font-size: 18px;
+
+
+    }
+    .content-user:focus{
+            border:1px solid @fontcolor;
+        }
+    .content-span{
+        width:36px;
+        text-align: center;
+    }
+    .content-user-password-title{
+        text-align: left;
+        width: calc(~"100% - 36px");
+    }
+    .content-user-password{
+        font-size: 16px;
+        color:rgb(124,124,124);
+    }
+
+    .content-login-button{
+        width:420px;
+        margin-left:calc(~"(502px - 420px)/2");
+        height:44px;
+        margin-top:30px;
+        color:rgb(255,255,255);
+        font-size: 20px;
+    }
+
+    .contract-login-img{
+        width:100%;
+        height:378px;
+        display: flex;
+        flex-direction: row;
+        justify-content:space-between;
+        align-items:flex-end;
+        height: calc(~"100% - 538px");
+    }
+    @media screen and (min-width:1280px) and (max-width:1660px) {
+    .img-notebook{
+        width: 325px;
+        height: 221px;
+        background: url('/static/img/notebookSmall.png') no-repeat;   
+        }
+        .img-coffee{
+            width: 206px;
+            height: 170px;
+            background: url('/static/img/coffeeSmall.png') no-repeat; 
+        }
+        .img-keyboard{
+            width: 425px;
+            height: 203px;
+            background: url('/static/img/keyboardSmall.png') no-repeat; 
+        }
+    }
+    @media screen and (min-width:1661px) and (max-width:1920px) {
+    .img-notebook{
+        width: 419px;
+        height: 378px;
+        background: url('/static/img/notebook.png') no-repeat;   
+        }
+        .img-coffee{
+            width: 302px;
+            height: 249px;
+            background: url('/static/img/coffee.png') no-repeat; 
+        }
+        .img-xuanwo:hover{
+            transform-origin:50% 50%;
+            transform:rotate(-10deg);
+        }
+        .img-xuanwo{
+            width: 154px;
+            height: 154px;
+        }
+        .img-xuanzhuan{
+            
+            background: url('/static/img/xuanwo.png') no-repeat; 
+        }
+        .img-keyboard{
+            width: 762px;
+            height: 324px;
+            background: url('/static/img/keyboard.png') no-repeat; 
+        }
+    }
+    .content-prompt-message{
+        margin-left:calc(~"(502px - 420px)/2");
+        bottom:0;
+        width:420px;
+        height:36px;
+        text-align: right;
+        color:@fontcolor;
+        font-size: 16px;
+    }
+    .prompt-message-label{
+        display: block;
+        padding-top: 15px;
+    }
+    .user-name{
+        border:1px solid @fontcolor;
+    }  
+
+    .contract-login .el-input__inner{
+        border:none!important;
+        outline:none!important;
+    }
+}

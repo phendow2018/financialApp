@@ -1,0 +1,69 @@
+.organization(@backcolor, @fontcolor){
+    @preCls: ~'organization';
+    .fontBlodStyle(){
+        font-family: ~'微软雅黑 Bold', ~'微软雅黑 Regular', ~'微软雅黑';
+        font-weight: 700;
+        font-style: normal;
+        font-size: 20px;
+        color: #515151;
+    }
+    .@{preCls} {
+        height: 100%;
+        width: 100%;
+        @searchButtonWidth: 120px;
+        @inputHeight: 40px;
+        @maginHeight: 10px;
+        
+        &-search{
+            margin: @maginHeight 0px;
+            display: flex;
+            justify-content: space-between;
+            .search-input{
+                width: calc(~"100% - @{searchButtonWidth}");
+                input{ 
+                    height: @inputHeight;
+                }
+                div{
+                    width: 100%;
+                }
+            }
+            .search-add{
+                width: @searchButtonWidth - 20px;
+                margin-left: 20px;
+                text-align: right;
+                button{
+                    width: 100%;
+                }
+            }
+        }
+
+        &-tabs{
+            height: calc(~"100% - @{inputHeight} - 2 * @{maginHeight}");
+            @tabsHeight: 40px;
+            @tabsMB: 15px;
+            & .icon-people{
+                font-size: 26px;
+                color: rgb(36, 159, 253);
+            }
+            .el-tabs__header{
+                height: 40px;
+            }
+
+            
+           
+
+            &-content{
+                width: 100%;
+            }
+        }
+
+       
+        &-user-count{
+            margin-right: 30px;
+            height: 100%;
+            padding: 0 5px;
+            font-size: 13px;
+            font-weight: 100;
+        }
+    }   
+}

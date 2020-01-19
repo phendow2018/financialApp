@@ -1,0 +1,70 @@
+.global(@backcolor, @fontcolor){
+    @padding: 14%;
+    @media screen and ( max-width: 1250px ){
+        @padding: 2%;
+
+        .small-container{
+            padding: 0 @padding 0 @padding;
+        }
+    }
+
+    @media screen and ( max-width: 1250px ) and (min-width: 700px){
+        @padding: 2%;
+
+        .small-container{
+            padding: 0 @padding 0 @padding;
+        }
+    }
+    
+    @media screen and ( min-width: 1250px ){
+        @padding: 14%;
+
+        .small-container{
+            padding: 0 @padding 0 @padding;
+        }
+    }
+    .small-container{
+        box-sizing: border-box;
+        height: calc(~"100% - 60px");
+    }
+
+    .big-container{
+        box-sizing: border-box;
+        height: calc(~"100% - 60px");
+        min-width: 1100px;
+        padding: 0 30px 0 30px;
+    }
+
+    a.relation-operater{
+        color: #515151;
+    }
+    a.relation-operater:hover{
+        color: @fontcolor;
+    }
+
+    .edit-object-title{
+        width: -webkit-max-content;
+        width: -moz-max-content;
+        width: max-content;
+        font-family: "微软雅黑 Bold, 微软雅黑 Regular, 微软雅黑";
+        font-weight: 700;
+        font-style: normal;
+        font-size: 20px;
+        color: #545454;
+        font-size: 18px;
+        border-bottom: 3px solid @fontcolor;
+        line-height: 30px;
+        margin-bottom: 20px;
+    }
+
+    .detail-content-globel{
+        padding-top: 40px; 
+        padding-bottom: 20px;
+        box-sizing: border-box;
+    }
+
+    .el-textarea__inner,
+    .el-button{
+        font-family: 'microsoft yahei';
+    }
+}
