@@ -499,7 +499,7 @@ export default {
         }).then(() => {
           this.updateOrderStatus(20)
 
-          this.http.post(`/financial/order-manage/orders/send-operation?`, {OrderNumber: this.orderData.OrderNumber, Sender: localStorage.getItem("UserName")}).then(res => {
+          this.http.post(`/financial/order-manage/orders/send-operation?`, {OrderNumber: this.orderData.OrderNumber, Operator: localStorage.getItem("UserName")}).then(res => {
             res.status == 201 && this.showMessage('发送订单成功', 'success')
           }).catch(err => {
             this.showMessage(`发送订单失败, ${err.response.data.Message}`, 'error')
@@ -538,10 +538,7 @@ export default {
         LastModifyUser: localStorage.getItem("UserName"),
       }
       this.http
-        .put(
-          `/financial/order-manage/orders?OrderNumber=${this.orderData.OrderNumber}`,
-          param
-        )
+        .put(`/financial/order-manage/orders?OrderNumber=${this.orderData.OrderNumber}`, param)
         .then(res => {
           if(res.status == 201) {
             this.orderData.Status = status
