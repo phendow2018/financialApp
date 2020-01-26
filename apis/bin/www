@@ -1,0 +1,43 @@
+#!/usr/bin/env node
+
+let global = require('../Common/Global');
+// let globalDBConfig = require('../Class/GlobalDBConfig');
+let httpCreate = require('../Common/HttpServer').Create;
+// let mastership = require('../Class/Mastership');
+// let WebsocketServer = require('../Common/WebsocketServer');
+// let Agent = require('../Class/Agent');
+// let tools = require('../Common/tools');
+
+
+let init = async function() {
+  global.log.writeLog("--------------------进程启动--------------------");
+
+  // //初始化globalDBConfig
+  // await globalDBConfig.init();
+  // //初始化mastership
+  // await mastership.init();
+
+  // if(!globalDBConfig.IsDBConfigPC) {
+  //   global.log.writeLog('当前机器非配置机器，进程结束');
+  //   log.writeLog("--------------------进程退出--------------------");
+  //   process.exit(0);
+  // }
+
+  //创建http服务
+  let httpPort = 8122;
+  if (!isNaN(parseInt(global.config.HttpPort)))
+    httpPort = parseInt(global.config.HttpPort);
+  httpCreate(httpPort);
+  global.log.writeLog(`开启Http监听 ${httpPort}`);
+  
+  //开启websocket服务
+  // let websocketPort = 18122;
+  // if (!isNaN(parseInt(global.config.WebsocketPort)))
+  //   websocketPort = parseInt(global.config.WebsocketPort);
+  // global.websocketServer = new WebsocketServer(websocketPort);
+  // global.log.writeLog(`开启Websocket监听 ${websocketPort}`);
+}
+
+init();
+
+

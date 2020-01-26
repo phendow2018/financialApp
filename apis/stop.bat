@@ -1,0 +1,1 @@
+./node_modules/.bin/pm2 stop  PM2.json

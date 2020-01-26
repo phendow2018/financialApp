@@ -1,0 +1,17 @@
+{
+  "apps": [
+    {
+      "name": "DeviceLibraryAgent",
+      "script": "./bin/www",
+      "cwd": "./",
+      "watch": [
+        "bin",
+        "config",
+        "routes",
+        "views"
+      ],
+      "out_file": "NULL",
+      "error_file": "NULL"
+    }
+  ]
+}

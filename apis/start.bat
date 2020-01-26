@@ -1,0 +1,1 @@
+./node_modules/.bin/pm2 start PM2.json
