@@ -30,7 +30,7 @@ class Company {
   async createCompany(postData) {
     let checkExistRet = await this.checkExist(postData.CompanyNumber);
     if (checkExistRet === true) {
-      this.LastError = `企业社会统一信用代码[${postData.CompanyNumber}]已存在`;
+      this.LastError = `统一社会信用代码[${postData.CompanyNumber}]已存在`;
       return false;
     }
 
@@ -56,7 +56,7 @@ class Company {
   async modifyCompany(CompanyNumber, postData) {
     let checkExistRet = await this.checkExist(CompanyNumber);
     if (checkExistRet === false) {
-      this.LastError = `社会统一信用代码为${CompanyNumber}的企业不存在`;
+      this.LastError = `统一社会信用代码为${CompanyNumber}的企业不存在`;
       return false;
     }
 

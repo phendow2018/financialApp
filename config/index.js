@@ -12,7 +12,7 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       '/financial':{
-        target: 'http://192.168.1.21:9999/financial-management/api/v1',  // 接口域名
+        target: 'http://localhost:9999/financial-management/api/v1/',  // 接口域名
         changeOrigin: true,  //是否跨域,
         pathRewrite: {
             '^/financial': ''

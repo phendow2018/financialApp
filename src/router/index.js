@@ -6,10 +6,11 @@ import frame from '@/packages/frame/frame'
 import {companyRouter} from './company'
 import {orderRouter} from './order'        //订单
 import {userRouter} from './user'     //用户
+import {statisticRouter} from './statistic'
 
 Vue.use(Router)
 
-const modules = companyRouter.concat(userRouter).concat(orderRouter)
+const modules = companyRouter.concat(userRouter).concat(orderRouter).concat(statisticRouter)
 
 
 let route = [{

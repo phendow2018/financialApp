@@ -458,11 +458,16 @@ export default {
       let idx = 1;
       let type = 1;
       this.timer = setInterval(() => {
+        let report1 = Math.ceil(Math.random() * 4)
+        let report2 = Math.ceil(Math.random() * 4)
+        if(report1 == report2) {
+          report2 = report1 + 1 > 4 ? 3 : report1 + 1;
+        }
         let data = {
           CompanyName: `长沙德鑫企业管理有限公司${idx}`,
           CompanyNumber: `ADEGDW457G54878${Math.floor(Math.random() * 1000)}`,
           Type: lastType,
-          ReportingNeeds: `${year}_${Math.ceil(Math.random() * 4)}`
+          ReportingNeeds: `${year}_${report1},${year}_${report2}`
         };
         lastType = lastType == 1 ? 2 : 1;
         idx++;

@@ -8,7 +8,7 @@
             <span class="name-value">{{companyData.Name}}</span>
           </div>
           <div class="companyid header-item">
-            <span class="name-label">社会统一编号：</span>
+            <span class="name-label">统一社会信用代码：</span>
             <span class="name-value">{{companyData.CompanyNumber}}</span>
           </div>
         </div>
@@ -30,7 +30,7 @@
             <span class="name-value">{{orderData.CompanyName}}</span>
           </div>
           <div class="companyid header-item">
-            <span class="name-label">社会统一编号：</span>
+            <span class="name-label">统一社会信用代码：</span>
             <span class="name-value">{{orderData.CompanyNumber}}</span>
           </div>
           <div> </div>
@@ -46,7 +46,7 @@
           </div>
           <div v-show="reportType == 'order' && isCompanyValid">
             <el-button @click="onSubmit" type="primary" :disabled="orderData.Status != 5">提交</el-button>
-            <el-button  @click="onSend"  type="success" :disabled="!(orderData.Status == 10 || orderData.Status == 20)">发送</el-button>
+            <el-button @click="onSend" type="success" :disabled="!(orderData.Status == 10 || orderData.Status == 20)">发送</el-button>
           </div>
         </div>
       </div>
@@ -383,9 +383,7 @@ export default {
     getOrderById(id) {
       let _ = this;
       this.http
-        .get(
-          `${this.preApiName}/financial/order-manage/orders?OrderNumber=${id}`
-        )
+        .get(`${this.preApiName}/financial/order-manage/orders?OrderNumber=${id}`)
         .then(res => {
           if (res.status == 200 && res.data.data.length > 0) {
             _.orderData = res.data.data[0];

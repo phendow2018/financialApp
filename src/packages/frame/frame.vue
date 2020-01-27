@@ -154,6 +154,7 @@
 	import {routeUser, routerRole, routerOrganization} from '$router/user.js'
 	import {routerOrder} from '$router/order.js'
 	import {routerCompany} from '$router/company.js'
+	import {routerStatistic} from '$router/statistic.js'
 
 	const preCls = 'platform'
 	const relationForm = [
@@ -171,15 +172,16 @@
 				title: '系统管理',
 				icon:'iconfont icon-yonghu',
 			},
-			children:[routeUser/*, routerRole, routerOrganization*/]
+			children:[routeUser, routerRole, routerOrganization]
 		},
-		// {
-		// 	meta: {
-		// 		title: '统计信息',
-		// 		icon:'iconfont icon-shiduan',
-		// 	},
-		// 	path: 'advCabs',
-		// },
+		{
+			meta: {
+				title: '统计信息',
+				icon:'iconfont icon-shiduan',
+			},
+			path: 'statistic',
+			children: [routerStatistic],
+		},
 	]
 
 	export default {
