@@ -58,6 +58,7 @@ router.beforeEach((to,from,next) => {
     if(!(getCookie('Token') != null && getCookie('Token') != '')){
       next('/login');
     }else if(to.matched.length === 0){
+      console.log('router no match' + from.name)
       from.name ? next({ name:from.name }) : next('/login');
     }else {
       next();

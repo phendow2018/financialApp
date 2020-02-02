@@ -63,7 +63,8 @@
 						:unique-opened="true"
 						:collapse="isCollapse"
 						:collapse-transition="false"
-						@open="onMenuOpened">
+						
+						>
 						<template v-for="(item, key) in menuList">
 							<el-submenu :index="key.toString()" v-if="!!item.children && item.children.length > 0" @click.native="clickFatherMenu(item)">
 								<template slot="title">
@@ -346,10 +347,10 @@
 				}
 			},
 			changeUrlPrefix(path) {
-				if(!!path) this.$router.push(`${this.preName}/${path}`)
+				if(!!path && path != this.defaultOpenModule) this.$router.push(`${this.preName}/${path}`)
 			},
 			clickFatherMenu(item) {
-				this.$router.push(`${this.preName}/${item.children[0].path}`)	
+				if(this.defaultOpenModule != item.children[0].path) this.$router.push(`${this.preName}/${item.children[0].path}`)	
 			},
 			quit() {
 				if(!!this.getToken('Token')){
@@ -363,9 +364,9 @@
 					this.$router.push(`/login`)
 				}
 			},
-			onMenuOpened(path, args){//changeUrlPrefix:当前模块名称
-				this.$router.push(`${this.preName}/${path}`)
-			},
+			// onMenuOpened(path, args){//changeUrlPrefix:当前模块名称
+			// 	this.$router.push(`${this.preName}/${path}`)
+			// },
 			getListFromRelationForm(modules) {
 				let listArr = []
 				relationForm[2].children = []

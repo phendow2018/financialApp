@@ -1,25 +1,42 @@
 <template>
   <div>
+    <div class="module-add" style="margin-top: 10px;" v-if="moduleAddShow">
+      <el-button @click="onAdd('order')">添加订单模块</el-button>
+      <el-button @click="onAdd('company')">添加企业模块</el-button>
+      <el-button @click="onAdd('user')">添加用户模块</el-button>
+      <el-button @click="onAdd('role')">添加角色模块</el-button>
+      <el-button @click="onAdd('statistic')">添加统计模块</el-button>
+    </div>
+    <div class="module-add" style="margin-top: 10px;" v-if="moduleAddShow">
+      <el-button @click="onEdit('order')">修改订单模块</el-button>
+      <el-button @click="onEdit('company')">修改企业模块</el-button>
+      <el-button @click="onEdit('user')">修改用户模块</el-button>
+      <el-button @click="onEdit('role')">修改角色模块</el-button>
+      <el-button @click="onEdit('statistic')">修改统计模块</el-button>
+    </div>
     <ICountUp :delay="delay" :endVal="endVal" :options="options" @ready="onReady" />
     <div id="chart" style="width: 400px;height: 400px;"></div>
-    <el-button @click="onAdd">添加模块</el-button>
+    
   </div>
 </template>
 
 <script>
-let echarts = require("echarts/lib/echarts");
-require("echarts/lib/chart/line");
-require("echarts/lib/component/legend");
-require("echarts/lib/component/toolbox");
-require("echarts/lib/component/tooltip");
+let echarts = require("echarts/lib/echarts")
+require("echarts/lib/chart/line")
+require("echarts/lib/component/legend")
+require("echarts/lib/component/toolbox")
+require("echarts/lib/component/tooltip")
 require('echarts/lib/component/dataZoom')
 
-import modules from "@/common/modules";
-import ICountUp from "vue-countup-v2";
+import modules from "@/common/modules"
+import ICountUp from "vue-countup-v2"
+import mixin from '$mixin/mixin.js'
 export default {
   components: { ICountUp },
+  mixins: [mixin],
   data() {
     return {
+      moduleAddShow: false,
       delay: 10,
       endVal: 0,
       options: {
@@ -38,8 +55,8 @@ export default {
   },
   methods: {
     initEcharts() {
-      let chartDom = document.getElementById("chart");
-      let chart = echarts.init(chartDom);
+      let chartDom = document.getElementById("chart")
+      let chart = echarts.init(chartDom)
 
       let option = {
         title: {
@@ -130,31 +147,40 @@ export default {
             symbol: 'rect'}, {value:1132, symbol: 'rect',symbolSize: [10, 8], symbolOffset: [-5,-5]}, 601, 234, 120, 90, 20]
           }
         ]
-      };
+      }
 
-      chart.setOption(option);
+      chart.setOption(option)
 
       chart.on("click", params => {
         console.log(params);
-      });
+      })
     },
     onReady: function(instance, CountUp) {
       //   const that = this;
       //   instance.update(that.endVal + 100);
     },
-    onAdd() {
-      this.endVal = 10000;
-      //   this.http
-      //     .post(`${this.preApiName}/financial/platform/modules`, modules.company)
-      //     .then(res => {
-      //       this.showMessage(`添加模块成功！`, "success");
-      //     })
-      //     .catch(({ response }) => {
-      //       this.showMessage(
-      //         `添加模块成功，原因：${response.data.error}！`,
-      //         "error"
-      //       );
-      //     });
+    onAdd(mod) {
+      let _this = this
+      _this.endVal = 10000
+      _this.http.post(`${_this.preApiName}/financial/platform/modules`, modules[mod])
+        .then(res => {
+          _this.showMessage(`添加模块成功！`, "success");
+        })
+        .catch(({ response }) => {
+          _this.showMessage(`添加模块失败，原因：${response.data.Message}！`,"error")
+        })
+    },
+    onEdit(mod) {
+      let _this = this
+      _this.endVal = 10000
+      let modd = modules[mod]
+      _this.http.put(`${_this.preApiName}/financial/platform/modules?Flag=${modd.Flag}`, modd)
+        .then(res => {
+          _this.showMessage(`修改模块成功！`, "success");
+        })
+        .catch(({ response }) => {
+          _this.showMessage(`修改模块失败，原因：${response.data.Message}！`,"error")
+        })
     }
   }
 };

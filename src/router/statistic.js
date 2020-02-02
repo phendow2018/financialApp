@@ -2,7 +2,6 @@ import statisticMain from '@/components/Statistic/Statistic/statistic'
 
 const routerStatistic = {
     path: 'statistic',
-    redirect: 'statistic',
     meta:{
         title:'统计信息',
         icon:'iconfont icon-shiduan'
