@@ -15,7 +15,7 @@
                 <el-input type="text" v-model="queryString" :placeholder="placeholderText"></el-input>
             </div>
             <div class="search-add">
-            <el-button type="primary" @click="actionAdd()">新建</el-button>
+            <el-button type="primary" @click="actionAdd()" v-show="showButton">新建</el-button>
             </div>  
         </div>
     </div>
@@ -47,6 +47,12 @@ export default {
             type:String,
             default() {
                 return ''
+            }
+        },
+        showButton: {
+            type: Boolean,
+            default() {
+                return true
             }
         }
     },

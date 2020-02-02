@@ -14,7 +14,7 @@
             <div class="report-item-name report-item">资产总额：</div>
             <div class="report-item" v-for="item in reportList">
               <el-input-number
-                v-model="item.Statement.LargeNumber.TotalAssets"
+                v-model="item.Statement.Asset.TotalAssets"
                 :precision="2"
                 :controls="false"
                 @focus="onInputFucus"
@@ -26,7 +26,7 @@
             <div class="report-item-name report-item">负债合计：</div>
             <div class="report-item" v-for="item in reportList">
               <el-input-number
-                v-model="item.Statement.LargeNumber.TotalLiabilities"
+                v-model="item.Statement.Liability.TotalLiabilities"
                 :precision="2"
                 :controls="false"
                 @focus="onInputFucus"
@@ -38,7 +38,7 @@
             <div class="report-item-name report-item">股东权益合计：</div>
             <div class="report-item" v-for="item in reportList">
               <el-input-number
-                v-model="item.Statement.LargeNumber.TotalEquity"
+                v-model="item.Statement.Liability.TotalEquity"
                 :precision="2"
                 :controls="false"
                 @focus="onInputFucus"
@@ -50,7 +50,7 @@
             <div class="report-item-name report-item">负债及股东权益合计：</div>
             <div class="report-item" v-for="item in reportList">
               <el-input-number
-                v-model="item.Statement.LargeNumber.TotalLiabilitiesAndShareholdersEquity"
+                v-model="item.Statement.Liability.TotalLiabilitiesOwnersEquity"
                 :precision="2"
                 :controls="false"
                 @focus="onInputFucus"
@@ -62,7 +62,7 @@
             <div class="report-item-name report-item">营业收入：</div>
             <div class="report-item" v-for="item in reportList">
               <el-input-number
-                v-model="item.Statement.LargeNumber.BusinessIncome"
+                v-model="item.Statement.Income.OperationRevenue"
                 :precision="2"
                 :controls="false"
                 @focus="onInputFucus"
@@ -74,7 +74,7 @@
             <div class="report-item-name report-item">利润总额：</div>
             <div class="report-item" v-for="item in reportList">
               <el-input-number
-                v-model="item.Statement.LargeNumber.TotalProfit"
+                v-model="item.Statement.Income.TotalProfit"
                 :precision="2"
                 :controls="false"
                 @focus="onInputFucus"
@@ -86,7 +86,7 @@
             <div class="report-item-name report-item">所得税：</div>
             <div class="report-item" v-for="item in reportList">
               <el-input-number
-                v-model="item.Statement.LargeNumber.IncomeTax"
+                v-model="item.Statement.Income.IncomeTaxExpense"
                 :precision="2"
                 :controls="false"
                 @focus="onInputFucus"
@@ -98,7 +98,7 @@
             <div class="report-item-name report-item">净利润：</div>
             <div class="report-item" v-for="item in reportList">
               <el-input-number
-                v-model="item.Statement.LargeNumber.NetProfit"
+                v-model="item.Statement.Income.NetProfit"
                 :precision="2"
                 :controls="false"
                 @focus="onInputFucus"

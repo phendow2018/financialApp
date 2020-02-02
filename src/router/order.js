@@ -3,7 +3,6 @@ import orderEdit from '@/components/Statements/Statements/statements'
 
 const routerOrder = {
     path: 'order',
-    redirect: 'order/main',
     meta:{
         title:'订单管理',
         icon:'iconfont icon-asterisks'
@@ -11,9 +10,8 @@ const routerOrder = {
 }
 
 const orderRouter = [
-    routerOrder,
     {
-        path: 'order/main',
+        path: 'order',
         name: 'orderMain',
         component: orderMain,
         meta:{

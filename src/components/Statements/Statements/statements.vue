@@ -22,8 +22,8 @@
             <span class="name-value">{{orderData.CreateTime}}</span>
           </div>
           <div style="text-align:right;color:#aaa;">
-            <a @click="onReturn" v-show="orderData.Status == 10 || orderData.Status == -1" class="small-btn">撤销</a>
-            <a @click="onCancel" v-show="!(orderData.Status == 20 || orderData.Status == -1)" class="small-btn">取消订单</a>
+            <a @click="onReturn" v-show="(orderData.Status == 10 || orderData.Status == -1) && $root.rights.includes('order_2_6')" class="small-btn">撤销</a>
+            <a @click="onCancel" v-show="(!(orderData.Status == 20 || orderData.Status == -1)) && $root.rights.includes('order_2_5')" class="small-btn">取消订单</a>
           </div>
           <div class="name header-item">
             <span class="name-label">企业名称：</span>
@@ -45,15 +45,15 @@
             <span class="name-value">{{getLastModifyUser()}}</span>
           </div>
           <div v-show="reportType == 'order' && isCompanyValid">
-            <el-button @click="onSubmit" type="primary" :disabled="orderData.Status != 5">提交</el-button>
-            <el-button @click="onSend" type="success" :disabled="!(orderData.Status == 10 || orderData.Status == 20)">发送</el-button>
+            <el-button @click="onSubmit" type="primary" :disabled="(orderData.Status != 5) " v-if="$root.rights.includes('order_2_3')">提交</el-button>
+            <el-button @click="onSend" type="success" :disabled="(!(orderData.Status == 10 || orderData.Status == 20))" v-if="$root.rights.includes('order_2_4')">发送</el-button>
           </div>
         </div>
       </div>
       <div class="main-content" v-if="isCompanyValid && initShow">
         <div class="opertion-buttons">
-          <el-button @click="onAdd" :disabled="orderData.Status == 20 || orderData.Status == 10  || orderData.Status == -1">添加</el-button>
-          <el-button @click="onSave" :disabled="orderData.Status == 20 || orderData.Status == 10  || orderData.Status == -1">保存</el-button>
+          <el-button @click="onAdd" :disabled="(orderData.Status == 20 || orderData.Status == 10  || orderData.Status == -1)" v-if="(reportType == 'order' && $root.rights.includes('order_2_1')) || (reportType == 'company' && $root.rights.includes('company_2_1'))">添加</el-button>
+          <el-button @click="onSave" :disabled="(orderData.Status == 20 || orderData.Status == 10  || orderData.Status == -1)" v-if="(reportType == 'order' && $root.rights.includes('order_2_2')) || (reportType == 'company' && $root.rights.includes('company_2_2'))">保存</el-button>
         </div>
         <el-tabs v-model="activeName">
           <el-tab-pane label="大数" name="summary" v-if="reportProp != 2">
@@ -71,9 +71,13 @@
           <el-tab-pane label="说明" name="memo" v-if="reportProp == 2"></el-tab-pane>
         </el-tabs>
       </div>
-      <div class="add-company-container" v-else-if="initShow && !isCompanyValid">
+      <div class="add-company-container" v-else-if="initShow && !isCompanyValid && $root.rights.includes('company_1_1')">
         <div class="add-company-desc">系统中不存在订单中需要的企业信息，请先点击</div>
-        <div class="add-company-btn" @click="onAddCompany"><i class="el-icon-plus"></i>添加企业</div>
+        <div class="add-company-btn" @click="onAddCompany" v-show="$root.rights.includes('company_1_1')"><i class="el-icon-plus"></i>添加企业</div>
+      </div>
+      <div class="add-company-container" v-else-if="!$root.rights.includes('company_1_1')">
+        <div class="add-company-desc">系统中不存在订单中需要的企业信息</div>
+        <div class="add-company-desc" style="color: red;">您没有添加新企业的权限，请联系管理员！</div>
       </div>
     </div>
     <el-dialog title="添加报表" :visible.sync="addReportWndVisible" width="500px">
@@ -141,7 +145,7 @@
                 </template>
               </el-radio-group>
             </el-form-item>
-            <div v-else style="color: red; font-size: 16px;padding-left: 10px;">当前订单不存在需要新增的报表~~</div>
+            <div v-else style="color: red; font-size: 16px;padding-left: 10px;">当前订单不存在需要添加的报表~~</div>
           </el-col>
         </el-row>
       </el-form>
@@ -166,74 +170,132 @@ let initReportData = {
   Year: "",
   Type: 4,
   Statement: {
-    LargeNumber: {
-      TotalAssets: 0,
-      TotalLiabilities: 0,
-      TotalEquity: 0,
-      TotalLiabilitiesAndShareholdersEquity: 0,
-      BusinessIncome: 0,
-      TotalProfit: 0,
-      IncomeTax: 0,
-      NetProfit: 0
-    },
     Asset: {
-      MonetaryFund: 0,
+      MonetaryResources: 0,
+      ShortTermInvestments: 0,
       NotesReceivable: 0,
-      AccountsReceivable: 0,
-      AdvancePayment: 0,
-      OtherReceivables: 0,
-      Stock: 0,
+      AccountReceivable: 0,
+      PrePayment: 0,
+      DividendsReceivable: 0,
+      InterestReceivable: 0,
+      ReceivableOther: 0,
+      Inventory: 0,
+      RawMaterial: 0,
+      GoodsInProcess: 0,
+      MerchandiseInventory: 0,
+      RevolvingMaterials: 0,
       OtherCurrentAssets: 0,
       TotalCurrentAssets: 0,
-      LongtermEquityInvestment: 0,
-      longtermReceivables: 0,
-      InvestmentRealEstate: 0,
+      TotalCurrentAssetsSuggest: "0.00",
+      LongTermBondInvestment: 0,
+      LongTermEquityInvestment: 0,
       FixedAssets: 0,
-      ConstructionInProgress: 0,
+      AccumulatedDepreciation: 0,
+      NetValueOfFixedAssets: 0,
+      ConstructionInProcess: 0,
+      EngineeringMaterial: 0,
+      DisposalOfFixedAssets: 0,
+      CapitalizedBiologicalAssets: 0,
+      OilAndGasAssets: 0,
       IntangibleAssets: 0,
+      DevelopmentExpenditure: 0,
       Goodwill: 0,
-      LongtermUnamortizedExpenses: 0,
-      DeferredTaxAssets: 0,
-      OtherNoncurrentAssets: 0,
-      TotalNoncurrentAssets: 0
+      EquipmentRentalDeposit: 0,
+      LongTermUnamortizedExpenses: 0,
+      DeferredIncomeTaxAssets: 0,
+      OtherNonCurrentAssets: 0,
+      TotalNonCurrentAssets: 0,
+      TotalNonCurrentAssetsSuggest: "0.00",
+      TotalAssets: 0,
+      TotalAssetsSuggest: "0.00",
     },
-    Balance: {
-      ShortTermLoan: 0,
+    Liability: {
+      ShortTermBorrowing: 0,
       NotesPayable: 0,
       AccountsPayable: 0,
-      AdvanceAccountReceivable: 0,
-      PayrollPayable: 0,
-      TaxesPayable: 0,
-      InterestPayable: 0,
-      DividendsPayable: 0,
+      UnearnedRevenue: 0, 
+      EmployeePayable: 0,
+      TaxPayable: 0,
+      AccrualInterestPayable: 0,
+      ProfitPayable: 0,
       OtherPayables: 0,
-      NoncurrentLiabilitiesDueWithinOneYear: 0,
-      OtherCurrentLiabilities: 0,
-      TotalCurrentLiabilities: 0,
-      LongtermLoan: 0,
-      LongtermAccountsPayable: 0,
-      DeferredTaxLiability: 0,
-      OtherNoncurrentLiabilities: 0,
-      TotalNoncurrentLiabilities: 0,
-      Equity: 0,
-      CapitalSurplus: 0,
-      SurplusReserves: 0,
-      SpecialReserve: 0,
+      OtherCurrentLiability: 0,
+      TotalCurrentLiability: 0,
+      TotalCurrentLiabilitySuggest: "0.00",
+      LongTermLoan: 0,
+      BondsPayable: 0,
+      LongTermPayable: 0,
+      AccountPayableSpecialFunds: 0,
+      FinanceLeasePayable: 0,
+      MajorRepairPreparation: 0,
+      AnticipationLiabilities: 0,
+      EmployeePayableMoreThanOneYear: 0,
+      DeferredIncomeTaxLiabilities: 0,
+      DeferredIncome: 0,
+      OtherNonCurrentLiability: 0,
+      TotalNonCurrentLiability: 0,
+      TotalNonCurrentLiabilitySuggest: "0.00",
+      TotalLiabilities: 0,
+      TotalLiabilitiesSuggest: "0.00",
+      PaidInCapital: 0,
+      CapitalReserve: 0,
+      EarnedSurplus: 0,
+      GeneralRiskPreparation: 0,
+      ReasonableReserve: 0,
       UndistributedProfit: 0,
-      MinorityInterest: 0
+      TranslationReserve: 0,
+      MinorityEquity: 0,
+      TotalEquity: 0,
+      TotalEquitySuggest: "0.00",
+      TotalLiabilitiesOwnersEquity: 0,
+      TotalLiabilitiesOwnersEquitySuggest: "0.00",
     },
     Income: {
-      OperatingCost: 0,
-      BusinessTaxAndSurcharges: 0,
+      OperationRevenue: 0,
+      MainBusinessIncome: 0,
+      OperatingCosts: 0,
+      BusinessTariffAndAnnex: 0,
+      ConsumptionTax: 0,
+      BusinessTax: 0,
+      UrbanMaintenanceAndConstructionTax: 0,
+      ResourcesTax: 0,
+      LandValueIncrementTax: 0,
+      LandUse_House_VehVesl_StmpTax: 0,
+      EduSurtax_MineralRsrcCompFees_SwgChrg: 0,
       OperatingMargin: 0,
-      SalesExpenses: 0,
-      ManagementCost: 0,
+      OperatingMarginSuggest: "0.00",
+      SellingExpenses: 0,
+      CostOfGoodsMaintenance: 0,
+      AdRate_BusinessPropagandizeFee: 0,
+      AdministrationExpenseCost: 0,
+      OrganizationCosts: 0,
+      BusinessEntertainment: 0,
+      ResearchExpenditure: 0,
       FinancialCost: 0,
+      InterestCost: 0,
       AssetsImpairmentLoss: 0,
-      InvestmentIncome: 0,
+      ExplorationExpenditure: 0,
+      OtherExpenses: 0,
+      IncomeFromInvestment: 0,
+      NetIncomeFromChangesInFairValue: 0,
+      ExchangeEarning: 0,
       OperatingProfit: 0,
-      NonoperatingIncome: 0,
-      NonoperatingExpenses: 0
+      OperatingProfitSuggest: "0.00",
+      NonOperatingIncome: 0,
+      PublicSubsidy: 0,
+      NonBusinessExpenditure: 0,
+      LossOnBadDebts: 0,
+      OtherProfit: 0,
+      UnrecoverableLossOnLongTermBondInvestment: 0,
+      UnrecoverableLossOnLongTermEquityInvestment: 0,
+      LossByForceMajeureFactors: 0,
+      TaxDelayCharge: 0,
+      TotalTax: 0,
+      TotalProfit: 0,
+      TotalProfitSuggest: "0.00",
+      IncomeTaxExpense: 0,
+      NetProfit: 0,
+      NetProfitSuggest: "0.00",
     }
   }
 };
@@ -358,7 +420,7 @@ export default {
       this.errOccured = false;
     },
     addReportToDb(report, callback) {
-      let newReport = Object.assign({}, initReportData);
+      let newReport = this.deepCopy(initReportData);
       newReport.Type = report.Type;
       newReport.Year =
         typeof report.Year == "string"

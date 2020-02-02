@@ -28,7 +28,7 @@
           </template>
         </el-autocomplete>
       </div>
-      <el-button type="primary" @click="onAddCompany">添加新企业</el-button>
+      <el-button type="primary" @click="onAddCompany" v-show="$root.rights.includes('company_1_1')">添加新企业</el-button>
     </div>
     <div class="company-container" v-if="companyList.length > 0">
       <vue-scroll :ops="ops" ref="globel-scroll">
@@ -42,45 +42,21 @@
           </div>
           <div></div>
           <template v-for="(item, idx) in companyList">
-            <div />
-            <div  class="company-item company-items-item" @click="linkToCompany(item)" title="跳转到企业管理页面">
+            <div></div>
+            <div  class="company-item company-items-item" @click="linkToCompany(item)" title="点击跳转到企业管理页面">
               <div>{{idx + 1}}</div>
               <div class="name" v-html="item.Name" ></div>
               <div class="number">{{item.CompanyNumber}}</div>
               <div class="company-reports-list">
-                <div class="company">
-                  <div class="year">2024</div>
+                <div class="company"  v-for="report in item.Statements">
+                  <div class="year">{{report.Year}}</div>
                   <div class="item">
-                    <span>一</span>
-                    <span>中</span>
-                    <span>三</span>
-                    <span>年</span>
+                    <template v-for="ii in report.Reports" ><span :key="ii">{{getLabel(ii).substring(0, 1)}}</span></template>
                   </div>
                 </div> 
-                <div class="company">
-                  <div class="year">2022</div>
-                  <div class="item">
-                    <span>中</span>
-                    <span>年</span>
-                  </div>
-                </div>
-                <div class="company">
-                  <div class="year">2020</div>
-                  <div class="item">
-                    <span>中</span>
-                    <span>年</span>
-                  </div>
-                </div>
-                <div class="company">
-                  <div class="year">2019</div>
-                  <div class="item">
-                    <span>三</span>
-                    <span>年</span>
-                  </div>
-                </div>
               </div>
             </div>
-            <div />
+            <div></div>
           </template>
           <div></div>
           <div class="more-company-info" v-if="moreThan100">结果超过100个，请修改条件进行更精确的查询</div>
@@ -115,6 +91,7 @@
 const preCls = "company";
 import mixin from "$mixin/mixin.js";
 export default {
+  name: 'company',
   mixins: [mixin],
   data() {
     var NameCheck = (rule, value, callback) => {
@@ -191,7 +168,7 @@ export default {
       } else {
         _.http
           .get(
-            `${_.preApiName}/financial/company-manage/companies?FuzzyQuery=${item.value}&Page=1&PerPage=100`
+            `${_.preApiName}/financial/company-manage/companies/detail?FuzzyQuery=${item.value}&Page=1&PerPage=100`
           )
           .then(res => {
             _.companyList = res.status == 200 ? res.data.data : [];

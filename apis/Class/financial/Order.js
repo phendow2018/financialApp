@@ -4,6 +4,24 @@ const tools = require('../../Common/tools');
 const TABLE_NAME = 'order';
 
 class Order {
+  /** 订单状态转字符串 */
+  static Status2String(status) {
+    if (status == -1) {
+      return `已取消`;
+    } else if (status == 0) {
+      return `新建`;
+    } else if (status == 1) {
+      return `已指派`;
+    } else if (status == 5) {
+      return `未完成`;
+    } else if (status == 10) {
+      return `已完成`;
+    } else if (status == 20) {
+      return `已发送`;
+    } else {
+      return `未知状态`;
+    }
+  }
   constructor() {
     this.dbLink = global.database;
     this.LastError = '';
@@ -136,7 +154,7 @@ class Order {
     if (tools.isNumber(postData.Status)) {
       params.Status = postData.Status;
     }
-    if (tools.isValidString(postData.Editor)) {
+    if (typeof postData.Editor == 'string') {
       params.Editor = postData.Editor;
     }
     if (tools.isValidString(postData.LastModifyUser)) {
@@ -154,35 +172,6 @@ class Order {
     }
     return {OrderNumber: OrderNumber};
   }
-  /** 操作订单状态 */
-  // async operateStatus(OrderNumber, postData) {
-  //   let exist = await this.checkExist(OrderNumber);
-  //   if (exist === false) {
-  //     this.LastError = `不存在的订单编号${OrderNumber}`;
-  //     return false;
-  //   }
-
-  //   let where = {
-  //     OrderNumber: OrderNumber,
-  //   }
-  //   let params = {};
-  //   if (tools.isNumber(postData.Status)) {
-  //     params.Status = parseInt(postData.Status);
-  //   }
-  //   if (tools.isValidString(postData.Operator)) {
-  //     params.Operator = postData.Operator;
-  //   }
-  //   if (typeof postData.Explain == 'string') {
-  //     params.Explain = postData.Explain;
-  //   }
-  //   let sql = tools.getUpdateSql(params, where, TABLE_NAME);
-  //   let ret = await this.dbLink.query(sql);
-  //   if (ret === false) {
-  //     this.LastError = this.dbLink.getLastError();
-  //     return false;
-  //   }
-  //   return {OrderNumber: OrderNumber};
-  // }
 
   /** 删除订单 */
   async deleteOrder(OrderNumber) {
@@ -279,6 +268,78 @@ class Order {
       totalCount: count,
       data: ret
     }
+  }
+
+  /** 指派订单 */
+  async assignOrder(OrderNumber, Editor, Operator) {
+    if (!tools.isValidString(OrderNumber)) {
+      this.LastError = `无效的OrderNamber参数`;
+      return false;
+    }
+
+    let retQuery = await this.queryOrder({OrderNumber: OrderNumber});
+    if (retQuery === false) {
+      this.LastError = this.dbLink.getLastError();
+      return false;
+    }
+
+    if (retQuery.totalCount <= 0 || retQuery.data.length <= 0) {
+      this.LastError = `对应订单不存在，订单编号:${OrderNumber}`;
+      return false;
+    }
+
+    if (retQuery.data[0].Status != 0) {//新建订单才能指派
+      this.LastError = `${Order.Status2String(retQuery.data[0].Status)}订单，不能指派`;
+      return false;
+    }
+
+    let data = {
+      Status: 1,
+      Editor: Editor,
+      LastModifyUser: Operator
+    }
+    let ret = await this.modifyOrder(OrderNumber, data);
+    if (ret === false) {
+      this.LastError = this.dbLink.getLastError();
+      return false;
+    }
+    return {OrderNumber: OrderNumber};
+  }
+
+  /** 取消订单指派 */
+  async assignOrderCancel(OrderNumber, Operator) {
+    if (!tools.isValidString(OrderNumber)) {
+      this.LastError = `无效的OrderNamber参数`;
+      return false;
+    }
+
+    let retQuery = await this.queryOrder({OrderNumber: OrderNumber});
+    if (retQuery === false) {
+      this.LastError = this.dbLink.getLastError();
+      return false;
+    }
+
+    if (retQuery.totalCount <= 0 || retQuery.data.length <= 0) {
+      this.LastError = `对应订单不存在，订单编号:${OrderNumber}`;
+      return false;
+    }
+
+    if (retQuery.data[0].Status > 1 || retQuery.data[0].Status < 0) {//新建订单或刚指派的订单才能取消指派
+      this.LastError = `${Order.Status2String(retQuery.data[0].Status)}订单，可能已经有人操作过，不能取消指派`;
+      return false;
+    }
+
+    let data = {
+      Status: 0,
+      Editor: "",
+      LastModifyUser: Operator
+    }
+    let ret = await this.modifyOrder(OrderNumber, data);
+    if (ret === false) {
+      this.LastError = this.dbLink.getLastError();
+      return false;
+    }
+    return {OrderNumber: OrderNumber};
   }
 };
 

@@ -41,28 +41,7 @@
               </template>
             </el-autocomplete>
           </div>
-
-          <!-- <el-checkbox v-model="onlyMe" style="margin-left: 40px;">只看我的</el-checkbox>
-          <span :class="[preCls + '-header-filter-left-label']">创建人：</span>
-          <el-select
-            :class="[preCls + '-header-filter-left-creator']"
-            v-model="creator"
-            filterable
-            remote
-            reserve-keyword
-            placeholder="请输入创建人信息"
-            :loading="creatorLoading"
-            :clearable="true"
-            @focus="getAllSigner"
-            :remote-method="searchSignerList"
-          >
-            <el-option
-              v-for="item in creatorrList"
-              :key="item.Id"
-              :label="item.Name"
-              :value="item.Account"
-            ></el-option>
-          </el-select>-->
+          <el-checkbox v-model="onlyMe" label="custom" style="margin-left: 20px;" :disabled="$root.rights.findIndex(vv => vv == 'order_1_2') < 0" @change="searchQueryString(false)">只看我的</el-checkbox>
         </div>
         <div :class="[preCls + '-header-filter-right']"></div>
       </div>
@@ -77,17 +56,15 @@
             <i class="order-status-info" style="background-color:rgb(215, 219, 226)"></i>
             <span>新增</span>
           </div>
-          <div
-            @click="changeShowMode(showMode.DEFAULT)"
-            :class="showModeSelectClass(showMode.DEFAULT)"
-          >
+          <div @click="changeShowMode(showMode.ASSIGN)" :class="showModeSelectClass(showMode.ASSIGN)">
+            <i class="order-status-info" style="background-color:rgb(180, 184, 191)"></i>
+            <span>已指派</span>
+          </div>
+          <div @click="changeShowMode(showMode.DEFAULT)":class="showModeSelectClass(showMode.DEFAULT)">
             <i class="order-status-info" style="background-color:rgb(144, 147, 153)"></i>
             <span>未提交</span>
           </div>
-          <div
-            @click="changeShowMode(showMode.SUBMIT)"
-            :class="showModeSelectClass(showMode.SUBMIT)"
-          >
+          <div @click="changeShowMode(showMode.SUBMIT)" :class="showModeSelectClass(showMode.SUBMIT)">
             <i class="order-status-info" style="background-color:rgb(32, 160, 255)"></i>
             <span>已提交</span>
           </div>
@@ -95,10 +72,7 @@
             <i class="order-status-info" style="background-color:rgb(19, 206, 102)"></i>
             <span>已发送</span>
           </div>
-          <div
-            @click="changeShowMode(showMode.CANCELED)"
-            :class="showModeSelectClass(showMode.CANCELED)"
-          >
+          <div @click="changeShowMode(showMode.CANCELED)" :class="showModeSelectClass(showMode.CANCELED)">
             <i class="order-status-info" style="background-color:rgb(255, 73, 73)"></i>
             <span>已取消</span>
           </div>
@@ -149,12 +123,29 @@
               <div class="list-content-item">{{item.Editor}}</div>
               <div class="list-content-item">{{item.CreateTime}}</div>
               <div class="list-content-item">
-                <el-button
+                <!-- <el-button
                   type="text"
                   icon="el-icon-edit"
                   size="mini"
                   @click="onLinkToEdit(item)"
-                >编辑</el-button>
+                >编辑</el-button> -->
+                <el-button 
+                    slot="reference"
+                    type="text"
+                    icon="el-icon-thumb"
+                    v-show="item.Status == 0"
+                    size="mini"
+                    @click="onAssignTo(item)"
+                  >指派给
+                </el-button>
+                
+                <!-- <el-button
+                  type="text"
+                  icon="el-icon-thumb"
+                  v-show="item.Status == 1"
+                  size="mini"
+                  @click="onCancelAssignTo(item)"
+                >取消指派</el-button> -->
               </div>
             </div>
           </div>
@@ -165,6 +156,23 @@
       </div>
     </div>
     <div></div>
+    <el-dialog
+      title="订单指派"
+      :visible.sync="dialogVisible"
+      width="400px">
+      <el-select v-model="assignUser" placeholder="请选择用户" style="width: 330px;margin-left: 20px;margin-bottom: 30px;">
+        <el-option
+          v-for="item in usersList"
+          :key="item.Name"
+          :label="item.Name"
+          :value="item.Name">
+        </el-option>
+      </el-select>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="assignOrder">确 定</el-button>
+        <el-button @click="dialogVisible = false">取 消</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -173,6 +181,7 @@ const preCls = "orderMain";
 const showMode = {
   ALL: "-2",
   NEW: "0",
+  ASSIGN: "1",
   DEFAULT: "5",
   SUBMIT: "10",
   AUDIT: "20",
@@ -233,7 +242,11 @@ export default {
       creatorLoading: false,
       creator: "",
       creatorrList: [],
-      onlyMe: true
+      onlyMe: false,
+      usersList: [],
+      assignUser: '',
+      dialogVisible: false,
+      assignOrderNumber: ''
     };
   },
 
@@ -249,7 +262,11 @@ export default {
         case "0":
           statusColor = "rgb(215, 219, 226)";
           break;
-        case 5: //未提交
+        case 1: //已指派
+        case "1":
+          statusColor = "rgb(180, 184, 191)";
+          break;
+        case 5: //未提交;
         case "5":
           statusColor = "rgb(144, 147, 153)";
           break;
@@ -273,34 +290,26 @@ export default {
       );
     },
     onLinkToCompanyEdit(item) {
-      this.$router.push(
-        `${this.preName}/company/companyEdit?companyId=${item.CompanyNumber}`
-      );
+      this.$router.push(`${this.preName}/company/companyEdit?companyId=${item.CompanyNumber}`)
     },
     handleDateChangeSearch() {
       this.searchQueryString(false);
     },
     searchQueryString(isInitSearch = true) {
-      this.currentPageInfo.pageNum = isInitSearch
-        ? this.currentPageInfo.pageNum + 1
-        : 1;
-      this.getOrderData();
+      this.currentPageInfo.pageNum = isInitSearch ? this.currentPageInfo.pageNum + 1 : 1
+      this.getOrderData()
     },
     getOrderData() {
       let _ = this;
       this.isLoading = true;
-      let qString = decodeURIComponent(this.queryString);
-      // FuzzyQuery
-      let date = this.getSearchDate();
-      let page = this.currentPageInfo;
+      let qString = decodeURIComponent(this.queryString)
+   
+      let date = this.getSearchDate()
+      let page = this.currentPageInfo
 
-      // this.loading = this.currentPageInfo.pageNum != 1
-      this.http
-        .get(
-          `${
-            this.preApiName
-          }/financial/order-manage/orders?FuzzyQuery=${qString}${
-            this.currentShowMode == -2 ? `` : `&Status=${this.currentShowMode}`
+      this.http.get(`${this.preApiName}/financial/order-manage/orders?FuzzyQuery=${qString}${
+            this.currentShowMode == -2 ? `` : `&Status=${this.currentShowMode}`}${
+            (this.$root.rights.findIndex(vv => vv == 'order_1_2') < 0  || this.onlyMe) ? `&Editor=${localStorage.getItem('UserName')}` :``
           }&OrderDate=${date}&Page=${page.pageNum}&PerPage=${page.pageSize}`
         )
         .then(res => {
@@ -359,12 +368,9 @@ export default {
 
       let date = this.getSearchDate();
       this.http
-        .get(
-          `${
-            this.preApiName
-          }/financial/order-manage/orders?FuzzyQuery=${qString}${
+        .get( `${this.preApiName}/financial/order-manage/orders?FuzzyQuery=${qString}${
             this.currentShowMode == -2 ? `` : `&Status=${this.currentShowMode}`
-          }&Page=1&PerPage=20`
+          }${this.onlyMe ? `&Editor=${localStorage.getItem('UserName')}` : ``}&Page=1&PerPage=20`
         )
         .then(res => {
           let list = [];
@@ -438,7 +444,6 @@ export default {
 
       return { StartCreateTime: StartDate, EndCreateTime: EndDate };
     },
-
     onScroll(info) {
       if (info.process > 0.9 && !this.isLoading && !this.isNoMoreData) {
         this.addMoreData();
@@ -450,6 +455,45 @@ export default {
     },
     reFormatString(name) {
       return name.replace(this.queryString, `<span style="color:#409EFF">${this.queryString}</span>`)
+    },
+    onAssignTo(item) {
+      this.assignUser = ''
+      this.assignOrderNumber = item.OrderNumber
+      this.dialogVisible = true
+    },
+    assignOrder() {
+      let param = {
+        Editor: this.assignUser,
+        Operator: localStorage.getItem('UserName'),
+        Orders: [{OrderNumber: this.assignOrderNumber}]
+      }
+      
+      this.http.post(`${this.preApiName}/financial/order-manage/orders/assign-operation`, param).then(res => {
+        if(res.status == 201) {
+          this.orderList.map(v => {
+            if(v.OrderNumber == this.assignOrderNumber){
+              v.Status = 1
+              v.Editor = this.assignUser
+              v.visible = false
+            }
+          })
+          this.dialogVisible = false
+        } else {
+          this.showMessage(`指派失败`, 'error')
+        }
+
+        this.assignOrderNumber = ''
+      })
+    },
+    onCancelAssignTo(item) {
+
+    },
+    getUserList() {
+      this.http.get(`${this.preApiName}/financial/platform/users`).then(res => {
+        if(res.status == 200) {
+          this.usersList = res.data.data
+        }
+      })
     },
     createRandomOrder() {
       let _this = this;
@@ -482,6 +526,8 @@ export default {
   },
   created() {
     // this.createRandomOrder()
+    this.getUserList()
+    this.onlyMe = this.$root.rights.findIndex(vv => vv == 'order_1_2') < 0
   },
   watch: {
     currentShowMode() {
@@ -494,14 +540,6 @@ export default {
         this.searchQueryString(false);
       }
     }
-  },
-  activated() {
-    // this.$root.$on("frame-scroll", this.onScroll);
-    // if (!this.$root.account) {
-    //   this.$root.$on("UserOnload", this.searchQueryString);
-    // } else {
-    //   this.searchQueryString();
-    // }
   },
   computed: {
     disabled() {

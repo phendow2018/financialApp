@@ -1,5 +1,6 @@
 const global = require('../../Common/Global');
 const tools = require('../../Common/tools');
+const UserRights = require('../platform/UserRights');
 const crypto = require('crypto'); 
 const crc32 = require('js-crc').crc32;
 
@@ -97,6 +98,12 @@ class LoginUser {
     let UserNameBase64 = Buffer.from(UserName).toString('base64');
     let Token = this.createToken(user);
 
+    let userRightsDeal = new UserRights();
+    let rightsRet = await userRightsDeal.getRoles(user);
+    if (rightsRet === false) {
+      rightsRet = [];
+    }
+
     _this.setCookie(TokenKey, Token, 30*60);
     _this.setCookie(AccountKey, user, 30*60);
     _this.setCookie(UserNameKey, UserNameBase64, 30*60);
@@ -104,6 +111,7 @@ class LoginUser {
       Token: Token,
       UserAccount: user,
       UserName: UserName,
+      Roles: rightsRet,
     };
   }
 

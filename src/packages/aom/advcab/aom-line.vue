@@ -72,6 +72,12 @@ export default {
                 return true
             }
         },
+        showDeleteButton: {
+            type: Boolean,
+            default() {
+                return true
+            }
+        },
         deleteButtonText:{
             type:String,
             default(){
@@ -173,7 +179,7 @@ export default {
             }
         },
         showDelete(item){
-            if(item.Level == 0){
+            if(item.Level == 0 || !this.showDeleteButton){
                 return false
             }else{
                 return true

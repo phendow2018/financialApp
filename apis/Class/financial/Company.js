@@ -30,7 +30,7 @@ class Company {
   async createCompany(postData) {
     let checkExistRet = await this.checkExist(postData.CompanyNumber);
     if (checkExistRet === true) {
-      this.LastError = `统一社会信用代码[${postData.CompanyNumber}]已存在`;
+      this.LastError = `企业社会统一信用代码[${postData.CompanyNumber}]已存在`;
       return false;
     }
 
@@ -56,7 +56,7 @@ class Company {
   async modifyCompany(CompanyNumber, postData) {
     let checkExistRet = await this.checkExist(CompanyNumber);
     if (checkExistRet === false) {
-      this.LastError = `统一社会信用代码为${CompanyNumber}的企业不存在`;
+      this.LastError = `社会统一信用代码为${CompanyNumber}的企业不存在`;
       return false;
     }
 
@@ -152,6 +152,53 @@ class Company {
       data: ret
     };
   }
+
+  /** 查询企业，联查报表基础信息 */
+  async queryCompanyDeatil(queryData) {
+    let ret = await this.queryCompany(queryData);
+    if (ret === false) {
+      return false;
+    }
+
+    if (!tools.isArray(ret.data)) {
+      this.LastError = `查询结果返回值不为数组`;
+      return false;
+    }
+
+    for (let t of ret.data) {
+      let sql = `SELECT \`Year\`, \`Type\` FROM \`company_statement\` 
+        WHERE \`CompanyNumber\`=${tools.MysqlEscape(t.CompanyNumber)}
+        ORDER BY \`Year\` DESC, Type`;
+      let retStatement = await this.dbLink.query(sql);
+      if (retStatement === false) {
+        this.LastError = this.dbLink.getLastError();
+        return false;
+      }
+
+      t.Statements = [];
+      for (let r of retStatement) {
+        let statement = findByYear(t.Statements, r.Year)
+        if (statement === null) {
+          t.Statements.push({
+            Year: r.Year,
+            Reports: [r.Type]
+          })
+        } else {
+          statement.Reports.push(r.Type);
+        }
+      }
+      // t.Statements = retStatement;
+    }
+    return ret;
+  }
 };
+
+var findByYear = function(Statements, year) {
+  for (let t of Statements) {
+    if (t.Year == year)
+      return t;
+  }
+  return null;
+}
 
 module.exports = Company;

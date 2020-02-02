@@ -499,7 +499,7 @@ QichachaReport.prototype.makeFianacialDetailFinancialRatiosOfChange = function(o
   for (let item of statements) {
     let b = this.financialRatiosOfChangeDefault();
     if (tools.isNumber(item.Year)) 
-      b.annual = item.Year;
+      b.annual = `${item.Year}`;
   
     let statement = item.Statement;
 
@@ -511,6 +511,8 @@ QichachaReport.prototype.makeFianacialDetailFinancialRatiosOfChange = function(o
       b.totalAssets = `${statement.FinancialRatiosOfChange.TotalAssets}`;
     if (typeof statement.FinancialRatiosOfChange == 'object' && tools.isNumber(statement.FinancialRatiosOfChange.TotalLiabilities))
       b.totalLiabilities = `${statement.FinancialRatiosOfChange.TotalLiabilities}`;
+    if (typeof statement.FinancialRatiosOfChange == 'object' && tools.isNumber(statement.FinancialRatiosOfChange.TotalOwnersEquity))
+      b.totalOwnersEquity = `${statement.FinancialRatiosOfChange.TotalOwnersEquity}`;
     if (typeof statement.FinancialRatiosOfChange == 'object' && tools.isNumber(statement.FinancialRatiosOfChange.TotalCurrentAssets))
       b.totalCurrentAssets = `${statement.FinancialRatiosOfChange.TotalCurrentAssets}`;
     if (typeof statement.FinancialRatiosOfChange == 'object' && tools.isNumber(statement.FinancialRatiosOfChange.TotalCurrentLiability))
@@ -529,45 +531,38 @@ QichachaReport.prototype.makeFianacialDetailFinancialRatios = function(orderInfo
   for (let item of statements) {
     let b = this.financialRatiosDefault();
     if (tools.isNumber(item.Year)) 
-      b.annual = item.Year;
+      b.annual = `${item.Year}`;
   
     let statement = item.Statement;
 
-    if (typeof statement.FinancialRatios == 'object' && tools.isNumber(statement.FinancialRatios.GrossProfitRate))
-      b.grossProfitRate = `${statement.FinancialRatios.GrossProfitRate}`;
-    if (typeof statement.FinancialRatios == 'object' && tools.isNumber(statement.FinancialRatios.NetSalesRate))
-      b.netSalesRate = `${statement.FinancialRatios.NetSalesRate}`;
-    if (typeof statement.FinancialRatios == 'object' && tools.isNumber(statement.FinancialRatios.NetAssetInterestRate))
-      b.netAssetInterestRate = `${statement.FinancialRatios.NetAssetInterestRate}`;
     if (typeof statement.FinancialRatios == 'object' && tools.isNumber(statement.FinancialRatios.ReturnOnEquity))
       b.returnOnEquity = `${statement.FinancialRatios.ReturnOnEquity}`;
-    if (typeof statement.FinancialRatios == 'object' && tools.isNumber(statement.FinancialRatios.CurrentRatio))
-      b.currentRatio = `${statement.FinancialRatios.CurrentRatio}`;
-    
-    if (typeof statement.FinancialRatios == 'object' && tools.isNumber(statement.FinancialRatios.QuickRatio))
-      b.quickRatio = `${statement.FinancialRatios.QuickRatio}`;
-    if (typeof statement.FinancialRatios == 'object' && tools.isNumber(statement.FinancialRatios.EquityRatio))
-      b.equityRatio = `${statement.FinancialRatios.EquityRatio}`;
-    if (typeof statement.FinancialRatios == 'object' && tools.isNumber(statement.FinancialRatios.AssetLiabilityRatio))
-      b.assetLiabilityRatio = `${statement.FinancialRatios.AssetLiabilityRatio}`;
-    if (typeof statement.FinancialRatios == 'object' && tools.isNumber(statement.FinancialRatios.AccountsReceivableTurnover))
-      b.accountsReceivableTurnover = `${statement.FinancialRatios.AccountsReceivableTurnover}`;
-    if (typeof statement.FinancialRatios == 'object' && tools.isNumber(statement.FinancialRatios.AccountsReceivableTurnoverDays))
-      b.accountsReceivableTurnoverDays = `${statement.FinancialRatios.AccountsReceivableTurnoverDays}`;
-    
-    if (typeof statement.FinancialRatios == 'object' && tools.isNumber(statement.FinancialRatios.InventoryTurnover))
-      b.inventoryTurnover = `${statement.FinancialRatios.InventoryTurnover}`;
-    if (typeof statement.FinancialRatios == 'object' && tools.isNumber(statement.FinancialRatios.InventoryTurnoverDays))
-      b.inventoryTurnoverDays = `${statement.FinancialRatios.InventoryTurnoverDays}`;
+    if (typeof statement.FinancialRatios == 'object' && tools.isNumber(statement.FinancialRatios.ReturnOnAssets))
+      b.returnOnAssets = `${statement.FinancialRatios.ReturnOnAssets}`;    
+    if (typeof statement.FinancialRatios == 'object' && tools.isNumber(statement.FinancialRatios.GrossProfitRate))
+      b.grossProfitRate = `${statement.FinancialRatios.GrossProfitRate}`;      
+    if (typeof statement.FinancialRatios == 'object' && tools.isNumber(statement.FinancialRatios.NetSalesRate))
+      b.netSalesRate = `${statement.FinancialRatios.NetSalesRate}`;
     if (typeof statement.FinancialRatios == 'object' && tools.isNumber(statement.FinancialRatios.TotalAssetsTurnover))
       b.totalAssetsTurnover = `${statement.FinancialRatios.TotalAssetsTurnover}`;
+
+    if (typeof statement.FinancialRatios == 'object' && tools.isNumber(statement.FinancialRatios.CurrentAssetsTurnover))
+      b.currentAssetsTurnover = `${statement.FinancialRatios.CurrentAssetsTurnover}`;
+    if (typeof statement.FinancialRatios == 'object' && tools.isNumber(statement.FinancialRatios.AccountsReceivableTurnover))
+      b.accountsReceivableTurnover = `${statement.FinancialRatios.AccountsReceivableTurnover}`;
+    if (typeof statement.FinancialRatios == 'object' && tools.isNumber(statement.FinancialRatios.AssetLiabilityRatio))
+      b.assetLiabilityRatio = `${statement.FinancialRatios.AssetLiabilityRatio}`;      
+    if (typeof statement.FinancialRatios == 'object' && tools.isNumber(statement.FinancialRatios.CurrentRatio))
+      b.currentRatio = `${statement.FinancialRatios.CurrentRatio}`;    
+    if (typeof statement.FinancialRatios == 'object' && tools.isNumber(statement.FinancialRatios.QuickRatio))
+      b.quickRatio = `${statement.FinancialRatios.QuickRatio}`;
+
     if (typeof statement.FinancialRatios == 'object' && tools.isNumber(statement.FinancialRatios.RevenueGrowthRate))
       b.revenueGrowthRate = `${statement.FinancialRatios.RevenueGrowthRate}`;
     if (typeof statement.FinancialRatios == 'object' && tools.isNumber(statement.FinancialRatios.GrossProfitGrowthRate))
       b.grossProfitGrowthRate = `${statement.FinancialRatios.GrossProfitGrowthRate}`;
-    
     if (typeof statement.FinancialRatios == 'object' && tools.isNumber(statement.FinancialRatios.GrowthRateOfTotalAssets))
-      b.growthRateOfTotalAssets = `${statement.FinancialRatios.GrowthRateOfTotalAssets}`;
+      b.growthRateOfTotalAssets = `${statement.FinancialRatios.GrowthRateOfTotalAssets}`; 
 
     financialRatios.push(b);
   }

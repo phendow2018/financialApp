@@ -38,7 +38,7 @@ let clientPost = async function (ipAddr, url, port, postData, method) {
         });
         req.setNoDelay(true);
         // req.setSocketKeepAlive(false,2);
-        req.setTimeout(5000, function () {
+        req.setTimeout(10000, function () {
             let retData = {
                 statusCode: 408,
                 data: `request error:超时`

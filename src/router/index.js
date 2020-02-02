@@ -42,7 +42,7 @@ router.beforeEach((to,from,next) => {
   var getCookie = function(name) {
     let arr = document.cookie.match(new RegExp("(^| )"+name+"=([^;]*)(;|$)"));
     if(arr != null) {
-        return unescape(arr[2]);
+      return unescape(arr[2]);
     }
     return null;
   };
@@ -55,7 +55,7 @@ router.beforeEach((to,from,next) => {
   //   } 
   // }else 
   if(to.path !== '/login'){
-    if(!(getCookie('Token') != null && getCookie('Token') != '' && localStorage.getItem('isLogin') == '1')){
+    if(!(getCookie('Token') != null && getCookie('Token') != '')){
       next('/login');
     }else if(to.matched.length === 0){
       from.name ? next({ name:from.name }) : next('/login');

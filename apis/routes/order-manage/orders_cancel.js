@@ -42,7 +42,7 @@ OrderCancel.prototype.check = async function(postData) {
   }
 
   if (ret.data[0].Status == 20) {//已完成的订单才能发送
-    this.LastError = `已发送订单不能取消`;
+    this.LastError = `${Order.Status2String(ret.data[0].Status)}订单不能取消`;
     this.Code = 201;
     return false;
   }

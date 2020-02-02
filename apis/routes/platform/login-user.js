@@ -18,6 +18,7 @@ LoginUser.prototype.create = async function(){
     let ret = await loginUser.Login(postData.Account, postData.Password);
 
     if(ret === false){
+        _this.Code = 301;
         _this.LastError = loginUser.getLastError();
         _this.responseError();
     }else{
@@ -31,6 +32,7 @@ LoginUser.prototype.delete = async function(){
     let loginUser = new LoginUserDeal(_this.ctx);
     let ret = await loginUser.Logout();
     if(ret === false){
+        _this.Code = 301;
         _this.LastError = loginUser.getLastError();
         _this.responseError();
     }else{

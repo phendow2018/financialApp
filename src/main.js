@@ -54,9 +54,6 @@ Vue.use(gfui)
 import '$static/icon/iconfont.css'
 import '$static/css/buttonsscope.less'
 
-// import inlineList from '@/components/EditAdvBill/editAdvBill/inlineList.vue'  //editAdvBill模块table中list组件
-// Vue.component('inlineList', inlineList)
-
 Vue.config.productionTip = false
 Vue.prototype.preName = '/platform'
 Vue.prototype.preApiName = ''
@@ -88,9 +85,9 @@ const vueRoot = new Vue({
     return {
       token: null,
       account: null,
-      rights: null,
-      //是否缓存OrderEdit
-      isKeepAliveOrderEdit: [],//['contract-main', 'orderMain'],
+      rights: [],
+      modules: [],
+      isKeepAliveOrderEdit: [],//['orderMain', 'company'],
       tempObject: {}
     }
   }

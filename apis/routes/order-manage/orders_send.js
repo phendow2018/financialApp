@@ -41,8 +41,8 @@ OrderSend.prototype.check = async function(postData) {
     return false;
   }
 
-  if (ret.data[0].Status != 10) {//已完成的订单才能发送
-    this.LastError = `不是已完成的订单，不能发送`;
+  if (!(ret.data[0].Status == 10 || ret.data[0].Status == 20)) {//已完成的订单才能发送
+    this.LastError = `${Order.Status2String(ret.data[0].Status)}订单，不能发送`;
     this.Code = 201;
     return false;
   }

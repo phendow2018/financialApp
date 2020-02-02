@@ -1,7 +1,7 @@
 <template>
     <ul>
         <li :key='advCab.Id' v-for="advCab in copyData" v-show="copyData.length !== 0 ">
-            <aom-line :item="advCab" @on-edit="onEdit" @on-delete="onDelete" @on-todetail="onTodetail" @edit-right="eidtRight" :enableToLink="enableToLink" @toUserRole="toUserRole" :showRightEditButton="showRightEditButton" :showEditButton="showEditButton">
+            <aom-line :item="advCab" @on-edit="onEdit" @on-delete="onDelete" @on-todetail="onTodetail" @edit-right="eidtRight" :enableToLink="enableToLink" @toUserRole="toUserRole" :showRightEditButton="showRightEditButton" :showEditButton="showEditButton" :showDeleteButton="showDeleteButton">
             </aom-line>
         </li>
         <div class="no-relation-data" v-show="(listData && listData.length === 0)">没有相关数据!</div>
@@ -33,7 +33,13 @@ export default {
             default(){
                 return true
             }
-        }
+        },
+        showDeleteButton: {
+            type: Boolean,
+            default() {
+                return true
+            }
+        },
     },
     data(){
         return {

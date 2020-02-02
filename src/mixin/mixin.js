@@ -87,16 +87,7 @@ export default {
       return map[toString.call(obj)];
     },
     getToken(Name) {
-      var strcookie = document.cookie; //获取cookie字符串
-      var arrcookie = strcookie.split("; "); //分割
-      //遍历匹配
-      for (var i = 0; i < arrcookie.length; i++) {
-        var arr = arrcookie[i].split("=");
-        if (arr[0] == Name) {
-          return arr[1];
-        }
-      }
-      return "";
+      return this.getCookie(Name)
     },
     getLabel(Type) {
       let type = '未知'
@@ -175,6 +166,31 @@ export default {
     },
     backToMain() {
       this.$router.go(-1);
+    },
+    setCookie(name, value, time) {
+      var exp = new Date();
+      if (time == undefined) time = 24 * 60 * 60 * 1000
+      exp.setTime(exp.getTime() + time);
+      document.cookie = `${name}=${escape(value)};expires=${exp.toGMTString()};path=/`;
+    },
+    getCookie(name) {
+      var strcookie = document.cookie; //获取cookie字符串
+      var arrcookie = strcookie.split("; "); //分割
+      //遍历匹配
+      for (var i = 0; i < arrcookie.length; i++) {
+        var arr = arrcookie[i].split("=");
+        if (arr[0] == name) {
+          return arr[1];
+        }
+      }
+      return "";
+    },
+    delCookie(name) {
+      var exp = new Date();
+      exp.setTime(exp.getTime() - 1);
+      var cval = getCookie(name);
+      if (cval != null)
+        document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString();
     }
   }
 }

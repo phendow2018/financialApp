@@ -13,7 +13,8 @@ class DBLog {
   async writeLog(user='', position='', module='', content='') { 
     let id = tools.createUuid();
     let time = new Date();
-    let sql = this.makeInsertSql(id, time, user, position, module, content);
+    let userName = await this.getUserName(user);
+    let sql = this.makeInsertSql(id, time, user, userName, position, module, content);
     if (!tools.isValidString(sql)) { 
       this.LastError = `无效的sql语句`;
       return false;
@@ -58,9 +59,21 @@ class DBLog {
   }
 }
 
-DBLog.prototype.makeInsertSql = function(id, time, user='', position='', module='', content='') {
+DBLog.prototype.getUserName = async function(account) {
+  let sql = `SELECT \`Name\` FROM \`user\` WHERE \`Account\`=${tools.MysqlEscape(account)}`;
+  let ret = await this.dbLink.query(sql);
+  if (ret === false || ret.length <= 0) {
+    return "";
+  }
+  return ret[0].Name;
+}
+
+DBLog.prototype.makeInsertSql = function(id, time, user='', userName='', position='', module='', content='') {
   if (!tools.isValidString(user)) {
     user = '';
+  }
+  if (!tools.isValidString(userName)) {
+    userName = '';
   }
   if (!tools.isValidString(position)) {
     position = '';
@@ -73,9 +86,9 @@ DBLog.prototype.makeInsertSql = function(id, time, user='', position='', module=
   }
   let sql = '';
   if (global.database.dbConfig.Type.toLocaleUpperCase() == 'MYSQL') {
-    let fields = `\`Id\`, \`Time\`, \`User\`, \`Position\`, \`Module\`, \`Content\``;
+    let fields = `\`Id\`, \`Time\`, \`User\`, \`UserName\`, \`Position\`, \`Module\`, \`Content\``;
     let values = `${tools.MysqlEscape(id)}, ${tools.MysqlEscape(time.format('yyyy-MM-dd HH:mm:ss.S'))}`;
-    values += `,${tools.MysqlEscape(user)}, ${tools.MysqlEscape(position)}, ${tools.MysqlEscape(module)}, ${tools.MysqlEscape(content)}`;
+    values += `,${tools.MysqlEscape(user)}, ${tools.MysqlEscape(userName)}, ${tools.MysqlEscape(position)}, ${tools.MysqlEscape(module)}, ${tools.MysqlEscape(content)}`;
     sql = `INSERT INTO \`log\`(${fields}) VALUES(${values})`;
   }
   return sql;
@@ -98,6 +111,9 @@ DBLog.prototype.makeSearchSql = function(queryParams) {
     if (tools.isValidString(queryParams.User)) {
       where += ` AND \`User\`=${tools.MysqlEscape(queryParams.User)}`;
     }
+    if (tools.isValidString(queryParams.UserName)) {
+      where += ` AND \`User\`=${tools.MysqlEscape(queryParams.UserName)}`;
+    }
     if (tools.isValidString(queryParams.Position)) {
       where += ` AND \`Position\`=${tools.MysqlEscape(queryParams.Position)}`;
     }
@@ -106,7 +122,7 @@ DBLog.prototype.makeSearchSql = function(queryParams) {
     }
     if (tools.isValidString(queryParams.FuzzyQuery)) {
       let likeString = tools.MysqlEscape(`%${queryParams.FuzzyQuery}%`);
-      where += ` AND (\`User\` LIKE ${likeString} OR \`Position\` LIKE ${likeString} OR \`Module\` LIKE ${likeString} OR \`Content\` LIKE ${likeString})`;
+      where += ` AND (\`User\` LIKE ${likeString} OR \`UserName\` LIKE ${likeString} OR \`Position\` LIKE ${likeString} OR \`Module\` LIKE ${likeString} OR \`Content\` LIKE ${likeString})`;
     }
 
     sqlQueryCount = `SELECT COUNT(1) AS COUNT FROM \`log\` ${where}`;
@@ -131,7 +147,7 @@ DBLog.prototype.makeSearchSql = function(queryParams) {
         sort = ` ORDER BY ${SortBy} ${SortType}`;        
       }  
     }
-    sqlQueryData = `SELECT \`Id\`,DATE_FORMAT(Time, '%Y-%m-%d %H:%i:%S') AS Time,\`User\`,\`Position\`,\`Module\`,\`Content\` FROM \`log\` ${where} ${sort} ${limit}`;
+    sqlQueryData = `SELECT \`Id\`,DATE_FORMAT(Time, '%Y-%m-%d %H:%i:%S') AS Time,\`User\`,\`UserName\`,\`Position\`,\`Module\`,\`Content\` FROM \`log\` ${where} ${sort} ${limit}`;
   }
   return {
     sqlQueryCount: sqlQueryCount,

@@ -39,8 +39,8 @@ OrderSave.prototype.check = async function(postData) {
     return false;
   }
 
-  if (ret.data[0].Status != 0 && ret.data[0].Status != 5) {//新建订单和已保存的订单才能保存
-    this.LastError = `不是草稿订单，不能保存`;
+  if (ret.data[0].Status < 0 || ret.data[0].Status >= 10) {//新建订单和已保存的订单才能保存
+    this.LastError = `${Order.Status2String(ret.data[0].Status)}订单，不能保存`;
     this.Code = 201;
     return false;
   }

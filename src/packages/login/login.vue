@@ -58,13 +58,15 @@
     </div>
 </template>
 <script>
+import RightConvert from '@/common/right'
 export default {
     data(){
         return{
             username: '',
             password: '',
             error: null,
-            isLogining: false
+            isLogining: false,
+            RightConvert: new RightConvert()
         }
     },
     created() {
@@ -98,16 +100,54 @@ export default {
             }).then( res => {
                 _.isLogining = false
                 if(res.status == 201){
-                    
+                    let {rights, modules} = _.combineRightList(res.data.Roles)
                     localStorage.setItem('UserName', res.data.UserName)
                     localStorage.setItem('isLogin', 1)
+                    localStorage.setItem('rights', rights)
+                    localStorage.setItem('modules', modules)
                     _.$router.push('/platform')
                 }
             }).catch(err => {
+                _.$root.roles = []
                 _.isLogining = false
                 _.error = err.response.data.Message
             })
             return;
+        },
+        combineRightList(roles) { //合并各个角色的权限 roles[0].Rights参考 common/modules内各个模块的权限
+            let rightsArr = [],modulesArr = [],_ = this
+                
+            roles.forEach(v => {
+                let {rights, modules} = _.RightConvert.toString(v.Rights)
+
+                rightsArr = [...rightsArr, ...rights]
+                modulesArr = [...modules, ...modulesArr]
+                // v.Rights.forEach(vv => {
+                //     let mods = [...modules, vv.Flag]
+                //     let rigs = _.decodeRight(vv.Flag, vv.Functions)
+
+                //     rights = [...rights, ...(_.decodeRight(vv.Flag, vv.Functions))]
+                //     modules = mods
+                // })
+            })
+
+            return {rights: [...new Set(rightsArr)], modules: [...new Set(modulesArr)]}
+        },
+        decodeRight(flag, Functions) {
+            if(typeof Functions == 'object') {
+                let arr = []
+                Functions.forEach(v => {
+                    let prefix = `${flag}_${v.id}`
+
+                    return v.functions.forEach((vv) => {
+                        arr.push(`${prefix}_${vv.id}`)
+                    })
+                })
+
+                return arr
+            } else {
+                return functions
+            }
         },
         funFocus(userPassword, frameLine){
             // $('.user-password-line').css('border','1px solid #eaeaea');

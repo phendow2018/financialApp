@@ -28,9 +28,11 @@ UserPassword.prototype.doUpdate = async function(){
     let Sql = `Select Count(*) AS Count From user Where Account = ${tools.MysqlEscape(queryData.Account)} AND Password = ${tools.MysqlEscape(postData.OldPassword)}`
     let Count = await _this.dbLink.query(Sql);
     if(Count === false){
+        _this.Code = 301;
         _this.LastError = _this.dbLink.getLastError();
         return false;
     }else if(Count[0].Count <= 0){
+        _this.Code = 302;
         _this.LastError = `原账号密码错误`;
         return false;   
     }
@@ -38,6 +40,7 @@ UserPassword.prototype.doUpdate = async function(){
     Sql = `update user set Password = ${tools.MysqlEscape(postData.NewPassword)} Where Account = ${tools.MysqlEscape(queryData.Account)} `
     let ret = await _this.dbLink.query(Sql);
     if(ret === false){
+        _this.Code = 301;
         _this.LastError = _this.dbLink.getLastError();
         return false;
     }

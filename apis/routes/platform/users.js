@@ -135,34 +135,12 @@ users.prototype.doDelete = async function(){
     // let Name = await this.GetNameByAccount(queryData.Account);
     let ret = await _this.dbLink.query(Sql);
     if(ret === false){
+        _this.Code = 301;
         _this.LastError = _this.dbLink.getLastError();
         return false;
     }
 
     return true;
-}
-
-let formatUserRole = function(users,userroles){
-    try{
-        for(let tempUser of users){
-            tempUser.UserRoles = [];
-            tempUser.IsAdmin = 0;
-            if(typeof tempUser.CreateTime == 'object' && tempUser.CreateTime != null)
-                tempUser.CreateTime = tempUser.CreateTime.format('yyyy-MM-dd HH:mm:ss.S');
-            for(let i =0; i < userroles.length; i++){
-                if(userroles[i].UserAccount === tempUser.Account){
-                    if(userroles[i].IsAdmin == 1)
-                        tempUser.IsAdmin = 1;
-                    delete userroles[i].UserAccount;
-                    delete userroles[i].IsAdmin;
-                    tempUser.UserRoles.push(userroles[i]);
-                    userroles.splice(i--,1);
-                }
-            }   
-        }
-    }catch(e){
-
-    }
 }
 
 users.prototype.doRead = async function(){
@@ -222,10 +200,11 @@ users.prototype.doRead = async function(){
     Sql = `Select Account,Name,Password,Level,Sex,Email,Description from user ${Where} ${Limit}`;
     let Users = await _this.dbLink.query(Sql);
     if(Users === false){
+        _this.Code = 301;
         _this.LastError = _this.dbLink.getLastError();
         return false;
     }
-    return {data:Users, totalCount:Count[0].Count};
+    return {totalCount:Count[0].Count, data:Users};
 }
 
 users.prototype.create = async function(){

@@ -57,9 +57,6 @@
                                 </div>
                             </div>
                         </div>
-                         <!-- <div slot="titleButton">
-                            <el-button @click="editSelf" class="button-edit">编辑</el-button>
-                        </div> -->
                     </aom-panel>
                 </div>
                 <div class="detail-content content-right">
@@ -68,14 +65,6 @@
                         <div>关联用户</div>
                     </div>
                     <div slot="content">
-                        <!-- <el-form ref="form" :model="program" :rules="rule" label-width="80px" style="width: 80%;margin-left: 10%;padding-top: 20px;" class="programForm">
-                            <el-form-item label="用户 :" prop="Name">
-                                <el-input v-model="program.Name" placeholder="请输入用户名称"></el-input>
-                            </el-form-item>
-                            <el-form-item>
-                                <el-button type="primary" @click="addProgram">关联</el-button>
-                            </el-form-item>
-                        </el-form> -->
                         <el-form :model="program" label-width="100px" ref="form" :rules="rule" style="width: 80%;margin-left: 10%;padding-top: 20px;">
                             <el-form-item label="用户:" prop="Name">
                                 <div class="input-content">
@@ -106,7 +95,6 @@
                             <div>关联的用户<i class="total-count-big-tipe">{{childInfo.length}}</i></div>
                         </div>
                         <div slot="content">
-                            <!-- <aom-panel-delete v-show="childInfo.length > 0" v-for="(item , index) in childInfo" :idx ="index" :item="item" :key="item.Id" :onDelete="onDeleteProgram"></aom-panel-delete> -->
                              <ul class="detail-item">
                                 <li v-for="(item, index) in childInfo"  :key="index">
                                     <aom-line  :item="item" @on-todetail="onToDetail" @on-edit="onEdit" :showEditButton="false" deleteButtonText='解除关联' @on-delete="onDeleteProgram">
@@ -177,7 +165,7 @@ export default {
         initData(){
             let id = this.id = this.$route.query.id
             this.roleInfo = [];
-            this.http.get(`${this.preApiName}/Platform/Roles?Id=${id}`).then((res) => {
+            this.http.get(`${this.preApiName}/financial/platform/roles?Id=${id}`).then((res) => {
                 let data = res.data.data.length ? res.data.data[0] : {};
                 this.roleRight = data.Rights = JSON.parse(data.Rights)
                 data.RightDescription = data.Rights ?  `共${data.Rights.length}项`: `共0项`

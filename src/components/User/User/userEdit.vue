@@ -6,19 +6,18 @@
                  <aom-edit-tips editTipsName='用户编辑' :editItemName="editUserName"></aom-edit-tips>
             </div>
         </div>
-        
         <div :class="[preCls + '-content']" v-loading="isLoading">
             <el-form :model="userForm" label-width="100px" class="demo-ruleForm" :rules="rules" ref="ruleForm" @submit.prevent="updown">
             <div class="edit-object-title">用户信息</div>
             <div class="time-msg-form">             
                     <el-form-item label="用户名" prop="UserName">
-                        <el-input type="text" autocomplete="off" v-model="userForm.UserName" placeholder="请输入用户名" :disabled="isEdit"></el-input>      
+                        <el-input type="text" autocomplete="off" v-model="userForm.UserName" placeholder="请输入用户名，用于登陆" :disabled="isEdit"></el-input>      
                     </el-form-item>
                     <el-form-item label="真实姓名" prop="Name">
                         <el-input type="text" autocomplete="off" v-model="userForm.Name" placeholder="请输入真实姓名"></el-input>
                     </el-form-item>
-                    <!-- <el-form-item label="用户角色" prop="Role" v-show="userForm.Level !== 0">
-                        <el-select v-model="userForm.Role" multiple placeholder="请选择角色" value-key="Id" class="user-select">
+                    <el-form-item label="用户角色" prop="Role" v-show="userForm.Level !== 0">
+                        <el-select v-model="userForm.Role" multiple placeholder="请选择角色" value-key="Id" class="user-select" style="width: 100%;">
                             <el-option
                             v-for="item in roleOptions"
                             :key="item.Id"
@@ -26,7 +25,7 @@
                             :value="item">
                             </el-option>
                         </el-select>
-                    </el-form-item> -->
+                    </el-form-item>
                     <el-form-item label="性别" prop="Sex">
                         <el-radio v-model="userForm.Sex" label="0">男</el-radio>
                         <el-radio v-model="userForm.Sex" label="1">女</el-radio>
@@ -34,9 +33,6 @@
                     <!-- <el-form-item label="管理员" prop="IsAdmin">
                         <el-radio v-model="userForm.IsAdmin" label="0">否</el-radio>
                         <el-radio v-model="userForm.IsAdmin" label="1">是</el-radio>
-                    </el-form-item> -->
-                    <!-- <el-form-item label="头像" prop="Icon">
-                        <div class='headIcon'><span>默认</span><button onClick="return false">上传图片</button></div>
                     </el-form-item> -->
             </div>
             <div class="time-msg-title" v-if="!isEdit">用户密码</div>
@@ -63,6 +59,9 @@
                 </el-form-item> -->
                 <el-form-item label="邮箱" prop="Email">
                     <el-input type="text" v-model="userForm.Email" placeholder="请输入邮箱号"></el-input>                       
+                </el-form-item>
+                <el-form-item label="描述" prop="Description">
+                    <el-input type="textarea" v-model="userForm.Description" placeholder="请输入描述信息"></el-input>
                 </el-form-item>
             </div>
         </el-form>
@@ -155,18 +154,13 @@ import AomCommonButtons from '$packages/frame/aom-common-buttons'
                 circleBcgArr,
                 preCls,
                 isEdit:false,
-                role: '',
                 isLoading: false,
-                departmentOptions:[],//部门选项
                 roleOptions: [],//角色选项
-                editContentName:'',
                 userForm:{
                     Name:'',//姓名
                     UserName:'',//用户名
-                    Department:'',//部门
                     Role:[],//角色
-                    Sex:'0',//性别
-                    Icon:'',//头像
+                    Sex:'1',//性别
                     Visible:true,//新密码是否可见
                     ConfirmVisible:true,//确认密码是否可见
                     NewPassword:'',//新密码
@@ -176,17 +170,16 @@ import AomCommonButtons from '$packages/frame/aom-common-buttons'
                     Email:'',//邮箱
                     NewPasswordEdit:'',
                     ConfirmPasswordEdit:'',
-                    Level: 0,
-                    IsAdmin: '0'
+                    Level: 1,
+                    IsAdmin: '0',
+                    Description: '',
                 },
                 rules:{
                     Name: [
                         { required: true,validator:validName,trigger: 'blur' },
-                        // { required: true,validator:validName,trigger: 'change' }
                     ],
                     UserName: [
                         { required: true,validator:validName,trigger: 'blur' },
-                        // { required: true,validator:validName,trigger: 'change' }
                     ],
                     NewPassword: [
                          { required: true,validator:validatePass,trigger: 'blur' },
@@ -212,17 +205,13 @@ import AomCommonButtons from '$packages/frame/aom-common-buttons'
                 //查询用户信息
                 this.getUser = getId;
                 this.isEdit = true;
-                _.http.get(`${this.preApiName}/financial/platform/users?Account=`+getId).then( res => {
-             
-                    let data = res.data.data.length ? res.data.data[0] : '';
+                _.http.get(`${this.preApiName}/financial/platform/users/roles?UserAccount=${getId}`).then( res => {
+                    let data = res.data.data
                     if(data){
-                        _.editContentName = _.editUserName = data.Name;
                         _.userForm.Name = data.Name;
                         _.userForm.UserName = data.Account;
-                        _.userForm.Department = data.DepartmentId;
-                        _.userForm.Role = data.UserRoles;
-                        _.userForm.Sex = ""+data.Sex;
-                        _.userForm.Icon = '';
+                        _.userForm.Role = data.Roles;
+                        _.userForm.Sex = "" + data.Sex;
                         _.userForm.Visible = true;
                         _.userForm.ConfirmVisible = true;
                         _.userForm.NewPassword = '';
@@ -230,14 +219,18 @@ import AomCommonButtons from '$packages/frame/aom-common-buttons'
                         _.userForm.OfficePhone = data.OfficePhone;
                         _.userForm.Email = data.Email;
                         _.userForm.Level = data.Level;
+                        _.userForm.Description = data.Description
                         _.userForm.IsAdmin = ''+data.IsAdmin;
                     }
                 })
             }  
+
+            this.http.get(`${this.preApiName}/financial/platform/roles`).then( res => {
+                this.roleOptions = res.data.data
+            })
         },
         methods: {
             backPath() {
-                // this.$router.push(`${this.preName}/user`)
                 this.$router.go(-1)
             },
             async saveUser() {
@@ -248,52 +241,57 @@ import AomCommonButtons from '$packages/frame/aom-common-buttons'
                 let sendData = {
                     Account: this.myTrim(this.userForm.UserName),
                     Name: this.myTrim(this.userForm.Name),
-                    Password:this.getUser?this.myTrim(this.userForm.ConfirmPasswordEdit):this.myTrim(this.userForm.ConfirmPassword),
+                    Password:this.getUser ? this.myTrim(this.userForm.ConfirmPasswordEdit) : this.myTrim(this.userForm.ConfirmPassword),
                     Sex: this.userForm.Sex,
                     Telephone: this.myTrim(this.userForm.Telephone),
                     OfficePhone: this.myTrim(this.userForm.OfficePhone),
                     Email: this.myTrim(this.userForm.Email),
-                    Wechat: "",
-                    DepartmentId: this.userForm.Department,
-                    Description: "",
                     Role:this.userForm.Role,
-                    IsAdmin:parseInt(this.userForm.IsAdmin)
+                    IsAdmin:parseInt(this.userForm.IsAdmin),
+                    Description: this.userForm.Description,
                 };
                 if(this.getUser){//更新
                     this.http.put(`${this.preApiName}/financial/platform/users?Account=${this.getUser}`,sendData).then( res => {
-                        //成功
-                        if(res.status===201){
-                            this.showMessage('修改用户成功！','success',0);
-                            this.backToMain();
-
+                        if(res.status === 201){
+                            this.updateRole()
                         }
                     }).catch(res =>{
                         let err = res.response.data.error ? res.response.data.error : '修改用户失败！';
                         this.showMessage(err,'error');
                     })
-                }else{//保存
+                } else {//保存
                     sendData.CreateUser = this.$root.account
                     this.http.post(`${this.preApiName}/financial/platform/users`,sendData).then( res => {
-                        //成功
-                        if(res.status===201){
-                            this.showMessage('新建用户成功！','success',0);
-                            this.backToMain();
+                        if(res.status === 201){
+                            this.updateRole()
                         }
                     }).catch(res =>{
                         let err = res.response.data.error ? res.response.data.error : '新建用户失败！';
                         this.showMessage(err,'error');
                     })
                 }
-                
+            },
+            updateRole() {
+                let roleList = this.userForm.Role.map(v => {
+                    return {RoleId: v.Id}
+                })
+                console.log(roleList)
+                this.http.put(`${this.preApiName}/financial/platform/users/roles?UserAccount=${this.getUser}`,roleList).then( res => {
+                    if(res.status === 201){
+                        this.showMessage(this.getUser ? '修改用户成功！' : '新建用户成功！','success');
+                        this.backToMain();
+                    }
+                }).catch(res =>{
+                    let err = res.response.data.error ? res.response.data.error : '新建（修改）用户失败！';
+                    this.showMessage(err,'error');
+                })
             },
             addUser(){
                 this.userForm = {
                     Name:'',//姓名
                     UserName:'',//用户名
-                    Department:[],//部门
                     Role:[],//角色
                     Sex:'0',//性别
-                    Icon:'',//头像
                     Visible:true,//新密码是否可见
                     ConfirmVisible:true,//确认密码是否可见
                     NewPassword:'',//新密码
@@ -303,14 +301,13 @@ import AomCommonButtons from '$packages/frame/aom-common-buttons'
                     IsAdmin:'0',
                     Level: 1
                 };
-                this.getUser="";
+                this.getUser = "";
                 this.isEdit = false;
                 this.$router.push(`${this.preName}/user/main/user/userEdit`)
             },
             
             clickIcon(item) {
                 item.isOpen = !item.isOpen
-              
             },
             getRightName(node) {
                 const name = {
@@ -332,8 +329,7 @@ import AomCommonButtons from '$packages/frame/aom-common-buttons'
                 }
             },
             changePass(value,type) {
-                 this.userForm.Visible =  !this.userForm.Visible
-                
+                this.userForm.Visible =  !this.userForm.Visible
             }, 
             changePassCon(){
                 this.userForm.ConfirmVisible = !this.userForm.ConfirmVisible
@@ -345,7 +341,6 @@ import AomCommonButtons from '$packages/frame/aom-common-buttons'
                         resolve(valid) 
                     })
                 })
-                
             },
             updown(){
                 return false;
@@ -353,171 +348,3 @@ import AomCommonButtons from '$packages/frame/aom-common-buttons'
         }
     }
 </script>
-
-<style lang="less">
-    // @preCls: ~'editUser';
-
-    // .fontBlodStyle(){
-    //     font-family: ~'微软雅黑 Bold', ~'微软雅黑 Regular', ~'微软雅黑';
-    //     font-weight: 700;
-    //     font-style: normal;
-    //     font-size: 20px;
-    //     color: #515151;
-    // }
-    // .user-select{
-    //     width: 100%;
-    // }
-    // .@{preCls} {
-    //     padding:20px 30px;
-    //     &-header{
-    //         border-bottom: 1px solid #ebeef5;
-    //         margin-bottom: 20px;
-    //         &-title{
-    //             .fontBlodStyle();
-    //             font-size: 20px;
-    //             font-weight: 700;
-    //             padding-bottom: 15px;
-
-    //             &-left{
-    //                 color:#AEAEAE;
-    //             }
-    //             &-right{
-    //                 color:#545454;
-    //             }
-    //         }
-    //     }
-    //     &-content{
-    //         &-main{
-    //             margin-top: 30px;
-    //             border-top: 1px solid #dbdbdb;
-    //         }
-    //         &-title{
-    //             width: max-content;
-    //             .fontBlodStyle();
-    //             font-size: 18px;
-    //             border-bottom: 3px solid rgb(147, 147, 147);
-    //         }
-    //     }
-
-    //     .treelist-item{
-    //         width: 100%;
-    //         padding-top: 10px;
-    //     }
-    //     .treelist-self{
-    //         height: 60px;
-    //         display: flex;
-    //         align-items: center;
-    //         align-content: center;
-    //         justify-content: space-between;
-    //         border-bottom: 1px solid #dbdbdb;
-    //     }
-    //     .treelist-child{
-    //         padding-left: 110px;
-    //     }
-    //     .treelist-item-left{
-    //         display: flex;
-    //         align-items: center;
-    //         align-content: center;
-    //         justify-content: space-between;
-    //         height: 100%;
-    //         line-height: 60px;
-    //     }
-    //     .treelist-item-right{
-    //         display: flex;
-    //         align-items: center;
-    //         align-content: center;
-    //         justify-content: space-between;
-    //     }
-    //     .module-switch{
-    //         margin-right: 10px;
-    //         .el-switch__core{ 
-    //             height: 30px;
-    //             border-radius: 15px;
-    //         }
-    //         .el-switch__core::after{
-    //             width: 25px;
-    //             height: 26px;
-    //         }
-    //         &.is-checked .el-switch__core::after{
-    //             margin-left: -25px;
-    //         }
-    //     }
-    //     .right-switch{
-    //         margin-right: 15px;
-    //         .el-switch__core{ 
-    //             border-radius: 5px;
-    //         }
-    //     }
-    //     .treelist-item-left-icon{
-    //         height: 100%;
-    //         line-height: 60px;
-    //         text-align: center;
-    //         cursor: pointer;
-    //         margin-right: 10px;
-
-    //         .iconfont{
-    //             font-size: 28px;
-    //         }   
-    //     }
-    //     .treelist-item-left-circle{
-    //         width: 44px;
-    //         height: 44px;
-    //         line-height: 44px;
-    //         border-radius: 22px;
-    //         color: #000000;
-    //         margin-right: 10px;
-    //         text-align: center;
-    //     }
-    //     .treelist-item-left-info{
-    //         text-align: left;
-    //         line-height: 60px;
-    //         .fontBlodStyle();
-    //         font-size: 16px;
-    //     }
-    //     .right-name{
-    //         text-align: center;
-    //     }
-    //     .time-msg-title{
-    //         .fontBlodStyle();
-    //         width: max-content;
-    //         font-size: 18px;
-    //         border-bottom: 3px solid #409EFF;
-    //         margin-bottom: 20px;
-    //         line-height: 30px;
-    //     }
-    //     .time-msg-form{
-    //         // width: calc(~'100% - 50px');
-    //         // margin-left: 50px;
-    //         padding: 0 100px;
-    //         & .el-form--label-left .el-form-item__label{
-    //             text-align: right;
-    //         }
-    //         & .el-select {
-    //             width: 100%;
-    //         }
-    //     }
-        
-    //     .mustInfo{
-    //         line-height: 20px;
-    //         font-size: 10px;
-    //         display: block;
-    //     }
-    //     .mustInfo i{
-    //         font-size: 12px;
-    //     }
-    //     .headIcon span{
-    //         width: 35px;
-    //         height: 35px;
-    //         border: 2px solid #797979;
-    //         text-align: center;
-    //         line-height: 35px;
-    //         font-weight: bold;
-    //         font-size: 12px;
-    //         border-radius: 50%;
-    //         display: inline-block;
-    //     }
-    //     .headIcon button{
-    //             margin-left: 20px;
-    //     }
-    // }
-</style>

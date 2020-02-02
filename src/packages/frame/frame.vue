@@ -94,8 +94,6 @@
 						<router-view/>
 					</keep-alive>
 				<!-- </vue-scroll> -->
-                
-				<!-- <iframe ref="iframe" :class="[preCls + '-main-iframe']" :path="currentIframeUrlPrefix" frameborder="0"></iframe> -->
 			</el-main>
 		</el-container>
 		 <!-- 重置密码 -->
@@ -167,12 +165,12 @@
 			}
 		},
 		{
-			path: 'user',
+			path: 'system',
 			meta: {
 				title: '系统管理',
 				icon:'iconfont icon-yonghu',
 			},
-			children:[routeUser, routerRole, routerOrganization]
+			children:[]
 		},
 		{
 			meta: {
@@ -249,7 +247,6 @@
 					againPassword: [
 						{ required: true,validator: againPw, trigger: 'blur' }
 					],
-					
 				},
 			}
 		},	
@@ -275,26 +272,15 @@
 			}
 		},
 		created() {
+			let _ = this
+			_.$root.modules = localStorage.getItem('modules').split(',')
+			_.$root.rights = localStorage.getItem('rights').split(',')
 
-			this.menuList = relationForm
-			this.$root.account = this.account = this.getToken('UserAccount')
-			this.UserName = localStorage.getItem('UserName')
-			this.$root.token = this.getToken('Token')
-			// this.$root.token = this.getToken()
-			// this.http.get(`${this.preApiName}/Platform/LoginUser/Rights?token=${this.$root.token}`).then( res => {
-			// 	let data = res.data.data
-			// 	let rights = JSON.parse(data.Rights)
-			// 	this.$root.rights = rights
-			// 	this.getListFromRelationForm(rights)
-			// 	this.currentIframeUrlPrefix = this.menuList[this.defaultOpenModule].path
-				this.urlJudeg()
-			// 	this.$root.account = this.account = data.Account
-			// 	this.$root.$emit('UserOnload')
-			// }).catch( err=> {
-			// 	this.showMessage('登录过期，请退出重新登录', 'error', ()=>{
-			// 		this.$router.push('/login')
-			// 	});
-			// })
+			_.$root.account = _.account = _.getToken('UserAccount')
+			_.UserName = localStorage.getItem('UserName')
+			_.$root.token = _.getToken('Token')
+			_.getListFromRelationForm(_.$root.modules)
+			_.urlJudeg()
 		},
 		beforeRouteUpdate (to, from, next) {
 			next()
@@ -376,40 +362,38 @@
 				}else{
 					this.$router.push(`/login`)
 				}
-				
 			},
 			onMenuOpened(path, args){//changeUrlPrefix:当前模块名称
 				this.$router.push(`${this.preName}/${path}`)
 			},
-			getListFromRelationForm(right) {
+			getListFromRelationForm(modules) {
 				let listArr = []
-				right.forEach( item => {
-					switch (item.UrlPrefix) {
-						case '/Customer': 
-							listArr.push(relationForm[0])
+				relationForm[2].children = []
+				modules.forEach( item => {
+					switch (item) {
+						case 'order': 
+							listArr.unshift(relationForm[0])
 							break
-						case '/BrandVersion': 
-							listArr.push(relationForm[3])
-							break
-						case '/Contract': 
+						case 'company': 
 							listArr.push(relationForm[1])
 							break
-						case '/Platform': 
-							listArr.push(relationForm[5])
+						case 'user': 
+							relationForm[2].children.push(routeUser)
+							if(listArr.findIndex(v => v.path == 'system') < 0) {
+								listArr.push(relationForm[2])
+							}
 							break
-						case '/Order': 
-							listArr.push(relationForm[2])
+						case 'role': 
+							relationForm[2].children.push(routerRole)
+							if(listArr.findIndex(v => v.path == 'system') < 0) {
+								listArr.push(relationForm[2])
+							}
 							break
-						case '/ChannelCabs': 
-							listArr.push(relationForm[6])
-							break
-						case '/EditAdvbill': 
-							listArr.push(relationForm[4])
-							listArr.push(relationForm[8])
-							break				
+						case 'statistic': 
+							listArr.push(relationForm[3])
+							break			
 					}
 				})
-				listArr.push(relationForm[7])
 				
 				this.menuList = listArr
 			},
@@ -437,14 +421,10 @@
 				if(!this.getValidateStatus())return;
 				//获取数据
 				data = this.getFormData();
-				console.log(data);
 				//发送修改请求
 				status = await this.sendData(data);
 				if(status){
-					this.showMessage(
-						'密码修改成功！',
-						'success'
-					);
+					this.showMessage('密码修改成功！','success');
 					this.resetPassword = false;
 				}else{
 					this.showMessage('密码修改成功！','error');
@@ -478,11 +458,11 @@
 			},
 			changeType(type){
 				if(type=='oldPassword'){
-					this.oldType= this.oldType == 'password' ? '' : 'password';
-				}else if(type== 'newPassword' ){
-					this.newType= this.newType == 'password' ? '' : 'password';
-				}else if(type== 'againPassword' ){
-					this.againType= this.againType == 'password' ? '' : 'password';
+					this.oldType = this.oldType == 'password' ? '' : 'password';
+				}else if(type == 'newPassword' ){
+					this.newType = this.newType == 'password' ? '' : 'password';
+				}else if(type == 'againPassword' ){
+					this.againType = this.againType == 'password' ? '' : 'password';
 				}
 			},
 			funEnter(item){

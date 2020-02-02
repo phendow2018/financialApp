@@ -1,19 +1,19 @@
 <template>
+<vue-scroll :ops="ops" ref='globel-scroll'>
     <div class="small-container">
-        <!-- <aom-header :showBack="false" mainTitle="用户管理" ></aom-header> -->
-        <aom-tab   :defaultQueryString="queryString"  @on-search="searchQueryString" @on-add="newItem" placeholderText="请输入用户账号或名称进行搜索"></aom-tab>
+        <aom-tab :defaultQueryString="queryString" @on-search="searchQueryString" @on-add="newItem" placeholderText="请输入用户账号或名称进行搜索" :showButton="$root.rights.includes('user_1_1')"></aom-tab>
         <div :class="[preCls + '-tabs']" v-loading="isLoading">
             <el-tabs v-model="activeName" @tab-click="tabClick">
                 <el-tab-pane label="全部" name="all">
                     <span slot="label">全部<span class="total-count-tipe">{{this.allCount}}</span></span>
                     <div :class="[preCls + '-tabs-content']">
-                        <line-list :listData="userList" @on-edit="editItem" @on-delete="deleteItem" @on-todetail="clickName" :enableToLink="false" @toUserRole="toUserRole">
-                        </line-list>
+                        <line-list :listData="userList" @on-edit="editItem" @on-delete="deleteItem" @on-todetail="clickName" :enableToLink="false" @toUserRole="toUserRole"  :showDeleteButton="$root.rights.includes('user_1_3')" :showEditButton="$root.rights.includes('user_1_2')"></line-list>
                     </div>
                 </el-tab-pane>
             </el-tabs>
         </div>
     </div>
+</vue-scroll>
 </template>
 <script>
 import mixin from '$mixin/mixin';
