@@ -314,6 +314,7 @@ export default {
         )
         .then(res => {
           if (res.status !== 200) {
+            _.isLoading = false;
             _.showMessage(`查询订单失败，原因：${res.data.error}！`, "error");
             return;
           }

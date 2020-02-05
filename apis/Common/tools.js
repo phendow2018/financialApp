@@ -188,6 +188,27 @@ module.exports.isMonth = function (dateString){
         return false;
     }
 } 
+
+module.exports.isYear = function (dateString){
+    try
+    {   
+        if(typeof dateString != 'string' || dateString.trim()==""){
+            return false;
+        }
+        var r=dateString.match(/^(\d{1,4})$/); //\2(\d{1,2})
+        if(r==null){
+            return false;
+        }
+        var d=new Date(r[1]);   //,r[4]
+        var num = (d.getFullYear()==r[1]);//&&d.getDate()==r[4]
+        if(num==0){
+            return false;
+        }
+        return (num!=0);
+    }catch(e){
+        return false;
+    }
+} 
  
 module.exports.isDiscount = function (dateString){
     if(typeof dateString != 'string' && typeof dateString != 'number')

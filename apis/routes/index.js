@@ -52,6 +52,18 @@ router.use('/financial-management/api/v1/company-manage/companies/detail', compa
 router.use('/financial-management/api/v1/company-manage/statements', cm_statements.routes(), cm_statements.allowedMethods());
 router.use('/financial-management/api/v1/company-manage/statements/batch-operation', cm_statements_batch.routes(), cm_statements_batch.allowedMethods());
 
+//statistics
+const so_count_by_status = require('./statistics/order_count-by-status');
+const so_count_by_yearstatus = require('./statistics/order_count-by-year_status');
+const so_count_by_quarterstatus = require('./statistics/order_count-by-quarter_status');
+const so_count_by_monthstatus = require('./statistics/order_count-by-month_status');
+const so_count_by_datestatus = require('./statistics/order_count-by-date_status');
+router.use('/financial-management/api/v1/statistics/order-count', so_count_by_status.routes(), so_count_by_status.allowedMethods());
+router.use('/financial-management/api/v1/statistics/order-count/groupby-year', so_count_by_yearstatus.routes(), so_count_by_yearstatus.allowedMethods());
+router.use('/financial-management/api/v1/statistics/order-count/groupby-quarter', so_count_by_quarterstatus.routes(), so_count_by_quarterstatus.allowedMethods());
+router.use('/financial-management/api/v1/statistics/order-count/groupby-month', so_count_by_monthstatus.routes(), so_count_by_monthstatus.allowedMethods());
+router.use('/financial-management/api/v1/statistics/order-count/groupby-date', so_count_by_datestatus.routes(), so_count_by_datestatus.allowedMethods());
+
 //apis
 // const test = require('./apis/common/test');
 // router.use('/apis/v1/test', test.routes(), test.allowedMethods());

@@ -557,8 +557,6 @@ export default {
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          // this.updateOrderStatus(20)
-
           this.http.post(`/financial/order-manage/orders/send-operation?`, {OrderNumber: this.orderData.OrderNumber, Operator: localStorage.getItem("UserName")}).then(res => {
             res.status == 201 && this.showMessage('发送订单成功', 'success')
           }).catch(err => {
