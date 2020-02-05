@@ -83,19 +83,35 @@
             <el-radio-button label="year">年</el-radio-button>
           </el-radio-group>
           <div class="other-tools">
-            <!-- <el-button @click="addOption">增加一项</el-button> -->
             <div class="day-tools" v-show="rangeType == 'day'">
-              <el-radio-group v-model="dayRange" size="small" class="">
+              <div>
+                <el-radio-group v-model="dayRange" size="small" class="">
+                  <el-radio-button label="curMonth">本月</el-radio-button>
+                  <el-radio-button label="lastMonth">上一月</el-radio-button>
+                  <el-radio-button label="custom">自定义</el-radio-button>
+                </el-radio-group>
+              </div>
                 
-                <el-radio-button label="curMonth">本月</el-radio-button>
-                <el-radio-button label="lastMonth">上一月</el-radio-button>
-                <el-radio-button label="custom">选择月份</el-radio-button>
-              </el-radio-group>
+              <div class="month-select" v-show="dayRange == 'custom'">
+                <el-date-picker
+                  v-model="curMonth"
+                  style="width:'100px'"
+                  :clearable="false"
+                  @change="onChangeMonth"
+                  type="month"
+                  placeholder="选择月">
+                </el-date-picker>
+              </div>
             </div>
             <div class="month-tools" v-show="rangeType == 'month'">
               <el-radio-group v-model="monthRange" size="small" class="">
-                <el-radio-button label="custom">选择年份</el-radio-button>
+                <el-radio-button label="curYear">本年度</el-radio-button>
+                <el-radio-button label="lastYear">上一年度</el-radio-button>
+                <el-radio-button label="custom">{{monthRange !== 'custom' ? '自定义' : curYear}}</el-radio-button>
               </el-radio-group>
+              <div class="year-select" v-show="monthRange == 'custom' && yearShow">
+                <div class="year-item" v-for="year in yearList" :key="year" @click="changeYear(year)">{{year}}</div>
+              </div>
             </div>
           </div>
           <div id="chart" style="width: 100%;height: 600px;margin-top: 70px;"></div>
@@ -134,7 +150,7 @@ export default {
       curMode: "all",
       rangeType: 'day',
       dayRange: 'curMonth',
-      monthRange: 'custom',
+      monthRange: '',
       options: {
         useEasing: true,
         useGrouping: true,
@@ -146,11 +162,26 @@ export default {
       },
       chart: null,
       summaryLoading: false,
+      yearShow: false,
+      yearList: [],
+      curYear: '',
+      curMonth: '',
     };
   },
   mounted() {
     this.getSummay()
     this.initEcharts()
+    this.getInitData()
+
+    let year = (new Date()).getFullYear()
+    let idx = 0
+    while(idx < 10) {
+      this.yearList.push(`${year}`)
+      year--
+      idx++
+    }
+
+    window.addEventListener('click', this.onClickWindow)
   },
   methods: {
     getSummay() {
@@ -170,14 +201,77 @@ export default {
         }
       })
     },
-    initEcharts() {
-      let chartDom = document.getElementById("chart");
-      this.chart = echarts.init(chartDom);
+    getOrdersByDate(month) {
+      let _ = this
+      _.chart.showLoading()
+      _.http.get(`${this.preApiName}/financial/statistics/order-count/groupby-date?Month=${month}`).then(res => {
+        if(res.status == 200) {
+          _.updateDateStatistic('Date', res.data.data)
+        }
+      }).catch(err => {
 
+      }) 
+    },
+    getOrdersByMonth(year) {
+      let _ = this
+      _.chart.showLoading()
+      _.http.get(`${this.preApiName}/financial/statistics/order-count/groupby-month?Year=${year}`).then(res => {
+        if(res.status == 200) {
+          _.updateDateStatistic('Month', res.data.data)
+        }
+      }).catch(err => {
+
+      })
+    },
+    getOrdersByQuarter() {
+      let _ = this
+      _.chart.showLoading()
+      _.http.get(`${this.preApiName}/financial/statistics/order-count/groupby-quarter`).then(res => {
+        if(res.status == 200) {
+          _.updateDateStatistic('Quarter', res.data.data)
+        }
+      }).catch(err => {
+
+      })
+    },
+    getOrdersByYear() {
+      let _ = this
+      _.chart.showLoading()
+      _.http.get(`${this.preApiName}/financial/statistics/order-count/groupby-year`).then(res => {
+        if(res.status == 200) {
+          _.updateDateStatistic('Year', res.data.data)
+        }
+      }).catch(err => {
+
+      })
+    },
+    updateDateStatistic(key, dateArray) {
+      let allOrder = [],
+          sendOrder = [],
+          unSendOrder = [],
+          cancelOrder = []
+      
+      let orderxAixs = []
+      
+      dateArray.forEach(item => {
+        orderxAixs.push(item[key])
+
+        allOrder.push(item.Count)
+        sendOrder.push(item.SendCount) 
+        unSendOrder.push(item.UnsendCount)
+        cancelOrder.push(item.CancelCount)
+      })
+
+      this.updateChartOption(orderxAixs, allOrder, sendOrder, unSendOrder, cancelOrder)
+    },
+    updateChartOption(orderxAixs, allOrder, sendOrder, unSendOrder, cancelOrder) {
       let option = {
         title: {
-          text: "某楼盘销售情况",
-          subtext: "纯属虚构"
+          text: "订单统计情况",
+          subtext: "",
+          show: true,
+          top: 10,
+          left: 20,
         },
         grid: {
           top: 40,
@@ -191,70 +285,64 @@ export default {
         tooltip: {
           trigger: "axis"
         },
-        // dataZoom: [
-        //   {
-        //     type: "slider",
-        //     start: 0,
-        //     end: 100
-        //   },
-        //   {
-        //     type: "inside",
-        //     start: 0,
-        //     end: 100
-        //   }
-        // ],
         xAxis: {
           type: "category",
-          // boundaryGap: false,
-          data: ["2020-01-24","2020-01-25","2020-01-26","2020-01-27", "2020-01-28", "2020-01-29", "2020-01-30", "2020-01-31", "2020-02-01", "2020-02-02"]
+          data: orderxAixs
         },
         yAxis: {
           type: "value"
         },
         series: [
-          // {
-          //   name: "订单总量",
-          //   type: "line",
-          //   smooth: false,
-          //   data: [3050, 3068, 3090, 3029, 3001, 3234, 3120, 3090, 3020, 3030]
-          // },
           {
-            name: "已发送",
+            name: "订单总量",
             type: "bar",
-            smooth: false,
             barWidth: 20,
             label: {
               show: true,
               position: 'top',
             },
-            data: [3000, 3007, 3016, 3029, 3001, 3234, 3120, 3090, 3020, 3030]
+            data: allOrder
+          },
+          {
+            name: "已发送",
+            type: "bar",
+            barWidth: 20,
+            label: {
+              show: true,
+              position: 'top',
+            },
+            data: sendOrder
           },
           {
             name: "未发送",
             type: "bar",
-            smooth: false,
             barWidth: 20,
             label: {
               show: true,
               position: 'top',
             },
-            data: [0, 11, 4, 1110, 1, 0, 31, 0, 1, 10]
+            data: unSendOrder
           },
           {
             name: "已取消",
             type: "bar",
-            smooth: false,
             barWidth: 20,
             label: {
               show: true,
               position: 'top',
             },
-            data: [0, 1, 4, 0, 1, 0, 1, 0, 1, 0]
+            data: cancelOrder
           }
         ]
       };
-
+      this.chart.hideLoading()
       this.chart.setOption(option);
+    },
+    initEcharts() {
+      let chartDom = document.getElementById("chart");
+      this.chart = echarts.init(chartDom);
+
+      this.updateChartOption([], [], [], [])
 
       this.chart.on("click", params => {
         console.log(params);
@@ -298,39 +386,77 @@ export default {
           );
         });
     },
-    addOption() {
-      this.chart.setOption({
-        legend: {
-          data: ['订单总量', '已发送','未发送', '已取消']
-        },
-        series: [
-        {
-          name: "订单总量",
-          type: "line",
-          smooth: false,
-          data: [3050, 3068, 3090, 3029, 3001, 3234, 3120, 3090, 3020, 3030]
-        },
-        {
-          name: "已发送",
-          type: "line",
-          smooth: false,
-          data: [3000, 3007, 3016, 3029, 3001, 3234, 3120, 3090, 3020, 3030]
-        },
-        {
-          name: "未发送",
-          type: "line",
-          smooth: false,
-          data: [0, 11, 4, 1110, 1, 0, 31, 0, 1, 10]
-        },
-        {
-          name: "已取消",
-          type: "line",
-          smooth: false,
-          data: [0, 1, 4, 0, 1, 0, 1, 0, 1, 0]
-        }]
-      })
+    getInitData(isCurMonth = true) {
+      let curDate = new Date()
+      let curMonth = isCurMonth ? curDate.getMonth() + 1 : curDate.getMonth()
+      curMonth = curMonth > 9 ? curMonth : `0${curMonth}`
+
+      this.getOrdersByDate(`${curDate.getFullYear()}-${curMonth}`)
     },
-  }
+    onClickWindow(event) {
+      this.yearShow = event.target.defaultValue == 'custom'
+    },
+    changeYear(year) {
+      this.curYear = year
+      this.getOrdersByMonth(year)
+    },
+    onChangeMonth(date) {
+      let month = date.getMonth() + 1
+      month = month > 9 ? curMonth : `0${month}`
+      this.getOrdersByDate(`${date.getFullYear()}-${month}`)
+    }
+  },
+  watch: {
+    rangeType(n, o) {
+      switch(n) {
+        case 'month':
+          this.monthRange = 'curYear'
+          this.getOrdersByMonth((new Date()).getFullYear())
+        break;
+        case 'quarter':
+          this.getOrdersByQuarter()
+        break;
+        case 'year':
+          this.getOrdersByYear()
+        break;
+        case 'day':
+        default:
+          this.dayRange = 'curMonth'
+
+          this.getInitData()
+        break;
+      }
+    },
+    dayRange(n, o) {
+      this.curMonth = ''
+      switch(n) {
+        case 'curMonth': 
+          this.getInitData(true)
+        break
+        case 'lastMonth':
+          this.getInitData(false)
+        break
+      }
+    },
+    monthRange(n, o) {
+      this.curYear = '自定义'
+      switch(n) {
+        case 'curYear': 
+          this.getOrdersByMonth((new Date()).getFullYear())
+        break
+        case 'lastYear':
+          this.getOrdersByMonth((new Date()).getFullYear() - 1)
+        break
+        default: 
+          this.yearShow = true
+        break;
+      }
+    },
+    
+  },
+  destroyed() {
+    window.removeEventListener('click', this.onClickWindow)
+  },
 };
 </script>
 
@@ -368,6 +494,48 @@ export default {
       right: 40px;
       top: 120px;
       z-index: 9999;
+
+      .day-tools{
+        display: grid;
+        grid-template-columns: auto auto;
+
+        .el-date-editor.el-input, .el-date-editor.el-input__inner{
+          width: 130px;
+        }
+
+        .month-select{
+          margin-left: 5px;
+          margin-top: -5px;
+        }
+      }
+
+      .month-tools{
+        position: relative;
+
+        .year-select{
+          position: absolute;
+          right: -1px;
+          width: 68px;
+          top: 30px;
+          height: 330px;
+          border: 1px solid #eee;
+          border-top: 0;
+          border-radius: 0 0 4px 4px;
+          background-color: #fff;
+
+          .year-item {
+            height: 32px;
+            line-height: 32px;
+            text-align: center;
+
+            &:hover {
+              background-color: #409EFF;
+              cursor: pointer;
+              color: white;
+            }
+          }
+        }
+      }
     }
   }
   .summary {
