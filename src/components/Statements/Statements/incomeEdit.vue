@@ -573,9 +573,6 @@ export default {
       show: true
     };
   },
-  created() {
-    console.log(this);
-  },
   methods: {
     onInputFucus(evt) {
       $(evt.target)
