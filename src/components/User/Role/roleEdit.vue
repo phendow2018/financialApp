@@ -2,11 +2,7 @@
   <vue-scroll :ops="ops">
     <div :class="['small-container']">
       <div :class="[preCls + '-header']">
-        <aom-header
-          parentTitle="角色管理"
-          :mainTitle="isEdit ? '角色编辑' : '新建角色'"
-          @aom-go-back="backPath"
-        ></aom-header>
+        <aom-header parentTitle="角色管理" :mainTitle="isEdit ? '角色编辑' : '新建角色'" @aom-go-back="backPath"></aom-header>
         <div class="main-header-nav">
           <aom-edit-tips editTipsName="角色编辑" :editItemName="currentItemName"></aom-edit-tips>
         </div>

@@ -20,57 +20,25 @@
           <div class="summary-item" :class="{'active': curMode == 'all'}" @click="curMode = 'all'">
             <div class="summary-title">总订单数</div>
             <div class="summary-value">
-              <ICountUp
-                :delay="delay"
-                :endVal="TotalOrderCount"
-                :options="options"
-                @ready="onReady"
-              />
+              <ICountUp :delay="delay" :endVal="TotalOrderCount" :options="options" @ready="onReady"/>
             </div>
           </div>
-          <div
-            class="summary-item"
-            :class="{'active': curMode == 'send'}"
-            @click="curMode = 'send'"
-          >
+          <div class="summary-item" :class="{'active': curMode == 'send'}" @click="curMode = 'send'">
             <div class="summary-title">已发送订单数</div>
             <div class="summary-value">
-              <ICountUp
-                :delay="delay"
-                :endVal="SendOrderCount"
-                :options="options"
-                @ready="onReady"
-              />
+              <ICountUp :delay="delay" :endVal="SendOrderCount" :options="options" @ready="onReady"/>
             </div>
           </div>
-          <div
-            class="summary-item"
-            :class="{'active': curMode == 'unSend'}"
-            @click="curMode = 'unSend'"
-          >
+          <div class="summary-item" :class="{'active': curMode == 'unSend'}" @click="curMode = 'unSend'">
             <div class="summary-title">未发送订单数</div>
             <div class="summary-value">
-              <ICountUp
-                :delay="delay"
-                :endVal="UnSendOrderCount"
-                :options="options"
-                @ready="onReady"
-              />
+              <ICountUp :delay="delay" :endVal="UnSendOrderCount" :options="options" @ready="onReady"/>
             </div>
           </div>
-          <div
-            class="summary-item"
-            :class="{'active': curMode == 'cancel'}"
-            @click="curMode = 'cancel'"
-          >
+          <div class="summary-item" :class="{'active': curMode == 'cancel'}" @click="curMode = 'cancel'">
             <div class="summary-title">已取消订单数</div>
             <div class="summary-value">
-              <ICountUp
-                :delay="delay"
-                :endVal="CanceledOrderCount"
-                :options="options"
-                @ready="onReady"
-              />
+              <ICountUp :delay="delay" :endVal="CanceledOrderCount"  :options="options" @ready="onReady"/>
             </div>
           </div>
         </div>

@@ -1,5 +1,6 @@
 <template>
   <div class="big-container" v-loading="isLoading">
+    <aom-header :parentTitle="reportType =='company' ? '企业' : '订单'" mainTitle="财务信息" @aom-go-back="backPath"></aom-header>
     <div :class="[preCls + '-tabs']">
       <div class="main-header" :style="orderStatus">
         <div class="company-header" v-if="reportType == 'company'">
@@ -159,6 +160,7 @@
 
 <script>
 import mixin from "$mixin/mixin";
+import AomHeader from "$packages/frame/aom-header"
 import assetsEdit from "./assetsEdit";
 import balanceEdit from "./balanceEdit";
 import incomeEdit from "./incomeEdit";
@@ -302,6 +304,7 @@ let initReportData = {
 export default {
   name: preCls,
   components: {
+    AomHeader,
     assetsEdit,
     balanceEdit,
     incomeEdit,
@@ -647,7 +650,10 @@ export default {
       this.$router.push(
         `${this.preName}/company/companyEdit?companyId=${companyId}`
       );
-    }
+    },
+    backPath() {
+      this.$router.go(-1);
+    },
   },
   computed: {
     orderStatus: function() {
