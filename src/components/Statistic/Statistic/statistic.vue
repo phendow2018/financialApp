@@ -517,7 +517,7 @@ export default {
     .summary-item {
       &:hover {
         background-color: #e0e0e0;
-        cursor: pointer;
+        // cursor: pointer;
       }
       .summary-title {
         font-size: 18px;

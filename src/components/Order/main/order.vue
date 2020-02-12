@@ -86,12 +86,12 @@
         <!-- <vue-scroll :ops="ops" ref='globel-scroll'  @handle-scroll="onScroll"> -->
         <div class="list-header">
           <div class="list-header-item list-header-item1">#</div>
-          <div class="list-header-item list-header-item2">状态</div>
-          <div class="list-header-item list-header-item3">订单编号</div>
-          <div class="list-header-item list-header-item4">类型</div>
-          <div class="list-header-item list-header-item5">企业名称</div>
-          <div class="list-header-item list-header-item6">制单人</div>
-          <div class="list-header-item list-header-item6">下单时间</div>
+          <div class="list-header-item list-header-item2" title="状态">状态</div>
+          <div class="list-header-item list-header-item3" title="订单编号">订单编号</div>
+          <div class="list-header-item list-header-item4" title="类型">类型</div>
+          <div class="list-header-item list-header-item5" title="企业名称">企业名称</div>
+          <div class="list-header-item list-header-item6" title="制单人">制单人</div>
+          <div class="list-header-item list-header-item6" title="下单时间">下单时间</div>
           <div class="list-header-item list-header-item7">操作</div>
         </div>
         <div class="infinite-list-wrapper" style="overflow:auto">
@@ -105,7 +105,7 @@
               <div class="list-content-item">
                 <i class="order-status" :style="statusStyle(item)"></i>
               </div>
-              <div class="list-content-item">
+              <div class="list-content-item" :title="item.OrderNumber">
                 <a
                   href="javascript:void(0);"
                   class="list-content-text"
@@ -113,16 +113,16 @@
                 >{{item.OrderNumber}}</a>
               </div>
               <div class="list-content-item">{{ item.Type == 1 ? '大数': '详财' }}</div>
-              <div class="list-content-item">
+              <div class="list-content-item" :title="item.CompanyName"> 
                 <a
                   href="javascript:void(0);"
                   class="list-content-text"
                   @click="onLinkToEdit(item)"
                 >{{item.CompanyName}}</a>
               </div>
-              <div class="list-content-item">{{item.Editor}}</div>
-              <div class="list-content-item">{{item.CreateTime}}</div>
-              <div class="list-content-item">
+              <div class="list-content-item" :title="item.Editor">{{item.Editor}}</div>
+              <div class="list-content-item" :title="item.CreateTime">{{item.CreateTime}}</div>
+              <div class="list-content-item" >
                 <!-- <el-button
                   type="text"
                   icon="el-icon-edit"

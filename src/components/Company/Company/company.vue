@@ -8,7 +8,7 @@
           ref="searchInput"
           v-model="queryString"
           :fetch-suggestions="suggestionSearch"
-          placeholder="请输入企业名称、缩写或统一编号"
+          placeholder="请输入企业名称或统一社会信用编号"
           @select="handleSelect"
           @clear="getCompanyData()"
           :select-when-unmatched="true"

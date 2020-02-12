@@ -543,8 +543,8 @@ export default {
           asset[prop] = 0
         }
         
-        asset.TotalCurrentAssetsSuggest = (asset.MonetaryResources + asset.ShortTermInvestments + asset.NotesReceivable + asset.AccountReceivable + asset.PrePayment + asset.DividendsReceivable + asset.InterestReceivable + asset.ReceivableOther + asset.Inventory + asset.RawMaterial + asset.GoodsInProcess + asset.MerchandiseInventory + asset.RevolvingMaterials + asset.OtherCurrentAssets).toFixed(2)
-        asset.TotalNonCurrentAssetsSuggest = (asset.LongTermBondInvestment + asset.LongTermEquityInvestment + asset.FixedAssets + asset.AccumulatedDepreciation + asset.NetValueOfFixedAssets + asset.ConstructionInProcess + asset.EngineeringMaterial + asset.DisposalOfFixedAssets + asset.CapitalizedBiologicalAssets + asset.OilAndGasAssets + asset.IntangibleAssets + asset.DevelopmentExpenditure + asset.Goodwill  + asset.EquipmentRentalDeposit + asset.LongTermUnamortizedExpenses + asset.DeferredIncomeTaxAssets + asset.OtherNonCurrentAssets + asset.TotalNonCurrentAssets).toFixed(2)
+        asset.TotalCurrentAssetsSuggest = (asset.MonetaryResources + asset.ShortTermInvestments + asset.NotesReceivable + asset.AccountReceivable + asset.PrePayment + asset.DividendsReceivable + asset.InterestReceivable + asset.ReceivableOther + asset.Inventory + asset.GoodsInProcess + asset.MerchandiseInventory + asset.RevolvingMaterials + asset.OtherCurrentAssets).toFixed(2)
+        asset.TotalNonCurrentAssetsSuggest = (asset.LongTermBondInvestment + asset.LongTermEquityInvestment + asset.FixedAssets - asset.AccumulatedDepreciation + asset.NetValueOfFixedAssets + asset.ConstructionInProcess + asset.EngineeringMaterial + asset.DisposalOfFixedAssets + asset.CapitalizedBiologicalAssets + asset.OilAndGasAssets + asset.IntangibleAssets + asset.DevelopmentExpenditure + asset.Goodwill  + asset.EquipmentRentalDeposit + asset.LongTermUnamortizedExpenses + asset.DeferredIncomeTaxAssets + asset.OtherNonCurrentAssets + asset.TotalNonCurrentAssets).toFixed(2)
         asset.TotalAssetsSuggest = (parseFloat(asset.TotalCurrentAssetsSuggest) + parseFloat(asset.TotalNonCurrentAssetsSuggest)).toFixed(2)
       })
     }
