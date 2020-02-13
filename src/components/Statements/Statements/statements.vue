@@ -399,9 +399,7 @@ export default {
     },
     addReportForOrder() {
       if (this.addReportFormForOrder.ReportIdx > -1) {
-        this.addReportToDb(
-          this.availableAddYears[this.addReportFormForOrder.ReportIdx],
-          () => {
+        this.addReportToDb( this.availableAddYears[this.addReportFormForOrder.ReportIdx], () => {
             this.addReportWndVisibleOrder = false;
           }
         );
