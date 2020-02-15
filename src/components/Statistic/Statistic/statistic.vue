@@ -112,10 +112,6 @@ require("echarts/lib/component/tooltip")
 require("echarts/lib/component/dataZoom")
 require('echarts/lib/component/grid')
 
-// import 'bootstrap-table/dist/js/bootstrap.min.js'
-// import 'bootstrap-table/dist/bootstrap-table.js'
-// import 'bootstrap-table/dist/bootstrap-table.min.css'
-
 import modules from "@/common/modules";
 import ICountUp from "vue-countup-v2";
 import mixin from "$mixin/mixin.js";
