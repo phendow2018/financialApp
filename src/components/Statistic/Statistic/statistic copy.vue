@@ -1,5 +1,5 @@
 <template>
-  <div class="statistic-container">
+  <div class="big-container">
     <div class="module-add" style="margin-top: 10px;" v-if="moduleAddShow">
       <el-button @click="onAdd('order')">添加订单模块</el-button>
       <el-button @click="onAdd('company')">添加企业模块</el-button>
@@ -16,88 +16,77 @@
     </div>
     <vue-scroll :ops="ops">
       <div class="statistic-main">
-        <div>
-          <div style="padding-top: 10px;">
-            <el-collapse style="padding-left: 10px;border-left: 6px solid #409eff;">
-              <el-collapse-item title="简略信息" name="1">
-                <div class="statistic-item summary" isLoading="summaryLoading">
-                  <div class="summary-item">
-                    <div class="summary-title">总订单数</div>
-                    <div class="summary-value">
-                      <ICountUp :delay="delay" :endVal="TotalOrderCount" :options="options" @ready="onReady"/>
-                    </div>
-                  </div>
-                  <div class="summary-item">
-                    <div class="summary-title">已发送订单数</div>
-                    <div class="summary-value">
-                      <ICountUp :delay="delay" :endVal="SendOrderCount" :options="options" @ready="onReady"/>
-                    </div>
-                  </div>
-                  <div class="summary-item">
-                    <div class="summary-title">未发送订单数</div>
-                    <div class="summary-value">
-                      <ICountUp :delay="delay" :endVal="UnSendOrderCount" :options="options" @ready="onReady"/>
-                    </div>
-                  </div>
-                  <div class="summary-item">
-                    <div class="summary-title">已取消订单数</div>
-                    <div class="summary-value">
-                      <ICountUp :delay="delay" :endVal="CanceledOrderCount"  :options="options" @ready="onReady"/>
-                    </div>
-                  </div>
-                </div>
-              </el-collapse-item>
-            </el-collapse>
-          </div>
-        </div>
-          
-        <div class="statistic-item">
-          <div class="title">
-            <span>详细统计</span>
-            <div class="mode-change">
-              <el-radio-group v-model="modeType" size="small">
-                <el-radio-button label="chart">图形</el-radio-button>
-                <el-radio-button label="table">表格</el-radio-button>
-              </el-radio-group>
+        <div class="statistic-item summary" isLoading="summaryLoading">
+          <div class="summary-item" :class="{'active': curMode == 'all'}" @click="curMode = 'all'">
+            <div class="summary-title">总订单数</div>
+            <div class="summary-value">
+              <ICountUp :delay="delay" :endVal="TotalOrderCount" :options="options" @ready="onReady"/>
             </div>
           </div>
-          <div id="chart" class="chart" v-show="modeType == 'chart'"></div>
-          <div class="chart" v-show="modeType == 'table'">
-            <el-table
-              :data="monthDatas"
-              stripe
-              show-summary
-              style="width: 100%">
-              <el-table-column
-                type="index"
-                width="80">
-              </el-table-column>
-              <el-table-column
-                prop="Month"
-                label="时间"
-                width="180">
-              </el-table-column>
-              <el-table-column
-                prop="Count"
-                label="总订单数"
-                width="280">
-              </el-table-column>
-              <el-table-column
-                prop="SendCount"
-                label="已发送订单数"
-                width="280">
-              </el-table-column>
-              <el-table-column
-                prop="UnsendCount"
-                label="未发送订单数">
-              </el-table-column>
-              <el-table-column
-                prop="CancelCount"
-                label="已取消订单数">
-              </el-table-column>
-            </el-table>
+          <div class="summary-item" :class="{'active': curMode == 'send'}" @click="curMode = 'send'">
+            <div class="summary-title">已发送订单数</div>
+            <div class="summary-value">
+              <ICountUp :delay="delay" :endVal="SendOrderCount" :options="options" @ready="onReady"/>
+            </div>
+          </div>
+          <div class="summary-item" :class="{'active': curMode == 'unSend'}" @click="curMode = 'unSend'">
+            <div class="summary-title">未发送订单数</div>
+            <div class="summary-value">
+              <ICountUp :delay="delay" :endVal="UnSendOrderCount" :options="options" @ready="onReady"/>
+            </div>
+          </div>
+          <div class="summary-item" :class="{'active': curMode == 'cancel'}" @click="curMode = 'cancel'">
+            <div class="summary-title">已取消订单数</div>
+            <div class="summary-value">
+              <ICountUp :delay="delay" :endVal="CanceledOrderCount"  :options="options" @ready="onReady"/>
+            </div>
           </div>
         </div>
+        <div class="statistic-item">
+          <div class="title">订单量</div>
+          <el-radio-group v-model="rangeType" size="small" class="range-tools">
+            <el-radio-button label="day">日</el-radio-button>
+            <el-radio-button label="month">月</el-radio-button>
+            <el-radio-button label="quarter">季</el-radio-button>
+            <el-radio-button label="year">年</el-radio-button>
+          </el-radio-group>
+          <div class="other-tools">
+            <div class="day-tools" v-show="rangeType == 'day'">
+              <div>
+                <el-radio-group v-model="dayRange" size="small" class="">
+                  <el-radio-button label="curMonth">本月</el-radio-button>
+                  <el-radio-button label="lastMonth">上一月</el-radio-button>
+                  <el-radio-button label="custom">自定义</el-radio-button>
+                </el-radio-group>
+              </div>
+                
+              <div class="month-select" v-show="dayRange == 'custom'">
+                <el-date-picker
+                  v-model="curMonth"
+                  style="width:'100px'"
+                  :clearable="false"
+                  @change="onChangeMonth"
+                  type="month"
+                  placeholder="选择月">
+                </el-date-picker>
+              </div>
+            </div>
+            <div class="month-tools" v-show="rangeType == 'month'">
+              <el-radio-group v-model="monthRange" size="small" class="">
+                <el-radio-button label="curYear">本年度</el-radio-button>
+                <el-radio-button label="lastYear">上一年度</el-radio-button>
+                <el-radio-button label="custom">{{monthRange !== 'custom' ? '自定义' : curYear}}</el-radio-button>
+              </el-radio-group>
+              <div class="year-select" v-show="monthRange == 'custom' && yearShow">
+                <div class="year-item" v-for="year in yearList" :key="year" @click="changeYear(year)">{{year}}</div>
+              </div>
+            </div>
+          </div>
+          <div id="chart" style="width: 100%;height: 600px;margin-top: 70px;"></div>
+        </div>
+        <!-- <div class="statistic-item">
+          <div class="title">其他统计</div>
+        </div> -->
       </div>
     </vue-scroll>
   </div>
@@ -111,10 +100,6 @@ require("echarts/lib/component/toolbox")
 require("echarts/lib/component/tooltip")
 require("echarts/lib/component/dataZoom")
 require('echarts/lib/component/grid')
-
-// import 'bootstrap-table/dist/js/bootstrap.min.js'
-// import 'bootstrap-table/dist/bootstrap-table.js'
-// import 'bootstrap-table/dist/bootstrap-table.min.css'
 
 import modules from "@/common/modules";
 import ICountUp from "vue-countup-v2";
@@ -130,7 +115,10 @@ export default {
       SendOrderCount: 0,
       UnSendOrderCount: 0,
       CanceledOrderCount: 0,
-      modeType: 'chart',
+      curMode: "all",
+      rangeType: 'day',
+      dayRange: 'curMonth',
+      monthRange: '',
       options: {
         useEasing: true,
         useGrouping: true,
@@ -142,13 +130,26 @@ export default {
       },
       chart: null,
       summaryLoading: false,
-      monthDatas: [],
+      yearShow: false,
+      yearList: [],
+      curYear: '',
+      curMonth: '',
     };
   },
   mounted() {
     this.getSummay()
     this.initEcharts()
     this.getInitData()
+
+    let year = (new Date()).getFullYear()
+    let idx = 0
+    while(idx < 10) {
+      this.yearList.push(`${year}`)
+      year--
+      idx++
+    }
+
+    window.addEventListener('click', this.onClickWindow)
   },
   methods: {
     getSummay() {
@@ -179,12 +180,11 @@ export default {
 
       }) 
     },
-    getOrdersByMonth(StartMonth, EndMonth) {
+    getOrdersByMonth(year) {
       let _ = this
       _.chart.showLoading()
-      _.http.get(`${this.preApiName}/financial/statistics/order-count/groupby-month?StartMonth=${StartMonth}&EndMonth=${EndMonth}`).then(res => {
+      _.http.get(`${this.preApiName}/financial/statistics/order-count/groupby-month?Year=${year}`).then(res => {
         if(res.status == 200) {
-          _.monthDatas = res.data.data
           _.updateDateStatistic('Month', res.data.data)
         }
       }).catch(err => {
@@ -230,25 +230,9 @@ export default {
         cancelOrder.push(item.CancelCount)
       })
 
-      // for(let i = 0; i < 120; ++i) {
-      //   orderxAixs.push(`2010-02-0${i+1}`)
-      //   allOrder.push(i* 100)
-      //   sendOrder.push(i * 29) 
-
-      //   this.monthDatas.push({
-      //     Month: `2010-0${i+1}`,
-      //     Count: i * 100,
-      //     SendCount: i * 90,
-      //     CancelCount: i * 8,
-      //     UnsendCount: i * 2
-      //   })
-      // }
-
       this.updateChartOption(orderxAixs, allOrder, sendOrder, unSendOrder, cancelOrder)
     },
     updateChartOption(orderxAixs, allOrder, sendOrder, unSendOrder, cancelOrder) {
-      let dataZoomStart =  orderxAixs.length  > 0 ? 100 - 12 * 100.0 / orderxAixs.length : 0
-      dataZoomStart = dataZoomStart < 0 ? 0 : dataZoomStart
       let option = {
         title: {
           text: "订单统计情况",
@@ -257,18 +241,11 @@ export default {
           top: 10,
           left: 20,
         },
-        dataZoom: [
-        {
-          type: 'slider',
-          start: dataZoomStart,
-          end: 100,
-          height: 20,
-        }],
         grid: {
           top: 40,
           left: 60,
           right: 40,
-          bottom: 70,
+          bottom: 30,
         },
         legend: {
           data: ['订单总量', '已发送','未发送', '已取消']
@@ -278,7 +255,7 @@ export default {
         },
         xAxis: {
           type: "category",
-          nameRotate: 90,
+          
           data: orderxAixs
         },
         yAxis: {
@@ -312,6 +289,29 @@ export default {
             },
             data: sendOrder
           },
+          {
+            name: "未发送",
+            type: "bar",
+            barWidth: 20,
+            itemStyle: {
+              color: '#ad40ff'
+            },
+            label: {
+              show: true,
+              position: 'top',
+            },
+            data: unSendOrder
+          },
+          {
+            name: "已取消",
+            type: "bar",
+            barWidth: 20,
+            label: {
+              show: true,
+              position: 'top',
+            },
+            data: cancelOrder
+          }
         ]
       };
       this.chart.hideLoading()
@@ -367,52 +367,154 @@ export default {
     },
     getInitData(isCurMonth = true) {
       let curDate = new Date()
-      let curMonth = curDate.getMonth() + 2
+      let curMonth = isCurMonth ? curDate.getMonth() + 1 : curDate.getMonth()
       curMonth = curMonth > 9 ? curMonth : `0${curMonth}`
 
-      this.getOrdersByMonth(`2020-01`, `${curDate.getFullYear()}-${curMonth}`)
+      this.getOrdersByDate(`${curDate.getFullYear()}-${curMonth}`)
     },
+    onClickWindow(event) {
+      this.yearShow = event.target.defaultValue == 'custom'
+    },
+    changeYear(year) {
+      this.curYear = year
+      this.getOrdersByMonth(year)
+    },
+    onChangeMonth(date) {
+      let month = date.getMonth() + 1
+      month = month > 9 ? curMonth : `0${month}`
+      this.getOrdersByDate(`${date.getFullYear()}-${month}`)
+    }
   },
   watch: {
-    modeType(n, o) {
+    rangeType(n, o) {
+      switch(n) {
+        case 'month':
+          this.monthRange = 'curYear'
+          this.getOrdersByMonth((new Date()).getFullYear())
+        break;
+        case 'quarter':
+          this.getOrdersByQuarter()
+        break;
+        case 'year':
+          this.getOrdersByYear()
+        break;
+        case 'day':
+        default:
+          this.dayRange = 'curMonth'
 
-    }
+          this.getInitData()
+        break;
+      }
+    },
+    dayRange(n, o) {
+      this.curMonth = ''
+      switch(n) {
+        case 'curMonth': 
+          this.getInitData(true)
+        break
+        case 'lastMonth':
+          this.getInitData(false)
+        break
+      }
+    },
+    monthRange(n, o) {
+      this.curYear = '自定义'
+      switch(n) {
+        case 'curYear': 
+          this.getOrdersByMonth((new Date()).getFullYear())
+        break
+        case 'lastYear':
+          this.getOrdersByMonth((new Date()).getFullYear() - 1)
+        break
+        default: 
+          this.yearShow = true
+        break;
+      }
+    },
+    
+  },
+  destroyed() {
+    window.removeEventListener('click', this.onClickWindow)
   },
 };
 </script>
 
 <style lang="less" scoped>
-.statistic-container{
-  height: 100%;
-}
 .statistic-main {
-  height: calc(100vh - 60px);
-  width: 94%;
-  margin-left: 3%;
   .statistic-item {
     position: relative;
-    padding-top: 10px;
+    padding-top: 20px;
 
     .title {
-      position: relative;
-      height: 50px;
-      line-height: 50px;
-      font-size: 18px;
+      width: 100px;
+      height: 35px;
+      line-height: 35px;
 
-      span{
-        padding-left: 10px;
-      }
-
-      border-left: 6px solid #409eff;
-      .mode-change{
+      &:before {
+        content: "";
         position: absolute;
-        right: 10px;
-        top: 0;
+        top: 55px;
+        left: 0;
+        height: 6px;
+        width: 50px;
+        background-color: #409eff;
       }
     }
 
-    .chart{
-      height: calc(100vh - 60px - 100px - 40px);
+    .range-tools {
+      position: absolute;
+      left: 60px;
+      top: 120px;
+      z-index: 9999;
+    }
+
+    .other-tools {
+      position: absolute;
+      right: 40px;
+      top: 120px;
+      z-index: 9999;
+
+      .day-tools{
+        display: grid;
+        grid-template-columns: auto auto;
+
+        .el-date-editor.el-input, .el-date-editor.el-input__inner{
+          width: 130px;
+        }
+
+        .month-select{
+          margin-left: 5px;
+          margin-top: -5px;
+        }
+      }
+
+      .month-tools{
+        position: relative;
+
+        .year-select{
+          position: absolute;
+          right: -1px;
+          width: 68px;
+          top: 30px;
+          height: 330px;
+          border: 1px solid #eee;
+          border-top: 0;
+          border-radius: 0 0 4px 4px;
+          background-color: #fff;
+
+          .year-item {
+            height: 32px;
+            line-height: 32px;
+            text-align: center;
+
+            &:hover {
+              background-color: #409EFF;
+              cursor: pointer;
+              color: white;
+            }
+          }
+        }
+      }
     }
   }
   .summary {

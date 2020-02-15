@@ -526,11 +526,7 @@ export default {
       });
     },
     onSave() {
-      this.http
-        .post(
-          `/financial/company-manage/statements/batch-operation`,
-          this.reportList
-        )
+      this.http.post( `/financial/company-manage/statements/batch-operation`, this.reportList)
         .then(res => {
           if(res.status == 201) {
             this.reportType == 'order' && this.updateOrderStatus(5, () => {
@@ -542,6 +538,12 @@ export default {
         });
     },
     onSubmit() {
+      if(this.reportYears.length != this.reportList.length) {
+        this.$alert(`当前订单还有未完成的报表，不能提交`, '提示', {
+          confirmButtonText: '确定'
+        })
+        return
+      }
       this.$confirm('确定提交此订单吗?', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
@@ -674,7 +676,7 @@ export default {
         break;
       }
       return {
-        'border-left': `10px solid ${color}`
+        'border-left': `15px solid ${color}`
       }
     }
   }

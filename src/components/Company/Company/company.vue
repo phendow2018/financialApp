@@ -103,6 +103,8 @@ export default {
     var NumberCheck = (rule, value, callback) => {
       if (!value) {
         callback(new Error("请输入企业的统一社会信用代码"));
+      } else if(value.length > 18) {
+        callback(new Error("企业的统一社会信用代码不能超过18个字符"));
       }
       callback();
     };
@@ -185,13 +187,13 @@ export default {
       let _ = this
       if(!_.getValidateStatus()) return
 
-       _.http
-        .post(`/financial/company-manage/companies`, _.addCompanyForm)
+       _.http.post(`/financial/company-manage/companies`, _.addCompanyForm)
         .then(res => {
           if (res.status == 201) {
             _.errOccured = false
             _.addCompanyWndVisible = false
-            _.companyList.unshift({..._.addCompanyForm})
+            // _.companyList.unshift({..._.addCompanyForm})
+            this.$router.push(`${this.preName}/company/companyEdit?companyId=${_.addCompanyForm.CompanyNumber}`)
             _.isSearched = true;
           }
         })
@@ -206,11 +208,11 @@ export default {
       return;
     },
     getValidateStatus() {
-      let validStatus = false;
+      let validStatus = false
       this.$refs["ruleForm"].validate(valid => {
-        validStatus = valid;
-      });
-      return validStatus;
+        validStatus = valid
+      })
+      return validStatus
     },
     reFormatString(name) {
       return name.replace(
@@ -219,9 +221,7 @@ export default {
       );
     },
     linkToCompany(item) {
-      this.$router.push(
-        `${this.preName}/company/companyEdit?companyId=${item.CompanyNumber}`
-      );
+      this.$router.push(`${this.preName}/company/companyEdit?companyId=${item.CompanyNumber}`)
     }
   }
 };
