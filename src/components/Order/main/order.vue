@@ -142,7 +142,7 @@
                 <el-button
                   slot="reference"
                   type="text"
-                  icon="el-icon-thumb"
+                  icon="el-icon-refresh-left"
                   v-show="item.Status == 1"
                   style="color:red;margin-left: 0px;width: 76px;"
                   size="mini"
@@ -492,7 +492,7 @@ export default {
     },
     onCancelAssignTo(item) {
       let _ = this
-      _.$confirm(`确定取消指派订单给 ${item.Editor} 吗?`, '提示', {
+      _.$confirm(`确定取消指派订单给用户 ${item.Editor} 吗?`, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
