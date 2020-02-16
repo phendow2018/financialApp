@@ -495,13 +495,16 @@ export default {
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
-          _.http.post(`${this.preApiName}/financial/order-manage/orders/cancel-operation`, {
+          let param = {
             OrderNumber: item.OrderNumber,
             Operator: localStorage.getItem('UserName')
-          }).then(res => {
-            if(res.status == 201) {
+          }
+          _.http.delete(`${this.preApiName}/financial/order-manage/orders/assign-operation?OrderNumber=${item.OrderNumber}&Operator=${localStorage.getItem('UserName')}`, {data: param})
+          .then(res => {
+            if(res.status == 204) {
               _.showMessage(`取消指派订单成功！`, 'success')
               item.Status = 0
+              item.Editor = ""
             } else {
               _.showMessage(`取消指派订单失败！`, 'error')
             }
