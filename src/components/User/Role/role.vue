@@ -2,7 +2,7 @@
 <vue-scroll :ops="ops" ref='globel-scroll'>
     <div class="small-container">
         <!--  -->
-        <aom-header :showBack="false" mainTitle="角色管理"></aom-header>
+        <!-- <aom-header :showBack="false" mainTitle="角色管理"></aom-header> -->
         <aom-tab :defaultQueryString="queryString"  @on-search="searchQueryString" @on-add="newItem" placeholderText="请输入角色名称进行搜索" :showButton="$root.rights.includes('role_1_1')"></aom-tab>
         <div :class="[preCls + '-tabs']" v-loading="isLoading">
             <el-tabs v-model="activeName">

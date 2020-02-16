@@ -250,36 +250,39 @@ import AomCommonButtons from '$packages/frame/aom-common-buttons'
                     IsAdmin:parseInt(this.userForm.IsAdmin),
                     Description: this.userForm.Description,
                 };
-                if(this.getUser){//更新
-                    this.http.put(`${this.preApiName}/financial/platform/users?Account=${this.getUser}`,sendData).then( res => {
+                if(_.isEdit){//更新
+                    _.http.put(`${_.preApiName}/financial/platform/users?Account=${_.getUser}`,sendData).then( res => {
                         if(res.status === 201){
-                            this.updateRole()
+                            _.updateRole()
                         }
                     }).catch(res =>{
                         let err = res.response.data.error ? res.response.data.error : '修改用户失败！';
-                        this.showMessage(err,'error');
+                        _.showMessage(err,'error');
                     })
                 } else {//保存
-                    sendData.CreateUser = this.$root.account
-                    this.http.post(`${this.preApiName}/financial/platform/users`,sendData).then( res => {
+                    sendData.CreateUser = _.$root.account
+                    _.http.post(`${_.preApiName}/financial/platform/users`,sendData).then( res => {
                         if(res.status === 201){
-                            this.updateRole()
+                            _.getUser = sendData.Account
+                            
+                            _.updateRole()
                         }
                     }).catch(res =>{
                         let err = res.response.data.error ? res.response.data.error : '新建用户失败！';
-                        this.showMessage(err,'error');
+                        _.showMessage(err,'error');
                     })
                 }
             },
             updateRole() {
-                let roleList = this.userForm.Role.map(v => {
+                let _ = this
+                let roleList = _.userForm.Role.map(v => {
                     return {RoleId: v.Id}
                 })
-                console.log(roleList)
-                this.http.put(`${this.preApiName}/financial/platform/users/roles?UserAccount=${this.getUser}`,roleList).then( res => {
+                _.http.put(`${_.preApiName}/financial/platform/users/roles?UserAccount=${_.getUser}`,roleList).then( res => {
                     if(res.status === 201){
-                        this.showMessage(this.getUser ? '修改用户成功！' : '新建用户成功！','success');
-                        this.backToMain();
+                        _.showMessage(_.isEdit ? '修改用户成功！' : '新建用户成功！','success');
+                        _.isEdit = true
+                        _.backToMain();
                     }
                 }).catch(res =>{
                     let err = res.response.data.error ? res.response.data.error : '新建（修改）用户失败！';

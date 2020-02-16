@@ -366,13 +366,8 @@ export default {
       let curMonth = curDate.getMonth() + 2
       curMonth = curMonth > 9 ? curMonth : `0${curMonth}`
 
-      this.getOrdersByMonth(`2020-01`, `${curDate.getFullYear()}-${curMonth}`)
+      this.getOrdersByMonth(`2019-10`, `${curDate.getFullYear()}-${curMonth}`)
     },
-  },
-  watch: {
-    modeType(n, o) {
-
-    }
   },
 };
 </script>

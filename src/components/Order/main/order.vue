@@ -139,13 +139,15 @@
                   >指派给
                 </el-button>
                 
-                <!-- <el-button
+                <el-button
+                  slot="reference"
                   type="text"
                   icon="el-icon-thumb"
                   v-show="item.Status == 1"
+                  style="color:red;margin-left: 0px;width: 76px;"
                   size="mini"
                   @click="onCancelAssignTo(item)"
-                >取消指派</el-button> -->
+                >取消指派</el-button>
               </div>
             </div>
           </div>
@@ -487,12 +489,35 @@ export default {
       })
     },
     onCancelAssignTo(item) {
-
+      let _ = this
+      _.$confirm(`确定取消指派订单给 ${item.Editor} 吗?`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          _.http.post(`${this.preApiName}/financial/order-manage/orders/cancel-operation`, {
+            OrderNumber: item.OrderNumber,
+            Operator: localStorage.getItem('UserName')
+          }).then(res => {
+            if(res.status == 201) {
+              _.showMessage(`取消指派订单成功！`, 'success')
+              item.Status = 0
+            } else {
+              _.showMessage(`取消指派订单失败！`, 'error')
+            }
+          }).catch(err => {
+            _.showMessage(`取消指派订单失败！`, 'error')
+          })
+        })
     },
     getUserList() {
-      this.http.get(`${this.preApiName}/financial/platform/users`).then(res => {
+      let _ = this
+      _.http.get(`${this.preApiName}/financial/platform/users`).then(res => {
         if(res.status == 200) {
-          this.usersList = res.data.data
+          let users = res.data.data.filter(v => {
+            return v.Account != 'admin'
+          })
+          _.usersList = users
         }
       })
     },
