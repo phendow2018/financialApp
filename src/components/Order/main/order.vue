@@ -11,6 +11,7 @@
             align="right"
             type="date"
             :clearable="false"
+            :editable="false"
             :disabled="dateRange != 'custom'"
             placeholder="选择日期"
             @change="handleDateChangeSearch"
@@ -216,10 +217,10 @@ export default {
             }
           },
           {
-            text: "一周前",
+            text: "前天",
             onClick(picker) {
               const date = new Date();
-              date.setTime(date.getTime() - 3600 * 1000 * 24 * 7);
+              date.setTime(date.getTime() - 3600 * 1000 * 24 * 2);
               picker.$emit("pick", date);
             }
           }
