@@ -465,27 +465,29 @@ export default {
       this.dialogVisible = true
     },
     assignOrder() {
+      let _ = this
       let param = {
         Editor: this.assignUser,
         Operator: localStorage.getItem('UserName'),
         Orders: [{OrderNumber: this.assignOrderNumber}]
       }
       
-      this.http.post(`${this.preApiName}/financial/order-manage/orders/assign-operation`, param).then(res => {
+      _.http.post(`${_.preApiName}/financial/order-manage/orders/assign-operation`, param).then(res => {
         if(res.status == 201) {
-          this.orderList.map(v => {
-            if(v.OrderNumber == this.assignOrderNumber){
+          _.orderList.map(v => {
+            if(v.OrderNumber == _.assignOrderNumber){
               v.Status = 1
-              v.Editor = this.assignUser
+              v.Editor = _.assignUser
               v.visible = false
             }
           })
-          this.dialogVisible = false
+          _.dialogVisible = false
+          _.showMessage(`指派订单成功！`, 'success', 1000)
         } else {
-          this.showMessage(`指派失败`, 'error')
+          _.showMessage(`指派失败`, 'error')
         }
 
-        this.assignOrderNumber = ''
+        _.assignOrderNumber = ''
       })
     },
     onCancelAssignTo(item) {
@@ -502,7 +504,7 @@ export default {
           _.http.delete(`${this.preApiName}/financial/order-manage/orders/assign-operation?OrderNumber=${item.OrderNumber}&Operator=${localStorage.getItem('UserName')}`, {data: param})
           .then(res => {
             if(res.status == 204) {
-              _.showMessage(`取消指派订单成功！`, 'success')
+              _.showMessage(`取消指派订单成功！`, 'success', 1000)
               item.Status = 0
               item.Editor = ""
             } else {
