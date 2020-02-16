@@ -58,16 +58,16 @@
         </div>
         <el-tabs v-model="activeName">
           <el-tab-pane label="大数" name="summary" v-if="reportProp != 2">
-            <summary-edit :reportList="reportList"></summary-edit>
+            <summary-edit :reportList="reportList" @on-value-changed="onValueChanged"></summary-edit>
           </el-tab-pane>
           <el-tab-pane label="资产" name="assets" v-if="reportProp == 2">
-            <assets-edit :reportList="reportList"></assets-edit>
+            <assets-edit :reportList="reportList" @on-value-changed="onValueChanged"></assets-edit>
           </el-tab-pane>
           <el-tab-pane label="负债" name="balance" v-if="reportProp == 2">
-            <balance-edit :reportList="reportList"></balance-edit>
+            <balance-edit :reportList="reportList" @on-value-changed="onValueChanged"></balance-edit>
           </el-tab-pane>
           <el-tab-pane label="损益" name="income" v-if="reportProp == 2">
-            <income-edit :reportList="reportList"></income-edit>
+            <income-edit :reportList="reportList" @on-value-changed="onValueChanged"></income-edit>
           </el-tab-pane>
           <el-tab-pane label="说明" name="memo" v-if="reportProp == 2"></el-tab-pane>
         </el-tabs>
@@ -363,7 +363,8 @@ export default {
       reportYears: [],
       availableAddYears: [],
       isCompanyValid: false,
-      initShow: false
+      initShow: false,
+      isDirty: false,
     };
   },
   created() {
@@ -421,22 +422,15 @@ export default {
       this.errOccured = false;
     },
     addReportToDb(report, callback) {
-      let newReport = this.deepCopy(initReportData);
-      newReport.Type = report.Type;
-      newReport.Year =
-        typeof report.Year == "string"
-          ? parseInt(report.Year)
-          : report.Year.Format("yyyy");
-      newReport.CompanyNumber = this.curCompanyId;
-      newReport.validReport =
-        this.reportType == "order"
-          ? this.validOrderReport(this.addReportForm)
-          : true;
+      let newReport = this.deepCopy(initReportData)
+      newReport.Type = report.Type
+      newReport.Year =typeof report.Year == "string" ? parseInt(report.Year) : report.Year.Format("yyyy")
+      newReport.CompanyNumber = this.curCompanyId
+      newReport.validReport = this.reportType == "order" ? this.validOrderReport(this.addReportForm) : true
 
-      this.http
-        .post(`/financial/company-manage/statements`, newReport)
+      this.http.post(`/financial/company-manage/statements`, newReport)
         .then(res => {
-          if (res.status == 201) this.reportList.unshift(newReport);
+          if (res.status == 201) this.reportList.unshift(newReport)
           callback && callback(res);
         })
         .catch(err => {
@@ -458,10 +452,7 @@ export default {
     },
     getCompanyById(id) {
       let _ = this;
-      this.http
-        .get(
-          `${this.preApiName}/financial/company-manage/companies?CompanyNumber=${id}`
-        )
+      this.http.get(`${this.preApiName}/financial/company-manage/companies?CompanyNumber=${id}`)
         .then(res => {
           _.companyData =
             res.data.data.length > 0 ? res.data.data[0] : _.companyData;
@@ -511,10 +502,7 @@ export default {
     },
     getStatements(CompanyNumber, ReportingNeeds = "") {
       this.isLoading = true;
-      this.http
-        .get(
-          `/financial/company-manage/statements?CompanyNumber=${this.$route.query.companyId}&ReportingNeeds=${ReportingNeeds}`
-        )
+      this.http.get(`/financial/company-manage/statements?CompanyNumber=${this.$route.query.companyId}&ReportingNeeds=${ReportingNeeds}`)
         .then(v => {
           this.isCompanyValid = v.status == 200 ? v.data.isExistCompany : false
           this.reportList = v.status == 200 ? v.data.data : [];
@@ -532,7 +520,8 @@ export default {
             this.reportType == 'order' && this.updateOrderStatus(5, () => {
               this.showMessage(`保存成功！`,'success')
             })
-
+            
+            this.isDirty = false
             this.reportType != 'order' && this.showMessage(`保存成功！`,'success')
           }
         });
@@ -647,12 +636,13 @@ export default {
       }
     },
     onLinkToCompany(companyId) {
-      this.$router.push(
-        `${this.preName}/company/companyEdit?companyId=${companyId}`
-      );
+      this.$router.push(`${this.preName}/company/companyEdit?companyId=${companyId}`)
     },
     backPath() {
       this.$router.go(-1);
+    },
+    onValueChanged() {
+      this.isDirty = true
     },
   },
   computed: {
@@ -679,6 +669,15 @@ export default {
         'border-left': `15px solid ${color}`
       }
     }
-  }
+  },
+  beforeRouteLeave(to, from, next) {
+    this.isDirty ? this.$confirm('当前报表信息有修改，还未保存，确定离开吗?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        next()
+      }) : next()
+  },
 };
 </script>

@@ -523,20 +523,15 @@ export default {
       isDirty: false,
     };
   },
-  created() {},
   methods: {
     onInputFucus(evt) {
-      $(evt.target)
-        .parents(".report-item-container")
-        .addClass("assets-container-focus");
+      $(evt.target).parents(".report-item-container").addClass("assets-container-focus");
     },
     onInputBlur(evt) {
-      $(evt.target)
-        .parents(".report-item-container")
-        .removeClass("assets-container-focus");
+      $(evt.target).parents(".report-item-container").removeClass("assets-container-focus");
     },
     onValueChanged(prop, val) {
-      this.isDirty = true
+      this.$emit('on-value-changed')
       this.reportList.map(item => {
         let asset = item.Statement.Asset
         if(asset[prop] == undefined || asset[prop] == null) {

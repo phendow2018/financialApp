@@ -585,7 +585,7 @@ export default {
         .removeClass("assets-container-focus");
     },
     onValueChanged(prop, val) {
-      this.isDirty = true
+      this.$emit('on-value-changed')
       this.reportList.map(item => {
         let Income = item.Statement.Income
         if(Income[prop] == undefined || Income[prop] == null) {

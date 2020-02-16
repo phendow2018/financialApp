@@ -483,7 +483,6 @@ export default {
       activeNames: ["1", "2", "3", "4"],
       num: 0,
       show: true,
-      isDirty: false,
     };
   },
   created() {
@@ -500,7 +499,7 @@ export default {
         .removeClass("assets-container-focus");
     },
     onValueChanged(prop, val) {
-      this.isDirty = true
+      this.$emit('on-value-changed')
       this.reportList.map(item => {
         let Liability = item.Statement.Liability
         if(Liability[prop] == undefined || Liability[prop] == null) {

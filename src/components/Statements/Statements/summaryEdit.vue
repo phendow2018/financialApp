@@ -18,6 +18,7 @@
                 :precision="2"
                 :controls="false"
                 @focus="onInputFucus"
+                @change="onValueChanged($event)"
                 @blur="onInputBlur"
               ></el-input-number>
             </div>
@@ -30,6 +31,7 @@
                 :precision="2"
                 :controls="false"
                 @focus="onInputFucus"
+                @change="onValueChanged($event)"
                 @blur="onInputBlur"
               ></el-input-number>
             </div>
@@ -42,6 +44,7 @@
                 :precision="2"
                 :controls="false"
                 @focus="onInputFucus"
+                @change="onValueChanged($event)"
                 @blur="onInputBlur"
               ></el-input-number>
             </div>
@@ -54,6 +57,7 @@
                 :precision="2"
                 :controls="false"
                 @focus="onInputFucus"
+                @change="onValueChanged($event)"
                 @blur="onInputBlur"
               ></el-input-number>
             </div>
@@ -66,6 +70,7 @@
                 :precision="2"
                 :controls="false"
                 @focus="onInputFucus"
+                @change="onValueChanged($event)"
                 @blur="onInputBlur"
               ></el-input-number>
             </div>
@@ -78,6 +83,7 @@
                 :precision="2"
                 :controls="false"
                 @focus="onInputFucus"
+                @change="onValueChanged($event)"
                 @blur="onInputBlur"
               ></el-input-number>
             </div>
@@ -90,6 +96,7 @@
                 :precision="2"
                 :controls="false"
                 @focus="onInputFucus"
+                @change="onValueChanged($event)"
                 @blur="onInputBlur"
               ></el-input-number>
             </div>
@@ -102,6 +109,7 @@
                 :precision="2"
                 :controls="false"
                 @focus="onInputFucus"
+                @change="onValueChanged($event)"
                 @blur="onInputBlur"
               ></el-input-number>
             </div>
@@ -142,6 +150,9 @@ export default {
       $(evt.target)
         .parents(".report-item-container")
         .removeClass("assets-container-focus");
+    },
+    onValueChanged(value) {
+      this.$emit('on-value-changed')
     }
   },
   computed: {
