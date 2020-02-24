@@ -2,14 +2,16 @@
   <div class="assets-container">
     <div class="report-date report-item-container" :class="layoutClass">
       <div class="name report-item"></div>
-      <div class="report-item report-date-item" v-for="item in reportList" :style="{'color': !!item.validReport && !item.validReport ? 'rgb(255, 73, 73)' : '#000'}">{{item.Year}}{{getLabel(item.Type)}}</div>
+      <div class="report-item report-date-item" v-for="item in reportList" :style="{'color': !!item.validReport && !item.validReport ? 'rgb(255, 73, 73)' : '#000'}" @mouseenter="showDelete = true" @mouseleave="showDelete = false">
+        <el-checkbox v-model="item.Checked">{{item.Year}}{{getLabel(item.Type)}}</el-checkbox>
+        <i class="el-icon-circle-close delete-icon" title="删除当前报表" v-show="!isOrderEdit && (showDelete && orderStatus < 10) && ($root.rights.includes('company_2_3'))" @click="$emit('on-delete-statement', item)"></i>
+      </div>
     </div>
     <vue-scroll :ops="ops" ref="globel-scroll">
-      <el-collapse v-model="activeNames">
-        <el-collapse-item title="营业总收入" name="1">
-          <template slot="title">
+        <div class="title-name">
+          <div class="title">
             <i class="header-icon el-icon-star-on"></i>营业总收入
-          </template>
+          </div>
           <div class="report-item-container" :class="layoutClass">
             <div class="report-item-name report-item">营业收入：</div>
             <div class="report-item" v-for="item in reportList">
@@ -34,11 +36,11 @@
               ></el-input-number>
             </div>
           </div>
-        </el-collapse-item>
-        <el-collapse-item title="营业总成本" name="2">
-          <template slot="title">
+        </div>
+        <div class="title-name">
+          <div class="title">
             <i class="header-icon el-icon-star-on"></i>营业总成本
-          </template>
+          </div>
           <div class="report-item-container" :class="layoutClass">
             <div class="report-item-name report-item">减：营业成本：</div>
             <div class="report-item" v-for="item in reportList">
@@ -345,11 +347,11 @@
               ></el-input-number>
             </div>
           </div>
-        </el-collapse-item>
-        <el-collapse-item title="营业利润" name="3">
-          <template slot="title">
+        </div>
+        <div class="title-name">
+          <div class="title">
             <i class="header-icon el-icon-star-on"></i>营业利润
-          </template>
+          </div>
           <div class="report-item-container" :class="layoutClass">
             <div class="report-item-name report-item">营业利润：</div>
             <div class="report-item" v-for="item in reportList">
@@ -488,11 +490,11 @@
               ></el-input-number>
             </div>
           </div>
-        </el-collapse-item>
-        <el-collapse-item title="利润总额" name="4">
-          <template slot="title">
+        </div>
+        <div class="title-name">
+          <div class="title">
             <i class="header-icon el-icon-star-on"></i>利润总额
-          </template>
+          </div>
           <div class="report-item-container" :class="layoutClass">
             <div class="report-item-name report-item">利润总额：</div>
             <div class="report-item" v-for="item in reportList">
@@ -512,11 +514,11 @@
             </div>
           </div>
           
-        </el-collapse-item>
-        <el-collapse-item title="净利润" name="5">
-          <template slot="title">
+        </div>
+        <div class="title-name">
+          <div class="title">
             <i class="header-icon el-icon-star-on"></i>净利润
-          </template>
+          </div>
           <div class="report-item-container" :class="layoutClass">
             <div class="report-item-name report-item">减：所得税费用：</div>
             <div class="report-item" v-for="item in reportList">
@@ -547,8 +549,7 @@
               <div class="suggestion-label">{{item.Statement.Income.NetProfitSuggest}}</div>
             </div>
           </div>
-        </el-collapse-item>
-      </el-collapse>
+        </div>
       <div style="height: 100px;"></div>
     </vue-scroll>
   </div>
@@ -564,13 +565,25 @@ export default {
       default() {
         return [];
       }
-    }
+    },
+    orderStatus: {
+      type: Number,
+      default() {
+        return 2
+      }
+    },
+    isOrderEdit: {
+      type: Boolean,
+      default() {
+        return 2
+      }
+    },
   },
   data() {
     return {
-      activeNames: ["1", "2", "3", "4", "5"],
       num: 0,
-      show: true
+      show: true,
+      showDelete: false,
     };
   },
   methods: {
@@ -591,9 +604,9 @@ export default {
         if(Income[prop] == undefined || Income[prop] == null) {
           Income[prop] = 0
         }
-        Income.OperatingMarginSuggest = (Income.OperationRevenue + Income.MainBusinessIncome + Income.OperatingCosts + Income.BusinessTariffAndAnnex + Income.BusinessTax + Income.UrbanMaintenanceAndConstructionTax + Income.ResourcesTax + Income.LandValueIncrementTax + Income.LandUse_House_VehVesl_StmpTax + Income.EduSurtax_MineralRsrcCompFees_SwgChrg).toFixed(2)
-        Income.OperatingProfitSuggest = (Income.SellingExpenses + Income.AdRate_BusinessPropagandizeFee + Income.AdministrationExpenseCost + Income.BusinessEntertainment + Income.ResearchExpenditure + Income.FinancialCost + Income.AssetsImpairmentLoss + Income.ExplorationExpenditure + Income.OtherExpenses + Income.IncomeFromInvestment + Income.NetIncomeFromChangesInFairValue + Income.ExchangeEarning).toFixed(2)
-        Income.TotalProfitSuggest = (Income.NonOperatingIncome - Income.NonBusinessExpenditure + Income.OtherProfit + Income.UnrecoverableLossOnLongTermBondInvestment + Income.UnrecoverableLossOnLongTermEquityInvestment + Income. LossByForceMajeureFactors + Income.TaxDelayCharge + Income.TotalTax).toFixed(2)
+        Income.OperatingMarginSuggest = (Income.OperationRevenue - Income.BusinessTariffAndAnnex - Income.OperatingCosts - Income.EduSurtax_MineralRsrcCompFees_SwgChrg).toFixed(2)
+        Income.OperatingProfitSuggest = (Income.OperatingMarginSuggest - Income.SellingExpenses - Income.AdministrationExpenseCost - Income.FinancialCost - Income.AssetsImpairmentLoss - Income.ExplorationExpenditure - Income.OtherExpenses + Income.IncomeFromInvestment + Income.NetIncomeFromChangesInFairValue + Income.ExchangeEarning).toFixed(2)
+        Income.TotalProfitSuggest = (Income.OperatingProfitSuggest +  Income.NonOperatingIncome - Income.NonBusinessExpenditure + Income.OtherProfit - Income.UnrecoverableLossOnLongTermBondInvestment - Income.UnrecoverableLossOnLongTermEquityInvestment - Income.LossByForceMajeureFactors - Income.TaxDelayCharge).toFixed(2)
         
         Income.NetProfitSuggest = (parseFloat(Income.TotalProfitSuggest) - Income.IncomeTaxExpense).toFixed(2)
         

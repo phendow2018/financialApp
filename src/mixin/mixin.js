@@ -10,7 +10,7 @@ export default {
           initialScrollY: false,
           initialScrollX: false,
           // feat: #11
-          scrollingX: false,
+          scrollingX: true,
           scrollingY: true,
           speed: 300,
           easing: undefined,
@@ -191,6 +191,29 @@ export default {
       var cval = getCookie(name);
       if (cval != null)
         document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString();
+    },
+    formatNumer(num) {
+      num = num.toFixed(2)
+      var beforeNum = num.toString().split(".")[0];//获取小数点之前的数字
+      var afterNum = num.toString().split(".")[1];//获取小数点之后的数字
+      function toThousands(newnum) { //每隔3位，用逗号隔开
+          var result = [],
+              counter = 0;
+          newnum = (newnum || 0).toString().split('');
+          for(var i = newnum.length - 1; i >= 0; i--) {
+              counter++;
+              result.unshift(newnum[i]);
+              if(!(counter % 3) && i != 0) {
+                  result.unshift(',');
+              }
+          }
+          return result.join('');
+      }
+      let arr = beforeNum.split('-')
+      let prefix = arr.length > 1 ? '-' : ''
+      beforeNum = arr.length > 1 ? arr[1] : arr[0]
+      var lastNum = toThousands(beforeNum);//将小数点之前的整数用逗号隔开
+      return prefix + lastNum.concat(".",afterNum);//将小数部分加在处理过的数字后边
     }
   }
 }

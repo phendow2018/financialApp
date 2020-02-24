@@ -2,14 +2,16 @@
   <div class="assets-container">
     <div class="report-date report-item-container" :class="layoutClass">
       <div class="name report-item"></div>
-      <div class="report-item report-date-item" v-for="item in reportList" :style="{'color': !!item.validReport && !item.validReport ? 'rgb(255, 73, 73)' : '#000'}">{{item.Year}}{{getLabel(item.Type)}}</div>
+      <div class="report-item report-date-item" v-for="item in reportList" :style="{'color': !!item.validReport && !item.validReport ? 'rgb(255, 73, 73)' : '#000'}" @mouseenter="showDelete = true" @mouseleave="showDelete = false">
+        <el-checkbox v-model="item.Checked">{{item.Year}}{{getLabel(item.Type)}}</el-checkbox>
+        <i class="el-icon-circle-close delete-icon" title="删除当前报表" v-show="!isOrderEdit && (showDelete && orderStatus < 10) && ($root.rights.includes('company_2_3'))" @click="$emit('on-delete-statement', item)"></i>
+      </div>
     </div>
     <vue-scroll :ops="ops" ref="globel-scroll">
-      <el-collapse v-model="activeNames">
-        <el-collapse-item title="大数" name="1">
-            <template slot="title">
-                <i class="header-icon el-icon-star-on"></i>大数
-            </template>
+        <div class="title-name">
+          <div class="title">
+            <i class="header-icon el-icon-star-on"></i>大数
+          </div>
           <div class="report-item-container" :class="layoutClass">
             <div class="report-item-name report-item">资产总额：</div>
             <div class="report-item" v-for="item in reportList">
@@ -114,8 +116,7 @@
               ></el-input-number>
             </div>
           </div>
-        </el-collapse-item>
-      </el-collapse>
+        </div>
       <div style="height: 100px;"></div>
     </vue-scroll>
   </div>
@@ -131,13 +132,25 @@ export default {
       default() {
         return [];
       }
-    }
+    },
+    orderStatus: {
+      type: Number,
+      default() {
+        return 2
+      }
+    },
+    isOrderEdit: {
+      type: Boolean,
+      default() {
+        return 2
+      }
+    },
   },
   data() {
     return {
-      activeNames: ["1", "2", "3", "4", "5"],
       num: 0,
-      show: true
+      show: true,
+      showDelete: false,
     };
   },
   methods: {

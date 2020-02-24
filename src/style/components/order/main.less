@@ -42,11 +42,50 @@
                         input{
                             height: 40px;
                             width: 300px;
-                            border-radius: 5px;
+                            border-radius: 0 5px 5px 0;
                         }
 
                         i{
                             line-height: 30px;
+                        }
+
+                        .search-type{
+                            position: relative;
+                            display: block;
+                            text-align: center;
+                            font-size: 14px;
+                            width: 90px;
+                            border: 1px solid #DCDFE6;
+                            height: 38px;
+                            line-height: 35px;
+                            margin-right: -6px;
+                            float:left;
+                            border-radius: 5px 0 0 5px;
+
+                            .search-container{
+                                position: absolute;
+                                top: 38px;
+                                width: 84px;
+                                height: 90px;
+                                border: 1px solid #DCDFE6;
+                                border-radius: 0 0 5px 5px;
+                                z-index: 1000;
+
+                                .select-item {
+                                    height: 40px;
+                                    line-height: 40px;
+                                    text-align: center;
+                                    &:hover {
+                                        background-color: #409EFF;
+                                        color: white;
+                                        cursor: pointer;
+                                    }
+                                }
+                            }
+                        }
+                        .active {
+                            background-color: #409EFF;
+                            color: white;
                         }
                     }
                     &-searchButton{
@@ -211,7 +250,7 @@
                 }
                 .list-header, .list-content {
                     display: grid;
-                    grid-template-columns: 5% 4% 12% 5% 38% 14% 16% 6%;
+                    grid-template-columns: 5% 4% 12% 5% 38% 13% 15% 8%;
                 }
                 .list-header{
                     height: 40px;

@@ -13,15 +13,24 @@ class DBLog {
   async writeLog(user='', position='', module='', content='') { 
     let id = tools.createUuid();
     let time = new Date();
+    let userAccount = user;
     let userName = await this.getUserName(user);
-    let sql = this.makeInsertSql(id, time, user, userName, position, module, content);
+    //如果没有查询到用户名称，可能传的是用户名，这时要用用户名去查询用户账户
+    if (!tools.isValidString(userName)) {
+      let account = await this.getUserAccountByName(user);
+      if (tools.isValidString(account)) {
+        userAccount = account;
+        userName = user;
+      }
+    }
+    let sql = this.makeInsertSql(id, time, userAccount, userName, position, module, content);
     if (!tools.isValidString(sql)) { 
       this.LastError = `无效的sql语句`;
       return false;
     }
 
     let ret = await this.dbLink.query(sql);
-    let logContent = `[User:${user} Position:${position} Module:${module}] => ${content}`;
+    let logContent = `[User:${userAccount} Position:${position} Module:${module}] => ${content}`;
     if (ret === false) {
       this.LastError = this.dbLink.getLastError();
       global.log.writeLog(`写入数据库日志失败，内容信息{${logContent}}`);
@@ -68,6 +77,15 @@ DBLog.prototype.getUserName = async function(account) {
   return ret[0].Name;
 }
 
+DBLog.prototype.getUserAccountByName = async function(name) {
+  let sql = `SELECT \`Account\`, \`Name\` FROM \`user\` WHERE \`Name\`=${tools.MysqlEscape(name)}`;
+  let ret = await this.dbLink.query(sql);
+  if (ret === false || ret.length <= 0) {
+    return "";
+  }
+  return ret[0].Account;
+}
+
 DBLog.prototype.makeInsertSql = function(id, time, user='', userName='', position='', module='', content='') {
   if (!tools.isValidString(user)) {
     user = '';
@@ -112,7 +130,7 @@ DBLog.prototype.makeSearchSql = function(queryParams) {
       where += ` AND \`User\`=${tools.MysqlEscape(queryParams.User)}`;
     }
     if (tools.isValidString(queryParams.UserName)) {
-      where += ` AND \`User\`=${tools.MysqlEscape(queryParams.UserName)}`;
+      where += ` AND \`UserName\`=${tools.MysqlEscape(queryParams.UserName)}`;
     }
     if (tools.isValidString(queryParams.Position)) {
       where += ` AND \`Position\`=${tools.MysqlEscape(queryParams.Position)}`;
@@ -123,6 +141,10 @@ DBLog.prototype.makeSearchSql = function(queryParams) {
     if (tools.isValidString(queryParams.FuzzyQuery)) {
       let likeString = tools.MysqlEscape(`%${queryParams.FuzzyQuery}%`);
       where += ` AND (\`User\` LIKE ${likeString} OR \`UserName\` LIKE ${likeString} OR \`Position\` LIKE ${likeString} OR \`Module\` LIKE ${likeString} OR \`Content\` LIKE ${likeString})`;
+    }
+    if (tools.isValidString(queryParams.FuzzyContent)) {
+      let likeString = tools.MysqlEscape(`%${queryParams.FuzzyContent}%`);
+      where += ` AND (\`Content\` LIKE ${likeString})`;
     }
 
     sqlQueryCount = `SELECT COUNT(1) AS COUNT FROM \`log\` ${where}`;

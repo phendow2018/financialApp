@@ -51,6 +51,12 @@ let company = {
         functions: [{
             label: '添加企业',
             id: 1
+        },{
+            label: '修改企业',
+            id: 2
+        },{
+            label: '删除企业',
+            id: 3
         }],
     }, {
         id: 2,
@@ -61,6 +67,9 @@ let company = {
         }, {
             label: '保存',
             id: 2
+        }, {
+            label: '报表删除',
+            id: 3
         }]
     }]
 }

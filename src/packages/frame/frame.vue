@@ -153,7 +153,7 @@
 	import {routeUser, routerRole, routerOrganization} from '$router/user.js'
 	import {routerOrder} from '$router/order.js'
 	import {routerCompany} from '$router/company.js'
-	import {routerStatistic} from '$router/statistic.js'
+	import {routerStatistic, routerLog} from '$router/statistic.js'
 
 	const preCls = 'platform'
 	const relationForm = [
@@ -179,7 +179,7 @@
 				icon:'iconfont icon-shiduan',
 			},
 			path: 'statistic',
-			children: [routerStatistic],
+			children: [routerStatistic, routerLog],
 		},
 	]
 

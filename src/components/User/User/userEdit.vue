@@ -256,8 +256,8 @@ import AomCommonButtons from '$packages/frame/aom-common-buttons'
                             _.updateRole()
                         }
                     }).catch(res =>{
-                        let err = res.response.data.error ? res.response.data.error : '修改用户失败！';
-                        _.showMessage(err,'error');
+                        let err = !!res.response.data.Error ? res.response.data.Error.Message : '修改用户失败！';
+                        _.showMessage(err,'error', 5000);
                     })
                 } else {//保存
                     sendData.CreateUser = _.$root.account
@@ -268,8 +268,8 @@ import AomCommonButtons from '$packages/frame/aom-common-buttons'
                             _.updateRole()
                         }
                     }).catch(res =>{
-                        let err = res.response.data.error ? res.response.data.error : '新建用户失败！';
-                        _.showMessage(err,'error');
+                        let err = !!res.response.data.Error? `新建用户失败：${res.response.data.Error.Message}` : '新建用户失败！';
+                        _.showMessage(err,'error', 5000);
                     })
                 }
             },

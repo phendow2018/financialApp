@@ -2,14 +2,16 @@
   <div class="assets-container">
     <div class="report-date report-item-container" :class="layoutClass">
       <div class="name report-item"></div>
-      <div class="report-item report-date-item" v-for="item in reportList" :style="{'color': !!item.validReport && !item.validReport ? 'rgb(255, 73, 73)' : '#000'}">{{item.Year}}{{getLabel(item.Type)}}</div>
+      <div class="report-item report-date-item" v-for="item in reportList" :style="{'color': !!item.validReport && !item.validReport ? 'rgb(255, 73, 73)' : '#000'}" @mouseenter="showDelete = true" @mouseleave="showDelete = false">
+        <el-checkbox v-model="item.Checked">{{item.Year}}{{getLabel(item.Type)}}</el-checkbox>
+        <i class="el-icon-circle-close delete-icon" title="删除当前报表" v-show="!isOrderEdit && (showDelete && orderStatus < 10) && ($root.rights.includes('company_2_3'))" @click="$emit('on-delete-statement', item)"></i>
+      </div>
     </div>
     <vue-scroll :ops="ops" ref="globel-scroll">
-      <el-collapse v-model="activeNames">
-        <el-collapse-item title="流动负债" name="2">
-          <template slot="title">
+        <div class="title-name">
+          <div class="title">
             <i class="header-icon el-icon-star-on"></i>流动负债
-          </template>
+          </div>
           <div class="report-item-container" :class="layoutClass">
             <div class="report-item-name report-item">短期借款：</div>
             <div class="report-item" v-for="item in reportList">
@@ -149,11 +151,11 @@
               <div class="suggestion-label">{{item.Statement.Liability.TotalCurrentLiabilitySuggest}}</div>
             </div>
           </div>
-        </el-collapse-item>
-        <el-collapse-item title="非流动负债" name="3">
-          <template slot="title">
+        </div>
+        <div class="title-name">
+          <div class="title">
             <i class="header-icon el-icon-star-on"></i>非流动负债
-          </template>
+          </div>
           <div class="report-item-container" :class="layoutClass">
             <div class="report-item-name report-item">长期借款：</div>
             <div class="report-item" v-for="item in reportList">
@@ -322,11 +324,11 @@
               <div class="suggestion-label">{{item.Statement.Liability.TotalLiabilitiesSuggest}}</div>
             </div>
           </div>
-        </el-collapse-item>
-        <el-collapse-item title="股东权益（所有者权益）合计" name="4">
-          <template slot="title">
+        </div>
+        <div class="title-name">
+          <div class="title">
             <i class="header-icon el-icon-star-on"></i>股东权益（所有者权益）合计
-          </template>
+          </div>
           <div class="report-item-container" :class="layoutClass">
             <div class="report-item-name report-item">实收资本（或股本）：</div>
             <div class="report-item" v-for="item in reportList">
@@ -459,8 +461,7 @@
               <div class="suggestion-label">{{item.Statement.Liability.TotalLiabilitiesOwnersEquitySuggest}}</div>
             </div>
           </div>
-        </el-collapse-item>
-      </el-collapse>
+        </div>
       <div style="height: 100px;"></div>
     </vue-scroll>
   </div>
@@ -476,13 +477,25 @@ export default {
       default() {
         return [];
       }
-    }
+    },
+    orderStatus: {
+      type: Number,
+      default() {
+        return 2
+      }
+    },
+    isOrderEdit: {
+      type: Boolean,
+      default() {
+        return 2
+      }
+    },
   },
   data() {
     return {
-      activeNames: ["1", "2", "3", "4"],
       num: 0,
       show: true,
+      showDelete: false,
     };
   },
   created() {

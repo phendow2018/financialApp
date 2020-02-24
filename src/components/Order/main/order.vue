@@ -18,12 +18,20 @@
             :picker-options="pickerOptions"
           ></el-date-picker>
           <div :class="[preCls + '-header-filter-left-searchInput']">
-            <label for="autoInput">查询：</label>
+            <type-select :menuList="menuList" @on-type-changed="onTypeChanged"></type-select>
+            <!-- <div class="search-type" @mouseenter="showTypeSelect = true" @mouseleave="showTypeSelect = false">
+              <span v-html="curSearchType == 'FuzzyOrderNumber' ? '订单编号' : '企业名称'"></span>
+              <span class="el-icon-caret-bottom"></span>
+              <div class="search-container" v-show="showTypeSelect">
+                <div class="select-item" :class="{'active': curSearchType == 'FuzzyOrderNumber'}" @click="onClickItem('FuzzyOrderNumber')">订单编号</div>
+                <div class="select-item" :class="{'active': curSearchType != 'FuzzyOrderNumber'}" @click="onClickItem('FuzzyCompanyName')">企业名称</div>
+              </div>
+            </div> -->
             <el-autocomplete
               ref="autoInput"
               v-model="queryString"
               :fetch-suggestions="orderSearch"
-              placeholder="请输入订单编号或企业名称"
+              :placeholder="searchPlaceholder"
               @select="handleSelect"
               @clear="getOrderData()"
               value-key="name"
@@ -163,7 +171,7 @@
       title="订单指派"
       :visible.sync="dialogVisible"
       width="400px">
-      <el-select v-model="assignUser" placeholder="请选择用户" style="width: 330px;margin-left: 20px;margin-bottom: 30px;">
+      <el-select v-model="assignUser" placeholder="请选择要指派的人员" style="width: 330px;margin-left: 20px;margin-bottom: 30px;">
         <el-option
           v-for="item in usersList"
           :key="item.Name"
@@ -191,9 +199,11 @@ const showMode = {
   CANCELED: "-1"
 };
 import mixin from "$mixin/mixin.js";
+import TypeSelect from '$packages/others/searchType.vue'
 export default {
   name: "orderMain",
   mixins: [mixin],
+  components: { TypeSelect },
   data() {
     return {
       preCls,
@@ -249,7 +259,17 @@ export default {
       usersList: [],
       assignUser: '',
       dialogVisible: false,
-      assignOrderNumber: ''
+      assignOrderNumber: '',
+      menuList: [{
+        Id: 'FuzzyOrderNumber',
+        Name: '订单编号'
+      }, {
+        Id: 'FuzzyCompanyName',
+        Name: '企业名称'
+      }],
+      showTypeSelect: false,
+      curSearchType: 'FuzzyOrderNumber',
+      searchPlaceholder: '',
     };
   },
 
@@ -310,7 +330,7 @@ export default {
       let date = this.getSearchDate()
       let page = this.currentPageInfo
 
-      this.http.get(`${this.preApiName}/financial/order-manage/orders?FuzzyQuery=${qString}${
+      this.http.get(`${this.preApiName}/financial/order-manage/orders?${this.curSearchType}=${qString}${
             this.currentShowMode == -2 ? `` : `&Status=${this.currentShowMode}`}${
             (this.$root.rights.findIndex(vv => vv == 'order_1_2') < 0  || this.onlyMe) ? `&Editor=${localStorage.getItem('UserName')}` :``
           }&OrderDate=${date}&Page=${page.pageNum}&PerPage=${page.pageSize}`
@@ -372,7 +392,7 @@ export default {
 
       let date = this.getSearchDate();
       this.http
-        .get( `${this.preApiName}/financial/order-manage/orders?FuzzyQuery=${qString}${
+        .get( `${this.preApiName}/financial/order-manage/orders?${this.curSearchType}=${qString}${
             this.currentShowMode == -2 ? `` : `&Status=${this.currentShowMode}`
           }${this.onlyMe ? `&Editor=${localStorage.getItem('UserName')}` : ``}&Page=1&PerPage=20`
         )
@@ -527,6 +547,19 @@ export default {
         }
       })
     },
+    onClickItem(searchType) {
+      this.curSearchType = searchType
+      this.showTypeSelect = false
+      this.searchPlaceholder = this.curSearchType == 'FuzzyOrderNumber' ? '请输入订单编号' : '请输入企业名称'
+      this.queryString = ''
+      this.$refs.autoInput.focus()
+    },
+    onTypeChanged(searchType) {
+      this.curSearchType = searchType
+      this.searchPlaceholder = this.curSearchType == 'FuzzyOrderNumber' ? '请输入订单编号' : '请输入企业名称'
+      this.queryString = ''
+      this.$refs.autoInput.focus()
+    },
     createRandomOrder() {
       let _this = this;
       let lastType = 1;
@@ -557,6 +590,7 @@ export default {
     }
   },
   created() {
+    this.searchPlaceholder = this.curSearchType == 'FuzzyOrderNumber' ? '请输入订单编号' : '请输入企业名称'
     // this.createRandomOrder()
     this.getUserList()
     this.onlyMe = this.$root.rights.findIndex(vv => vv == 'order_1_2') < 0
@@ -571,12 +605,12 @@ export default {
       if (this.dateRange !== "custom") {
         this.searchQueryString(false);
       }
-    }
+    },
   },
   computed: {
     disabled() {
       return this.loading || this.noMore;
-    }
+    },
   },
   destroyed() {
     clearInterval(this.timer)

@@ -112,7 +112,7 @@ statements.prototype.doDelete = async function(){
     } 
 
     let deal = new CompanyStatement();
-    let ret = await deal.deleteStatement(queryData.CompanyNumber, queryData.Year, queryData.Type);
+    let ret = await deal.deleteStatement(queryData.CompanyNumber, queryData.Year, queryData.Type, postData);
     if (ret === false) {
       this.LastError = deal.getLastError();
       this.Code = 301;

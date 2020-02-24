@@ -39,6 +39,11 @@ class Company {
       Name: postData.Name,
       Abbr: makePy(postData.Name),
     };
+    if (tools.isValidString(postData.Operator)) {
+      let time = new Date();
+      params.LastModifyUser = postData.Operator;
+      params.LastModifyTime = time.format('yyyy-MM-dd HH:mm:ss');
+    }
     if (tools.isValidString(postData.Description)) {
       params.Description = postData.Description;
     };
@@ -68,6 +73,11 @@ class Company {
       params.Name = postData.Name;
       params.Abbr = makePy(postData.Name);
     };
+    if (tools.isValidString(postData.Operator)) {
+      let time = new Date();
+      params.LastModifyUser = postData.Operator;
+      params.LastModifyTime = time.format('yyyy-MM-dd HH:mm:ss');
+    }
     if (typeof postData.Description != 'undefined') {
       params.Description = postData.Description;
     }
@@ -77,6 +87,16 @@ class Company {
       this.LastError = this.dbLink.getLastError();
       return false;
     }
+
+    //如果修改内容中有CompanyNumber字段，单独进行修改操作
+    // if (tools.isValidString(postData.CompanyNumber)) {
+    //   let ret = await this.modifyCompanyNumber(CompanyNumber, postData.CompanyNumber);
+    //   if(ret === false) {
+    //     return false;
+    //   } else {
+    //     return {CompanyNumber: postData.CompanyNumber};
+    //   }
+    // }
 
     return {CompanyNumber: CompanyNumber};
   }
@@ -111,6 +131,18 @@ class Company {
         OR \`Name\` LIKE ${tools.MysqlEscape(likeStr)} 
         OR \`Abbr\` LIKE ${tools.MysqlEscape(likeStr)})`;
     }
+    if (tools.isValidString(queryData.FuzzyCompanyNumber)) {
+      let likeStr = `%${queryData.FuzzyCompanyNumber}%`;
+      where += ` AND \`CompanyNumber\` LIKE ${tools.MysqlEscape(likeStr)}`;
+    }
+    if (tools.isValidString(queryData.FuzzyName)) {
+      let likeStr = `%${queryData.FuzzyName}%`;
+      where += ` AND \`Name\` LIKE ${tools.MysqlEscape(likeStr)}`;
+    }
+    if (tools.isValidString(queryData.FuzzyAbbr)) {
+      let likeStr = `%${queryData.FuzzyAbbr.toUpperCase()}%`;
+      where += ` AND \`Abbr\` LIKE ${tools.MysqlEscape(likeStr)}`;
+    }
 
     let count = 0;
     let sqlCount = `SELECT COUNT(1) AS COUNT FROM \`${TABLE_NAME}\` ${where}`;
@@ -128,9 +160,11 @@ class Company {
         if(tempSortType == "DESC" || tempSortType == "ASC")
           SortType = tempSortType; 
       } 
-      if(SortBy == "COMPANYNUMBER" || SortBy == "NAME") {
+      if(SortBy == "COMPANYNUMBER" || SortBy == "NAME" || SortBy == "LASTMODIFYTIME" || SortBy == "LASTMODIFYUSER") {
           sort = `ORDER BY ${SortBy} ${SortType}`;        
       } 
+    } else {
+      sort = `ORDER BY LASTMODIFYTIME DESC`;
     }
 
     let limit = '';
@@ -140,7 +174,9 @@ class Company {
       limit = `LIMIT ${Page*PerPage},${PerPage}`;         
     }
 
-    let sql = `SELECT \`CompanyNumber\`, \`Name\`, \`Abbr\`, \`Description\` FROM \`${TABLE_NAME}\` ${where} ${sort} ${limit}`;
+    let sql = `SELECT \`CompanyNumber\`, \`Name\`, \`Abbr\`, \`LastModifyUser\`, 
+      DATE_FORMAT(LastModifyTime, '%Y-%m-%d %H:%i:%S') AS LastModifyTime, \`Description\` 
+      FROM \`${TABLE_NAME}\` ${where} ${sort} ${limit}`;
     let ret = await this.dbLink.query(sql);
     if (ret === false) {
       this.LastError = this.dbLink.getLastError();
@@ -191,7 +227,147 @@ class Company {
     }
     return ret;
   }
+
+  /** 修改企业编号 */
+  // async modifyCompanyNumber(OldCompanyNumber, NewCompanyNumber) {
+    //如果两个编号相同，不需要修改，直接返回true
+    // if (OldCompanyNumber === NewCompanyNumber) {
+    //   return true;
+    // }
+
+    // let checkExist = await this.checkNewCompanyNumberExist(OldCompanyNumber, NewCompanyNumber);
+    // if (checkExist === true) {
+    //   this.LastError = `企业社会统一信用代码[${NewCompanyNumber}]已存在`;;
+    //   return false;
+    // }
+
+    // let where = {
+    //   CompanyNumber: OldCompanyNumber,
+    // }
+    // let params = {
+    //   CompanyNumber: NewCompanyNumber,
+    // }
+    // let sql = tools.getUpdateSql(params, where, TABLE_NAME);
+    // let ret = await this.dbLink.query(sql);
+    // if (ret === false) {
+    //   this.LastError = this.dbLink.getLastError();
+    //   return false;
+    // }
+
+    // let sqlStatement = tools.getUpdateSql(params, where, `company_statement`);
+    // let retStatement = await this.dbLink.query(sqlStatement);
+    // if (retStatement === false) {
+    //   this.LastError = this.dbLink.getLastError();
+    //   return false;
+    // }
+    // return {CompanyNumber: NewCompanyNumber}
+  // }
+
+  /** 修改企业最后操作人 */
+  async modifyLastModifyUser(CompanyNumber, Operator) {
+    if (!tools.isValidString(Operator)) {
+      this.LastError = `无有效的Opeartor参数`;
+      return false;
+    }
+
+    let checkExistRet = await this.checkExist(CompanyNumber);
+    if (checkExistRet === false) {
+      this.LastError = `社会统一信用代码为${CompanyNumber}的企业不存在`;
+      return false;
+    }
+
+    let where = {
+      CompanyNumber: CompanyNumber,
+    }
+    let time = new Date();
+    let params = {
+      LastModifyUser: Operator,
+      LastModifyTime: time.format('yyyy-MM-dd HH:mm:ss')
+    };
+
+    let sql = tools.getUpdateSql(params, where, TABLE_NAME);
+    let ret = await this.dbLink.query(sql);
+    if (ret === false) {
+      this.LastError = this.dbLink.getLastError();
+      return false;
+    }
+
+    return {CompanyNumber: CompanyNumber};
+  }
+
+  /** 修改企业说明信息 */
+  async modifyCompanyExplain(CompanyNumber, Explain, Operator) {
+    let checkExistRet = await this.checkExist(CompanyNumber);
+    if (checkExistRet === false) {
+      this.LastError = `社会统一信用代码为${CompanyNumber}的企业不存在`;
+      return false;
+    }
+
+    let config = await this.getConfig();
+
+    let where = {
+      CompanyNumber: CompanyNumber,
+    }
+    let params = {};
+    if (typeof Explain == 'string') {
+      config.Explain = Explain;
+      params.Config = JSON.stringify(config);
+    };
+    if (tools.isValidString(Operator)) {
+      let time = new Date();
+      params.LastModifyUser = Operator;
+      params.LastModifyTime = time.format('yyyy-MM-dd HH:mm:ss');
+    }
+    
+    let sql = tools.getUpdateSql(params, where, TABLE_NAME);
+    let ret = await this.dbLink.query(sql);
+    if (ret === false) {
+      this.LastError = this.dbLink.getLastError();
+      return false;
+    }
+
+    return {CompanyNumber: CompanyNumber};
+  }
+
+  /** 查询企业说明信息 */
+  async getCompanyExplain(CompanyNumber) {
+    let checkExistRet = await this.checkExist(CompanyNumber);
+    if (checkExistRet === false) {
+      this.LastError = `社会统一信用代码为${CompanyNumber}的企业不存在`;
+      return false;
+    }
+
+    let config = await this.getConfig(CompanyNumber);
+    let Explain = '';
+    if (tools.isValidString(config.Explain)) {
+      Explain = config.Explain;
+    }
+    return {
+      CompanyNumber: CompanyNumber,
+      Explain: Explain
+    };
+  }
 };
+
+Company.prototype.checkNewCompanyNumberExist = async function(OldCompanyNumber, NewCompanyNumber) {
+  let sql = `SELECT COUNT(1) AS COUNT FROM \`Company\` WHERE \`CompanyNumber\`<>${tools.MysqlEscape(OldCompanyNumber)} 
+    AND \`CompanyNumber\`=${tools.MysqlEscape(NewCompanyNumber)}`;
+  let ret = await this.dbLink.query(sql);
+  if (ret === false || ret.length <= 0) {
+    return false;
+  }
+  return ret[0].COUNT > 0;
+}
+
+Company.prototype.getConfig = async function(CompanyNumber) {
+  let config = {};
+  let sql = `SELECT Config FROM \`Company\` WHERE \`CompanyNumber\`=${tools.MysqlEscape(CompanyNumber)}`;
+  let ret = await this.dbLink.query(sql);
+  if (!(ret === false || ret.length <= 0)) {
+    try {config = JSON.parse(ret[0].Config);} catch(e) {}
+  }
+  return config;
+}
 
 var findByYear = function(Statements, year) {
   for (let t of Statements) {

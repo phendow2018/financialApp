@@ -37,6 +37,7 @@
                 color: #515151;
 
                 .report-item {
+                    position: relative;
                     font-size: 16px;
                     font-weight: 200;
                 }
@@ -51,10 +52,13 @@
             .main-header {
                 .company-header, .order-header {
                     display: grid;
-                    grid-template-columns: 512px auto 164px;
+                    grid-template-columns: 450px auto 248px;
         
                     .header-item {
                         padding: 5px;
+                        overflow: hidden;
+                        white-space: nowrap;
+                        text-overflow: ellipsis;
                     }
                 }
                 
@@ -130,6 +134,20 @@
                     font-size: 18px;
                     padding: 0 5px;
                 }
+
+                .title {
+                    height: 50px;
+                    font-size: 18px;
+                    line-height: 50px;
+                    background-color: #dae8f7;
+                }
+
+                .report-small-item {
+                    font-size: 14px;
+                    line-height: 20px;
+                    font-weight: 100;
+                    padding: 5px;
+                }
             }
             .report-item-container {
                 height: 50px;
@@ -191,8 +209,8 @@
             }
 
             
-            
             .report-item {
+                position: relative;
                 text-align: center;
                 font-size: 16px;
                 font-weight: 200;
@@ -203,6 +221,18 @@
                     text-align: right;
                     padding-right: 10px;
                     color: red;
+                }
+
+                .delete-icon {
+                    position: absolute;
+                    right: 10px;
+                    top: 5px;
+                    color: #787c84;
+
+                    &:hover{
+                        color: #409EFF;
+                        cursor: pointer;
+                    }
                 }
             }
 
@@ -220,6 +250,16 @@
         .el-tabs__nav-wrap::after{
             height: 1px;
         }
-    }    
+    }   
+    
+    .display-report {
+        height: calc(100vh - 150px);
+        width: 100%;
+
+        .display-container {
+            max-width: calc(100vw - 250px);
+            margin: 0 auto;
+        }
+    }
 }
 

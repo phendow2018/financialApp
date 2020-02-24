@@ -75,7 +75,7 @@ QichachaReport.CommonInfo = {
 
 QichachaReport.prototype.makeReportStruct = function(orderInfo, cancel=false) {
   let ReportStruct = {
-    orderCode: orderInfo.ExternalId,
+    orderCode: "",
     code: `1`,
     type: `${orderInfo.Type}`,
     resultBalance: "",
@@ -85,6 +85,9 @@ QichachaReport.prototype.makeReportStruct = function(orderInfo, cancel=false) {
     cancelReason: ""
   };
 
+  if (tools.isValidString(orderInfo.ExternalId)) {
+    ReportStruct.orderCode = orderInfo.ExternalId;
+  }
   if (cancel == true) {
     ReportStruct.code = `-1`;
     ReportStruct.cancelReason = orderInfo.Explain;

@@ -110,7 +110,7 @@ export default {
             }).catch(err => {
                 _.$root.roles = []
                 _.isLogining = false
-                _.error = err.response.data.Message
+                _.error = err.response.status === 504 ? '后台服务未开启，请联系管理员' : err.response.data.Message
             })
             return;
         },

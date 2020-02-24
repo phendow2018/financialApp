@@ -223,6 +223,14 @@ class Order {
       where += ` AND (\`OrderNumber\` LIKE ${tools.MysqlEscape(likeStr)} 
         OR \`CompanyName\` LIKE ${tools.MysqlEscape(likeStr)})`;
     }
+    if (tools.isValidString(queryData.FuzzyOrderNumber)) {
+      let likeStr = `%${queryData.FuzzyOrderNumber}%`;
+      where += ` AND \`OrderNumber\` LIKE ${tools.MysqlEscape(likeStr)}`;
+    }
+    if (tools.isValidString(queryData.FuzzyCompanyName)) {
+      let likeStr = `%${queryData.FuzzyCompanyName}%`;
+      where += ` AND \`CompanyName\` LIKE ${tools.MysqlEscape(likeStr)}`;
+    }
 
     let count = 0;
     let sqlCount = `SELECT COUNT(1) AS COUNT FROM \`${TABLE_NAME}\` ${where}`;

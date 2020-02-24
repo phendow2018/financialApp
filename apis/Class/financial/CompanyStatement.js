@@ -1,6 +1,7 @@
 const global = require('../../Common/Global');
 const tools = require('../../Common/tools');
 const makePy = require('../../Common/makePy').makePy;
+const Company = require('./Company');
 
 const TABLE_NAME = 'company_statement';
 
@@ -65,6 +66,11 @@ class CompanyStatement {
       return false;
     }
 
+    if (tools.isValidString(postData.Operator)) {
+      let deal = new Company();
+      await deal.modifyLastModifyUser(postData.CompanyNumber, postData.Operator); 
+    }
+
     return {
       CompanyNumber: postData.CompanyNumber,
       Year: postData.Year,
@@ -99,6 +105,11 @@ class CompanyStatement {
       return false;
     }
 
+    if (tools.isValidString(postData.Operator)) {
+      let deal = new Company();
+      await deal.modifyLastModifyUser(CompanyNumber, postData.Operator); 
+    }
+
     return {
       CompanyNumber: CompanyNumber,
       Year: Year,
@@ -114,12 +125,14 @@ class CompanyStatement {
         CompanyNumber: data.CompanyNumber,
         Year: data.Year,
         Type: data.Type,
+        Operator: data.Operator,
         ReportType: data.ReportType,
         Statement: data.Statement
       }
       return await this.createStatement(createData);
     } else {
       let modifyData = {
+        Operator: data.Operator,
         ReportType: data.ReportType,
         Statement: data.Statement
       }
@@ -128,7 +141,7 @@ class CompanyStatement {
   }
 
   /** 删除企业报表 */
-  async deleteStatement(CompanyNumber, Year, Type) {
+  async deleteStatement(CompanyNumber, Year, Type, postData) {
     let where = {
       CompanyNumber: CompanyNumber,
       Year: Year,
@@ -139,6 +152,11 @@ class CompanyStatement {
     if (ret === false) {
       this.LastError = this.dbLink.getLastError();
       return false;
+    }
+
+    if (tools.isValidString(postData.Operator)) {
+      let deal = new Company();
+      await deal.modifyLastModifyUser(CompanyNumber, postData.Operator); 
     }
 
     return {

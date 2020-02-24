@@ -6,16 +6,17 @@
     color: #949393;
     z-index: 999;
     background: #fff;
-    width: 530px;
+    width: 630px;
     display: grid;
     grid-template-columns: auto 100px;
     align-items: start;
     justify-items: center;
-    right: calc(50vw - 265px);
+    right: calc(50vw - 315px);
     transition: all 1s;
 
     input {
       width: 300px;
+      border-radius: 0 5px 5px 0;
     }
 
     .company-search-title {
@@ -36,7 +37,7 @@
 
     .company-main {
       display: grid;
-      grid-template-columns: 10% auto 10%;
+      grid-template-columns: 1% auto 1%;
 
       .more-company-info {
         height: 60px;
@@ -49,7 +50,7 @@
       color: #000;
       height: 50px;
       display: grid;
-      grid-template-columns: 5% 450px 450px auto;
+      grid-template-columns: 5% 300px 280px auto 160px;
 
       .company-reports-list{
         line-height: 20px;
@@ -99,9 +100,17 @@
       border-top: 1px solid #eee;
 
       &:hover {
-        color: @fontcolor;
         background-color: #eee;
-        cursor: pointer;
+      }
+
+      .name, .number{
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        &:hover {
+          color: @fontcolor;
+          cursor: pointer;
+        }
       }
     }
     .company-items-item:nth-child(odd) {

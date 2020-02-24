@@ -31,7 +31,8 @@ class Base {
     else 
         err.Message = JSON.stringify(error);
     this.ctx.status = 422;
-    this.ctx.body = err;
+    this.ctx.body = {Error:err};
+    // this.ctx.body = err;
   }
 
   response200(message={}) {

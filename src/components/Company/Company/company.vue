@@ -1,16 +1,17 @@
 <template>
   <div class="big-container">
     <div
-      class="company-search":style="{'margin-top': isSearched ? '0px' : '50px', top: isSearched? '80px' : '130px'}">
+      class="company-search" :style="{'margin-top': isSearched ? '0px' : '50px', top: isSearched? '80px' : '130px'}">
       <div>
-        <span class="company-search-title">企业查询：</span>
+        <!-- <span class="company-search-title">企业查询：</span> -->
+        <el-button style="float: left;margin-right: 10px;" @click="onFresh"><i class="el-icon-refresh"></i>刷新最新</el-button>
+        <type-select :menuList="menuList" @on-type-changed="onTypeChanged"></type-select>
         <el-autocomplete
           ref="searchInput"
           v-model="queryString"
           :fetch-suggestions="suggestionSearch"
-          placeholder="请输入企业名称或统一社会信用编号"
+          :placeholder="searchPlaceholder"
           @select="handleSelect"
-          @clear="getCompanyData()"
           :select-when-unmatched="true"
           value-key="name"
           prefix-icon="el-icon-search"
@@ -39,14 +40,15 @@
             <div>名称</div>
             <div>统一社会信用代码</div>
             <div>报表列表</div>
+            <div>操作</div>
           </div>
           <div></div>
           <template v-for="(item, idx) in companyList">
             <div></div>
-            <div  class="company-item company-items-item" @click="linkToCompany(item)" title="点击跳转到企业管理页面">
+            <div  class="company-item company-items-item">
               <div>{{idx + 1}}</div>
-              <div class="name" v-html="item.Name" ></div>
-              <div class="number">{{item.CompanyNumber}}</div>
+              <div class="name" :style="{'font-size': item.Name.length > 20 ? '16px' : '18px'}" v-html="item.Name" @click="linkToCompany(item)" :title="item.Name"></div>
+              <div class="number" @click="linkToCompany(item)" title="点击跳转到企业管理页面">{{item.CompanyNumber}}</div>
               <div class="company-reports-list">
                 <div class="company"  v-for="report in item.Statements">
                   <div class="year">{{report.Year}}</div>
@@ -54,6 +56,10 @@
                     <template v-for="ii in report.Reports" ><span :key="ii">{{getLabel(ii).substring(0, 1)}}</span></template>
                   </div>
                 </div> 
+              </div>
+              <div>
+                <el-button type="default" v-show="$root.rights.includes('company_1_2')" @click="onEdit(item)">编辑</el-button>
+                <el-button type="danger" v-show="$root.rights.includes('company_1_3')" @click="onDelete(item)">删除</el-button>
               </div>
             </div>
             <div></div>
@@ -63,7 +69,7 @@
         </div>
       </vue-scroll>
     </div>
-    <el-dialog title="添加新企业" :visible.sync="addCompanyWndVisible" width="500px" @opened="$refs['Name'].focus();">
+    <el-dialog :title="isEdit ? '修改企业名称' : '添加新企业'" :visible.sync="addCompanyWndVisible" width="500px" @opened="$refs['Name'].focus();">
       <el-form
         :model="addCompanyForm"
         ref="ruleForm"
@@ -75,7 +81,7 @@
           <el-input v-model="addCompanyForm.Name" ref="Name"></el-input>
         </el-form-item>
         <el-form-item label="社会信用代码" prop="CompanyNumber">
-          <el-input v-model="addCompanyForm.CompanyNumber"></el-input>
+          <el-input v-model="addCompanyForm.CompanyNumber" :disabled="isEdit"></el-input>
         </el-form-item>
       </el-form>
       <div class="error" style="color: red; padding-left: 30px;"  v-show="errOccured">{{ErrMsg}}</div>
@@ -90,9 +96,13 @@
 <script>
 const preCls = "company";
 import mixin from "$mixin/mixin.js";
+import TypeSelect from '$packages/others/searchType.vue'
 export default {
   name: 'company',
   mixins: [mixin],
+  components: {
+    TypeSelect
+  },
   data() {
     var NameCheck = (rule, value, callback) => {
       if (!value) {
@@ -115,11 +125,13 @@ export default {
       companyLoading: false,
       companyList: [],
       isSearched: false,
+      isEdit: false,
       moreThan100: false,
       addCompanyForm: {
         Name: '',
         CompanyNumber:'',
-        Description: ''
+        Description: '',
+        Operator: '',
       },
       addCompanyWndVisible: false,
       rules: {
@@ -128,10 +140,16 @@ export default {
       },
       errOccured: true,
       ErrMsg: '',
+      menuList: [{
+        Id: 'FuzzyName',
+        Name: '企业名称'
+      }, {
+        Id: 'FuzzyCompanyNumber',
+        Name: '信用代码'
+      }],
+      curSearchType: "FuzzyName",
+      searchPlaceholder: '请输入企业名称',
     };
-  },
-  mounted() {
-    this.$refs["searchInput"].focus();
   },
   methods: {
     suggestionSearch(qString, cb) {
@@ -140,8 +158,7 @@ export default {
         return;
       }
       qString = decodeURIComponent(qString);
-      this.http
-        .get(`${this.preApiName}/financial/company-manage/companies?FuzzyQuery=${qString}&Page=1&PerPage=20`)
+      this.http.get(`${this.preApiName}/financial/company-manage/companies?${this.curSearchType}=${qString}&Page=1&PerPage=20`)
         .then(res => {
           let list = [];
           for (let item of res.data.data) {
@@ -168,10 +185,7 @@ export default {
       if (!!item.id && item.id != "") {
         _.$router.push(`${_.preName}/company/companyEdit?companyId=${item.id}`);
       } else {
-        _.http
-          .get(
-            `${_.preApiName}/financial/company-manage/companies/detail?FuzzyQuery=${item.value}&Page=1&PerPage=100`
-          )
+        _.http.get(`${_.preApiName}/financial/company-manage/companies/detail?${this.curSearchType}=${item.value}&Page=1&PerPage=100`)
           .then(res => {
             _.companyList = res.status == 200 ? res.data.data : [];
             this.moreThan100 = res.data.totalCount > 100
@@ -180,19 +194,39 @@ export default {
       }
     },
     onAddCompany(){
+      this.isEdit = false
       this.addCompanyWndVisible = true
       this.$refs["ruleForm"].resetFields()
+      this.addCompanyForm = {
+        Name: '',
+        CompanyNumber:'',
+        Description: '',
+      }
     },
     addCompanyAction() {
       let _ = this
       if(!_.getValidateStatus()) return
 
-       _.http.post(`/financial/company-manage/companies`, _.addCompanyForm)
+       _.isEdit ? _.http.put(`${this.preApiName}/financial/company-manage/companies?CompanyNumber=${_.addCompanyForm.CompanyNumber}`, {
+           Name: _.addCompanyForm.Name,
+           Operator: localStorage.getItem('UserName'),
+         
+       }).then(res => {
+         if(res.status == 201) {
+           _.errOccured = false
+           _.addCompanyWndVisible = false
+           let idx = _.companyList.findIndex(v => {
+             return v.CompanyNumber == _.addCompanyForm.CompanyNumber
+           })
+           if(idx >= 0) _.companyList[idx].Name = _.addCompanyForm.Name
+           _.showMessage(`修改企业名称成功！`, 'success')
+         }
+       }) :
+       _.http.post(`${this.preApiName}/financial/company-manage/companies`, {..._.addCompanyForm, Operator: localStorage.getItem('UserName')})
         .then(res => {
           if (res.status == 201) {
             _.errOccured = false
             _.addCompanyWndVisible = false
-            // _.companyList.unshift({..._.addCompanyForm})
             this.$router.push(`${this.preName}/company/companyEdit?companyId=${_.addCompanyForm.CompanyNumber}`)
             _.isSearched = true;
           }
@@ -203,9 +237,6 @@ export default {
             _.ErrMsg = err.response.data.Message
           }
         });
-    },
-    getCompanyData() {
-      return;
     },
     getValidateStatus() {
       let validStatus = false
@@ -222,7 +253,46 @@ export default {
     },
     linkToCompany(item) {
       this.$router.push(`${this.preName}/company/companyEdit?companyId=${item.CompanyNumber}`)
-    }
+    },
+    onTypeChanged(searchType) {
+      this.curSearchType = searchType
+      this.searchPlaceholder = searchType == 'FuzzyCompanyNumber' ? '请输入统一信用社会代码' : '请输入企业名称'
+      this.queryString = ''
+      this.$refs.searchInput.focus()
+    },
+    onFresh() {
+      let _ = this
+      _.http.get(`${_.preApiName}/financial/company-manage/companies/detail?Page=1&PerPage=100`)
+          .then(res => {
+            _.companyList = res.status == 200 ? res.data.data : [];
+            this.moreThan100 = res.data.totalCount > 100
+            _.isSearched = true;
+          })
+    },
+    onEdit(item) {
+      this.isEdit = true
+      this.addCompanyWndVisible = true
+      this.addCompanyForm = this.deepCopy(item)
+    },
+    onDelete(item) {
+      this.$confirm(`删除企业将删除企业的所有财务信息，确定删除吗?`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.http.delete(`${this.preApiName}/financial/company-manage/companies?CompanyNumber=${item.CompanyNumber}`).then(res => {
+            if(res.status === 204) {
+              let idx = this.companyList.findIndex(v => {
+                return v.CompanyNumber == item.CompanyNumber
+              })
+              idx >= 0 && this.companyList.splice(idx, 1)
+              this.showMessage(`删除企业成功！`, 'success')
+            } else {
+              this.showMessage('删除企业失败！', 'error', 5000)
+            }
+          })
+        })
+    },
   }
 };
 </script>

@@ -144,39 +144,33 @@ export default {
   },
   created() {
     let id,
-      _ = this;
+      _ = this
     let roleId = (id = this.$route.query.id);
     if (id) {
-      this.http
-        .get(`${this.preApiName}/financial/platform/roles?Id=${id}`)
+      this.http.get(`${this.preApiName}/financial/platform/roles?Id=${id}`)
         .then(res => {
-          let item = res.data.data.length > 0 ? res.data.data[0] : _.currentInfo;
-          _.currentItemName = _.currentInfo.Name = item.Name;
-          _.currentInfo.Description = item.Description;
-          _.currentInfo.IsAdmin = item.IsAdmin;
-          _.isEdit = true;
+          let item = res.data.data.length > 0 ? res.data.data[0] : _.currentInfo
+          _.currentItemName = _.currentInfo.Name = item.Name
+          _.currentInfo.Description = item.Description
+          _.currentInfo.IsAdmin = item.IsAdmin
+          _.isEdit = true
 
           //权限处理
           let data = res.data.data;
-          data.length > 0
-            ? (_.roleInfo = res.data.data[0])
-            : _.showMessage(`该角色不存在，请重新查询`, "error");
+          data.length > 0 ? (_.roleInfo = res.data.data[0]) : _.showMessage(`该角色不存在，请重新查询`, "error")
 
           _.allRightList = Object.assign(_.allRightList, _.roleInfo.Rights)
-          _.editContentName = _.roleInfo.Name;
+          _.editContentName = _.roleInfo.Name
         })
         .catch(({ response }) => {
-          this.showMessage(
-            `获取角色信息失败，原因：${response.data.error}！`,
-            "error"
-          );
-        });
+          this.showMessage( `获取角色信息失败，原因：${response.data.error}！`, "error")
+        })
     } else {
-      this.isEdit = false;
+      this.isEdit = false
     }
 
     _.http.get(`${this.preApiName}/financial/platform/modules`).then(res => {
-      let rights = res.status == 200 ? res.data.data : [];
+      let rights = res.status == 200 ? res.data.data : []
       rights.forEach(v => {
         v.Functions = JSON.parse(v.Functions);
         v.isEnabled = false
@@ -187,21 +181,21 @@ export default {
             })
         })
 
-        v.isOpen = false;
+        v.isOpen = false
       });
 
-      _.allRightList = Object.assign(rights, _.roleInfo.Rights);
-    });
+      _.allRightList = Object.assign(rights, _.roleInfo.Rights)
+    })
   },
   methods: {
     save() {
       if (this.getValidateStatus()) {
-        this.editInfo();
+        this.editInfo()
       }
     },
     async editInfo() {
-      let isEdit = this.isEdit;
-      let currentInfo = this.currentInfo;
+      let isEdit = this.isEdit
+      let currentInfo = this.currentInfo
       let item = {
         Name: this.myTrim(currentInfo.Name),
         Description: this.myTrim(currentInfo.Description),
@@ -210,22 +204,19 @@ export default {
         CreateUser: this.$root.account
       };
       try {
-        let result = await this.http[isEdit ? "put" : "post"](
-          `${this.preApiName}/financial/platform/roles${
+        let result = await this.http[isEdit ? "put" : "post"](`${this.preApiName}/financial/platform/roles${
             isEdit ? `?Id=${this.$route.query.id}` : ""
           }`,
           item
         );
 
         this.saveRight(result.data.Id);
-        
-        // this.showMessage(`角色${isEdit ? "修改" : "新建"}成功！`, "success");
       } catch (e) {
         this.showMessage(e.response.data.error, "error");
       }
     },
     backPath() {
-      this.$router.go(-1);
+      this.$router.go(-1)
     },
     getInfo() {
       this.getValidateStatus();
@@ -238,55 +229,53 @@ export default {
       return validStatus;
     },
     saveRight(id) {
-      let roleInfo = this.roleInfo;
-      if (!roleInfo.Id) roleInfo.Id = id;
-      this.http
-        .put(`${this.preApiName}/financial/platform/roles?Id=${roleInfo.Id}`, {
+      let roleInfo = this.roleInfo
+      if (!roleInfo.Id) roleInfo.Id = id
+      this.http.put(`${this.preApiName}/financial/platform/roles?Id=${roleInfo.Id}`, {
           Rights: this.allRightList
-        })
-        .then(res => {
-          this.showMessage(!this.isEdit ? '新建角色成功' : `更新角色成功！`, "success");
-          this.backToMain();
+        }).then(res => {
+          this.showMessage(!this.isEdit ? '新建角色成功' : `更新角色成功！`, "success")
+          this.backToMain()
         })
         .catch(({ response }) => {
           this.showMessage(
             this.isEdit ? `更新权限失败，原因：${response.data.error}！`: '新建角色失败',
             "error"
-          );
-        });
+          )
+        })
     },
     clickIcon(item) {
-      item.isOpen = !item.isOpen;
+      item.isOpen = !item.isOpen
     },
     getFormatRights() {
-      let rightArr = [];
+      let rightArr = []
       this.copyRight.map(item => {
         if (!item.isEnabled) return;
-        let node = {};
-        node.Type = item.Type;
-        node.UrlPrefix = item.UrlPrefix;
-        node.Sort = item.Sort;
-        let nodeRight = [];
+        let node = {}
+        node.Type = item.Type
+        node.UrlPrefix = item.UrlPrefix
+        node.Sort = item.Sort
+        let nodeRight = []
         item.Functions.map(res => {
-          let rightStringArr = [];
-          let rights = res.right;
+          let rightStringArr = []
+          let rights = res.right
           Object.keys(rights).map(sr => {
-            rights[sr] ? rightStringArr.push(sr) : null;
+            rights[sr] ? rightStringArr.push(sr) : null
           });
-          let rightString = rightStringArr.toString();
+          let rightString = rightStringArr.toString()
           if (rightString) {
             nodeRight.push({
               Method: rightString,
               Name: res.Name,
               Url: res.Url
-            });
+            })
           }
         });
-        node.Functions = nodeRight;
-        rightArr.push(node);
-      });
+        node.Functions = nodeRight
+        rightArr.push(node)
+      })
 
-      return rightArr;
+      return rightArr
     },
     getRightName(node) {
       const name = {

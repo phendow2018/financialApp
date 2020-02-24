@@ -18,7 +18,7 @@
       <div class="statistic-main">
         <div>
           <div style="padding-top: 10px;">
-            <el-collapse style="padding-left: 10px;border-left: 6px solid #409eff;">
+            <el-collapse style="padding-left: 10px;border-left: 6px solid #409eff;" @change="handleChange">
               <el-collapse-item title="简略信息" name="1">
                 <div class="statistic-item summary" isLoading="summaryLoading">
                   <div class="summary-item">
@@ -138,11 +138,12 @@ export default {
       },
       chart: null,
       summaryLoading: false,
+      loaded: false,
       monthDatas: [],
     };
   },
   mounted() {
-    this.getSummay()
+    
     this.initEcharts()
     this.getInitData()
   },
@@ -225,20 +226,6 @@ export default {
         unSendOrder.push(item.UnsendCount)
         cancelOrder.push(item.CancelCount)
       })
-
-      // for(let i = 0; i < 120; ++i) {
-      //   orderxAixs.push(`2010-02-0${i+1}`)
-      //   allOrder.push(i* 100)
-      //   sendOrder.push(i * 29) 
-
-      //   this.monthDatas.push({
-      //     Month: `2010-0${i+1}`,
-      //     Count: i * 100,
-      //     SendCount: i * 90,
-      //     CancelCount: i * 8,
-      //     UnsendCount: i * 2
-      //   })
-      // }
 
       this.updateChartOption(orderxAixs, allOrder, sendOrder, unSendOrder, cancelOrder)
     },
@@ -367,6 +354,12 @@ export default {
       curMonth = curMonth > 9 ? curMonth : `0${curMonth}`
 
       this.getOrdersByMonth(`2019-10`, `${curDate.getFullYear()}-${curMonth}`)
+    },
+    handleChange(activeNames) {
+      if(activeNames.length > 0 && !this.loaded) {
+        this.loaded = true
+        this.getSummay()
+      }
     },
   },
 };
