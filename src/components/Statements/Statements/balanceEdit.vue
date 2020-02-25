@@ -515,15 +515,56 @@ export default {
       this.$emit('on-value-changed')
       this.reportList.map(item => {
         let Liability = item.Statement.Liability
-        if(Liability[prop] == undefined || Liability[prop] == null) {
-          Liability[prop] = 0
-        }
 
-        Liability.TotalCurrentLiabilitySuggest = (Liability.ShortTermBorrowing + Liability.NotesPayable + Liability.AccountsPayable + Liability.UnearnedRevenue + Liability.EmployeePayable + Liability.TaxPayable + Liability.AccrualInterestPayable + Liability.ProfitPayable + Liability.OtherPayables + Liability.OtherCurrentLiability).toFixed(2)
-        Liability.TotalNonCurrentLiabilitySuggest = (Liability.LongTermLoan + Liability.BondsPayable + Liability.LongTermPayable + Liability.AccountPayableSpecialFunds + Liability.FinanceLeasePayable + Liability.MajorRepairPreparation + Liability.AnticipationLiabilities + Liability.EmployeePayableMoreThanOneYear + Liability.DeferredIncomeTaxLiabilities + Liability.DeferredIncome + Liability.OtherNonCurrentLiability).toFixed(2)
-        Liability.TotalLiabilitiesSuggest = (parseFloat(Liability.TotalCurrentLiabilitySuggest) + parseFloat(Liability.TotalNonCurrentLiabilitySuggest)).toFixed(2)
-        Liability.TotalEquitySuggest = (Liability.PaidInCapital + Liability.CapitalReserve + Liability.EarnedSurplus + Liability.GeneralRiskPreparation + Liability.ReasonableReserve + Liability.UndistributedProfit + Liability.TranslationReserve + Liability.MinorityEquity).toFixed(2)
-        Liability.TotalLiabilitiesOwnersEquitySuggest = (parseFloat(Liability.TotalCurrentLiabilitySuggest) + parseFloat(Liability.TotalNonCurrentLiabilitySuggest) + parseFloat(Liability.TotalEquitySuggest)).toFixed(2)
+        let ShortTermBorrowing = Liability.ShortTermBorrowing == undefined ? 0 : Liability.ShortTermBorrowing
+        let NotesPayable = Liability.NotesPayable == undefined ? 0 : Liability.NotesPayable
+        let AccountsPayable = Liability.AccountsPayable == undefined ? 0 : Liability.AccountsPayable
+        let UnearnedRevenue = Liability.UnearnedRevenue == undefined ? 0 : Liability.UnearnedRevenue
+        let EmployeePayable = Liability.EmployeePayable == undefined ? 0 : Liability.EmployeePayable
+        let TaxPayable = Liability.TaxPayable == undefined ? 0 : Liability.TaxPayable
+        let AccrualInterestPayable = Liability.AccrualInterestPayable == undefined ? 0 : Liability.AccrualInterestPayable
+        let ProfitPayable = Liability.ProfitPayable == undefined ? 0 : Liability.ProfitPayable
+        let OtherPayables = Liability.OtherPayables == undefined ? 0 : Liability.OtherPayables
+        let OtherCurrentLiability = Liability.OtherCurrentLiability == undefined ? 0 : Liability.OtherCurrentLiability
+
+        let curTotalCurrentLiabilitySuggest = ShortTermBorrowing + NotesPayable + AccountsPayable + UnearnedRevenue + EmployeePayable + TaxPayable 
+          + AccrualInterestPayable + ProfitPayable + OtherPayables + OtherCurrentLiability
+
+        Liability.TotalCurrentLiabilitySuggest = curTotalCurrentLiabilitySuggest.toFixed(2)
+
+        let LongTermLoan = Liability.LongTermLoan == undefined ? 0 : Liability.LongTermLoan
+        let BondsPayable = Liability.BondsPayable == undefined ? 0 : Liability.BondsPayable
+        let LongTermPayable = Liability.LongTermPayable == undefined ? 0 : Liability.LongTermPayable
+        let AccountPayableSpecialFunds = Liability.AccountPayableSpecialFunds == undefined ? 0 : Liability.AccountPayableSpecialFunds
+        let FinanceLeasePayable = Liability.FinanceLeasePayable == undefined ? 0 : Liability.FinanceLeasePayable
+        let MajorRepairPreparation = Liability.MajorRepairPreparation == undefined ? 0 : Liability.MajorRepairPreparation
+        let AnticipationLiabilities = Liability.AnticipationLiabilities == undefined ? 0 : Liability.AnticipationLiabilities
+        let EmployeePayableMoreThanOneYear = Liability.EmployeePayableMoreThanOneYear == undefined ? 0 : Liability.EmployeePayableMoreThanOneYear
+        let DeferredIncomeTaxLiabilities = Liability.DeferredIncomeTaxLiabilities == undefined ? 0 : Liability.DeferredIncomeTaxLiabilities
+        let DeferredIncome = Liability.DeferredIncome == undefined ? 0 : Liability.DeferredIncome
+        let OtherNonCurrentLiability = Liability.OtherNonCurrentLiability == undefined ? 0 : Liability.OtherNonCurrentLiability
+
+        let curTotalNonCurrentLiabilitySuggest = LongTermLoan + BondsPayable + LongTermPayable + AccountPayableSpecialFunds + FinanceLeasePayable 
+          + MajorRepairPreparation + AnticipationLiabilities + EmployeePayableMoreThanOneYear + DeferredIncomeTaxLiabilities + DeferredIncome + OtherNonCurrentLiability
+        Liability.TotalNonCurrentLiabilitySuggest = curTotalNonCurrentLiabilitySuggest.toFixed(2)
+
+        Liability.TotalLiabilitiesSuggest = (curTotalCurrentLiabilitySuggest + curTotalNonCurrentLiabilitySuggest).toFixed(2)
+
+        let PaidInCapital = Liability.PaidInCapital == undefined ? 0 : Liability.PaidInCapital
+        let CapitalReserve = Liability.CapitalReserve == undefined ? 0 : Liability.CapitalReserve
+        let EarnedSurplus = Liability.EarnedSurplus == undefined ? 0 : Liability.EarnedSurplus
+        let GeneralRiskPreparation = Liability.GeneralRiskPreparation == undefined ? 0 : Liability.GeneralRiskPreparation
+        let ReasonableReserve = Liability.ReasonableReserve == undefined ? 0 : Liability.ReasonableReserve
+        let UndistributedProfit = Liability.UndistributedProfit == undefined ? 0 : Liability.UndistributedProfit
+        let TranslationReserve = Liability.TranslationReserve == undefined ? 0 : Liability.TranslationReserve
+        let MinorityEquity = Liability.MinorityEquity == undefined ? 0 : Liability.MinorityEquity
+        
+        let curTotalEquitySuggest = PaidInCapital + CapitalReserve + EarnedSurplus + GeneralRiskPreparation + ReasonableReserve + UndistributedProfit 
+          + TranslationReserve + MinorityEquity
+        Liability.TotalEquitySuggest = curTotalEquitySuggest.toFixed(2)
+
+
+        Liability.TotalLiabilitiesOwnersEquitySuggest = (curTotalCurrentLiabilitySuggest + curTotalNonCurrentLiabilitySuggest + curTotalEquitySuggest).toFixed(2)
       }) 
     }
   },

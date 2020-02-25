@@ -193,6 +193,8 @@ export default {
         document.cookie = name + "=" + cval + ";expires=" + exp.toGMTString();
     },
     formatNumer(num) {
+      if(num == undefined) return ''
+      
       num = num.toFixed(2)
       var beforeNum = num.toString().split(".")[0];//获取小数点之前的数字
       var afterNum = num.toString().split(".")[1];//获取小数点之后的数字

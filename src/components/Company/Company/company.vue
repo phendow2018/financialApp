@@ -275,7 +275,7 @@ export default {
       this.addCompanyForm = this.deepCopy(item)
     },
     onDelete(item) {
-      this.$confirm(`删除企业将删除企业的所有财务信息，确定删除吗?`, '提示', {
+      this.$confirm(`将删除企业的所有财务信息，确定删除企业[${item.Name}]吗?`, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'

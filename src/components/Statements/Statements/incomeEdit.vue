@@ -588,28 +588,52 @@ export default {
   },
   methods: {
     onInputFucus(evt) {
-      $(evt.target)
-        .parents(".report-item-container")
-        .addClass("assets-container-focus");
+      $(evt.target).parents(".report-item-container").addClass("assets-container-focus")
     },
     onInputBlur(evt) {
-      $(evt.target)
-        .parents(".report-item-container")
-        .removeClass("assets-container-focus");
+      $(evt.target).parents(".report-item-container").removeClass("assets-container-focus")
     },
     onValueChanged(prop, val) {
       this.$emit('on-value-changed')
       this.reportList.map(item => {
         let Income = item.Statement.Income
-        if(Income[prop] == undefined || Income[prop] == null) {
-          Income[prop] = 0
-        }
-        Income.OperatingMarginSuggest = (Income.OperationRevenue - Income.BusinessTariffAndAnnex - Income.OperatingCosts - Income.EduSurtax_MineralRsrcCompFees_SwgChrg).toFixed(2)
-        Income.OperatingProfitSuggest = (Income.OperatingMarginSuggest - Income.SellingExpenses - Income.AdministrationExpenseCost - Income.FinancialCost - Income.AssetsImpairmentLoss - Income.ExplorationExpenditure - Income.OtherExpenses + Income.IncomeFromInvestment + Income.NetIncomeFromChangesInFairValue + Income.ExchangeEarning).toFixed(2)
-        Income.TotalProfitSuggest = (Income.OperatingProfitSuggest +  Income.NonOperatingIncome - Income.NonBusinessExpenditure + Income.OtherProfit - Income.UnrecoverableLossOnLongTermBondInvestment - Income.UnrecoverableLossOnLongTermEquityInvestment - Income.LossByForceMajeureFactors - Income.TaxDelayCharge).toFixed(2)
         
-        Income.NetProfitSuggest = (parseFloat(Income.TotalProfitSuggest) - Income.IncomeTaxExpense).toFixed(2)
-        
+        let OperationRevenue = Income.OperationRevenue == undefined ? 0 : Income.OperationRevenue
+        let BusinessTariffAndAnnex = Income.BusinessTariffAndAnnex == undefined ? 0 : Income.BusinessTariffAndAnnex
+        let OperatingCosts = Income.OperatingCosts == undefined ? 0 : Income.OperatingCosts
+        let EduSurtax_MineralRsrcCompFees_SwgChrg = Income.EduSurtax_MineralRsrcCompFees_SwgChrg == undefined ? 0 : Income.EduSurtax_MineralRsrcCompFees_SwgChrg 
+
+        let curOperatingMarginSuggest = OperationRevenue - BusinessTariffAndAnnex - OperatingCosts - EduSurtax_MineralRsrcCompFees_SwgChrg
+        Income.OperatingMarginSuggest = (curOperatingMarginSuggest).toFixed(2)
+
+        let SellingExpenses = Income.SellingExpenses == undefined ? 0 : Income.SellingExpenses
+        let AdministrationExpenseCost = Income.AdministrationExpenseCost == undefined ? 0 : Income.AdministrationExpenseCost
+        let FinancialCost = Income.FinancialCost == undefined ? 0 : Income.FinancialCost
+        let AssetsImpairmentLoss = Income.AssetsImpairmentLoss == undefined ? 0 : Income.AssetsImpairmentLoss
+        let ExplorationExpenditure = Income.ExplorationExpenditure == undefined ? 0 : Income.ExplorationExpenditure
+        let OtherExpenses = Income.OtherExpenses == undefined ? 0 : Income.OtherExpenses
+        let IncomeFromInvestment = Income.IncomeFromInvestment == undefined ? 0 : Income.IncomeFromInvestment
+        let NetIncomeFromChangesInFairValue = Income.NetIncomeFromChangesInFairValue == undefined ? 0 : Income.NetIncomeFromChangesInFairValue
+        let ExchangeEarning = Income.ExchangeEarning == undefined ? 0 : Income.ExchangeEarning
+
+        let curOperatingProfitSuggest = curOperatingMarginSuggest - SellingExpenses - AdministrationExpenseCost - FinancialCost - AssetsImpairmentLoss 
+          - ExplorationExpenditure - OtherExpenses + IncomeFromInvestment + NetIncomeFromChangesInFairValue + ExchangeEarning
+        Income.OperatingProfitSuggest = curOperatingProfitSuggest.toFixed(2)
+
+        let NonOperatingIncome = Income.NonOperatingIncome == undefined ? 0 : Income.NonOperatingIncome
+        let NonBusinessExpenditure = Income.NonBusinessExpenditure == undefined ? 0 : Income.NonBusinessExpenditure
+        let OtherProfit = Income.OtherProfit == undefined ? 0 : Income.OtherProfit
+        let UnrecoverableLossOnLongTermBondInvestment = Income.UnrecoverableLossOnLongTermBondInvestment == undefined ? 0 : Income.UnrecoverableLossOnLongTermBondInvestment
+        let LossByForceMajeureFactors = Income.LossByForceMajeureFactors == undefined ? 0 : Income.LossByForceMajeureFactors
+        let UnrecoverableLossOnLongTermEquityInvestment = Income.UnrecoverableLossOnLongTermEquityInvestment == undefined ? 0 : Income.UnrecoverableLossOnLongTermEquityInvestment
+        let TaxDelayCharge = Income.TaxDelayCharge == undefined ? 0 : Income.TaxDelayCharge
+
+        let curTotalProfitSuggest = curOperatingProfitSuggest +  NonOperatingIncome - NonBusinessExpenditure + OtherProfit - UnrecoverableLossOnLongTermBondInvestment 
+          - UnrecoverableLossOnLongTermEquityInvestment - LossByForceMajeureFactors - TaxDelayCharge
+        Income.TotalProfitSuggest = (curTotalProfitSuggest).toFixed(2)
+
+        let IncomeTaxExpense = Income.IncomeTaxExpense == undefined ? 0 : Income.IncomeTaxExpense
+        Income.NetProfitSuggest = (curTotalProfitSuggest - IncomeTaxExpense).toFixed(2)
       }) 
     }
   },

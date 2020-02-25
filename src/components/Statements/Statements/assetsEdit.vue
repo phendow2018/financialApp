@@ -512,13 +512,49 @@ export default {
       this.$emit('on-value-changed')
       this.reportList.map(item => {
         let asset = item.Statement.Asset
-        if(asset[prop] == undefined || asset[prop] == null) {
-          asset[prop] = 0
-        }
         
-        asset.TotalCurrentAssetsSuggest = (asset.MonetaryResources + asset.ShortTermInvestments + asset.NotesReceivable + asset.AccountReceivable + asset.PrePayment + asset.DividendsReceivable + asset.InterestReceivable + asset.ReceivableOther + asset.Inventory + asset.GoodsInProcess + asset.MerchandiseInventory + asset.RevolvingMaterials + asset.OtherCurrentAssets).toFixed(2)
-        asset.TotalNonCurrentAssetsSuggest = (asset.LongTermBondInvestment + asset.LongTermEquityInvestment + asset.NetValueOfFixedAssets + asset.ConstructionInProcess + asset.EngineeringMaterial + asset.DisposalOfFixedAssets + asset.CapitalizedBiologicalAssets + asset.OilAndGasAssets + asset.IntangibleAssets + asset.DevelopmentExpenditure + asset.Goodwill  + asset.EquipmentRentalDeposit + asset.LongTermUnamortizedExpenses + asset.DeferredIncomeTaxAssets + asset.OtherNonCurrentAssets).toFixed(2)
-        asset.TotalAssetsSuggest = (parseFloat(asset.TotalCurrentAssetsSuggest) + parseFloat(asset.TotalNonCurrentAssetsSuggest)).toFixed(2)
+        let MonetaryResources = asset.MonetaryResources == undefined ? 0 : asset.MonetaryResources
+        let ShortTermInvestments = asset.ShortTermInvestments == undefined ? 0 : asset.ShortTermInvestments
+        let NotesReceivable = asset.NotesReceivable == undefined ? 0 : asset.NotesReceivable
+        let AccountReceivable = asset.AccountReceivable == undefined ? 0 : asset.AccountReceivable
+        let PrePayment = asset.PrePayment == undefined ? 0 : asset.PrePayment
+        let DividendsReceivable = asset.DividendsReceivable == undefined ? 0 : asset.DividendsReceivable
+        let InterestReceivable = asset.InterestReceivable == undefined ? 0 : asset.InterestReceivable
+        let ReceivableOther = asset.ReceivableOther == undefined ? 0 : asset.ReceivableOther
+        let Inventory = asset.Inventory == undefined ? 0 : asset.Inventory
+        let GoodsInProcess = asset.GoodsInProcess == undefined ? 0 : asset.GoodsInProcess
+        let MerchandiseInventory = asset.MerchandiseInventory == undefined ? 0 : asset.MerchandiseInventory
+        let RevolvingMaterials = asset.RevolvingMaterials == undefined ? 0 : asset.RevolvingMaterials
+        let OtherCurrentAssets = asset.OtherCurrentAssets == undefined ? 0 : asset.OtherCurrentAssets
+        
+        let curTotalCurrentAssetsSuggest = MonetaryResources + ShortTermInvestments + NotesReceivable + AccountReceivable + PrePayment + DividendsReceivable 
+          + InterestReceivable + ReceivableOther + Inventory + GoodsInProcess + MerchandiseInventory + RevolvingMaterials + OtherCurrentAssets
+
+        asset.TotalCurrentAssetsSuggest = curTotalCurrentAssetsSuggest.toFixed(2)
+
+        let LongTermBondInvestment = asset.LongTermBondInvestment == undefined ? 0 : asset.LongTermBondInvestment
+        let LongTermEquityInvestment = asset.LongTermEquityInvestment == undefined ? 0 : asset.LongTermEquityInvestment
+        let NetValueOfFixedAssets = asset.NetValueOfFixedAssets == undefined ? 0 : asset.NetValueOfFixedAssets
+        let ConstructionInProcess = asset.ConstructionInProcess == undefined ? 0 : asset.ConstructionInProcess
+        let EngineeringMaterial = asset.EngineeringMaterial == undefined ? 0 : asset.EngineeringMaterial
+        let DisposalOfFixedAssets = asset.DisposalOfFixedAssets == undefined ? 0 : asset.DisposalOfFixedAssets
+        let CapitalizedBiologicalAssets = asset.CapitalizedBiologicalAssets == undefined ? 0 : asset.CapitalizedBiologicalAssets
+        let OilAndGasAssets = asset.OilAndGasAssets == undefined ? 0 : asset.OilAndGasAssets
+        let IntangibleAssets = asset.IntangibleAssets == undefined ? 0 : asset.IntangibleAssets
+        let DevelopmentExpenditure = asset.DevelopmentExpenditure == undefined ? 0 : asset.DevelopmentExpenditure
+        let Goodwill = asset.Goodwill == undefined ? 0 : asset.Goodwill
+        let EquipmentRentalDeposit = asset.EquipmentRentalDeposit == undefined ? 0 : asset.EquipmentRentalDeposit
+        let LongTermUnamortizedExpenses = asset.LongTermUnamortizedExpenses == undefined ? 0 : asset.LongTermUnamortizedExpenses
+        let DeferredIncomeTaxAssets = asset.DeferredIncomeTaxAssets == undefined ? 0 : asset.DeferredIncomeTaxAssets
+        let OtherNonCurrentAssets = asset.OtherNonCurrentAssets == undefined ? 0 : asset.OtherNonCurrentAssets
+
+        let curTotalNonCurrentAssetsSuggest = LongTermBondInvestment + LongTermEquityInvestment + NetValueOfFixedAssets + ConstructionInProcess + EngineeringMaterial 
+          + DisposalOfFixedAssets + CapitalizedBiologicalAssets + OilAndGasAssets + IntangibleAssets + DevelopmentExpenditure + Goodwill  
+          + EquipmentRentalDeposit + LongTermUnamortizedExpenses + DeferredIncomeTaxAssets + OtherNonCurrentAssets
+
+        asset.TotalNonCurrentAssetsSuggest = curTotalNonCurrentAssetsSuggest.toFixed(2)
+
+        asset.TotalAssetsSuggest = (curTotalCurrentAssetsSuggest + curTotalNonCurrentAssetsSuggest).toFixed(2)
       })
     }
   },

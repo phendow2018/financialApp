@@ -43,7 +43,7 @@
                 </div>
             </div>
         </div>
-        <div class="contract-login-img">
+        <!-- <div class="contract-login-img">
             <div class="img-notebook">
             </div>
              <div class="img-coffee">
@@ -54,7 +54,7 @@
              <div class="img-keyboard">
 
             </div>
-        </div>
+        </div> -->
     </div>
 </template>
 <script>
