@@ -671,20 +671,36 @@ export default {
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
+          
           this.updateOrderStatus(0, () => {
             this.showMessage(`撤销状态成功！`,'success')
           })
         })
     },
     onCancel() {
-      this.$confirm('取消订单将导致该订单无法继续操作，确定取消吗?', '提示', {
+      this.$prompt('请输入取消订单的原因：', '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
-        }).then(() => {
-          this.updateOrderStatus(-1, () => {
-            this.showMessage(`取消订单成功！`,'success')
+        }).then((res) => {
+          if(res.value == null) {
+            this.showMessage(`请输入取消订单的原因`, 'warning')
+            return
+          }
+          this.http.post(`/financial/order-manage/orders/cancel-operation?`, {OrderNumber: this.orderData.OrderNumber, Operator: localStorage.getItem("UserName"), Explain: res.value}).then(res => {
+            if(res.status == 201) {
+              this.showMessage('取消订单成功!', 'success')
+              this.orderData.Status = -1
+              this.orderData.LastModifyUser = localStorage.getItem("UserName")
+
+              this.orderData.Editor = localStorage.getItem("UserName")
+            }
+          }).catch(err => {
+            this.showMessage(`取消订单失败, ${err.response.data.Message}`, 'error')
           })
+          // this.updateOrderStatus(-1, () => {
+          //   this.showMessage(`取消订单成功！`,'success')
+          // })
         })
     },
     updateOrderStatus(status, callback) {
@@ -773,7 +789,7 @@ export default {
       this.$router.push(`${this.preName}/company/companyEdit?companyId=${companyId}`)
     },
     backPath() {
-      this.$router.go(-1);
+      this.reportType == "order" ? this.$router.push(`${this.preName}/order`) : this.$router.push(`${this.preName}/company`)
     },
     onValueChanged() {
       this.isDirty = true

@@ -94,7 +94,7 @@ OrderCommit.prototype.doCreate = async function() {
     return false;
   }
 
-  await _this.writeDBLog(postData.Operator, `提交订单 订单编号:${ret.OrderNumber} 操作人:${postData.Operator}`);
+  await _this.writeDBLog(postData.Operator, `提交订单 订单编号:${ret.OrderNumber}`);
   return ret;
 }
 
@@ -151,7 +151,7 @@ OrderCommit.prototype.doDelete = async function(){
       return false;
     }
   
-    await _this.writeDBLog(postData.Operator, `取消订单提交 订单编号:${ret.OrderNumber} 操作人:${postData.Operator}`);
+    await _this.writeDBLog(postData.Operator, `取消订单提交 订单编号:${ret.OrderNumber}`);
     return ret;
 }
 

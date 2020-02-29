@@ -1,9 +1,7 @@
 <template>
   <div class="big-container">
-    <div
-      class="company-search" :style="{'margin-top': isSearched ? '0px' : '50px', top: isSearched? '80px' : '130px'}">
+    <div class="company-search" :style="{'margin-top': isSearched ? '0px' : '50px', top: isSearched? '80px' : '130px'}">
       <div>
-        <!-- <span class="company-search-title">企业查询：</span> -->
         <el-button style="float: left;margin-right: 10px;" @click="onFresh"><i class="el-icon-refresh"></i>刷新最新</el-button>
         <type-select :menuList="menuList" @on-type-changed="onTypeChanged"></type-select>
         <el-autocomplete
@@ -31,6 +29,10 @@
       </div>
       <el-button type="primary" @click="onAddCompany" v-show="$root.rights.includes('company_1_1')">添加新企业</el-button>
     </div>
+
+    <div class="company-totalcount" :style="{'margin-top': isSearched ? '0px' : '80px', top: isSearched? '80px' : '160px', right: isSearched ? '20px' : 'calc(50vw - 150px)'}">
+      共 <span style="color: #409EFF;font-size: 20px;"><ICountUp :delay="10" :endVal="TotalCompanyCount" :options="options"/> </span> 个企业
+    </div>
     <div class="company-container" v-if="companyList.length > 0">
       <vue-scroll :ops="ops" ref="globel-scroll">
         <div class="company-main">
@@ -46,7 +48,7 @@
           <template v-for="(item, idx) in companyList">
             <div></div>
             <div  class="company-item company-items-item">
-              <div>{{idx + 1}}</div>
+              <div>{{((currentPage - 1) * 100 + idx + 1)}}</div>
               <div class="name" :style="{'font-size': item.Name.length > 20 ? '16px' : '18px'}" v-html="item.Name" @click="linkToCompany(item)" :title="item.Name"></div>
               <div class="number" @click="linkToCompany(item)" title="点击跳转到企业管理页面">{{item.CompanyNumber}}</div>
               <div class="company-reports-list">
@@ -58,14 +60,20 @@
                 </div> 
               </div>
               <div>
-                <el-button type="default" v-show="$root.rights.includes('company_1_2')" @click="onEdit(item)">编辑</el-button>
-                <el-button type="danger" v-show="$root.rights.includes('company_1_3')" @click="onDelete(item)">删除</el-button>
+                <el-button type="default" v-show="$root.rights.includes('company_1_2')" @click="onEdit(item)" size="small">编辑</el-button>
+                <el-button type="danger" v-show="$root.rights.includes('company_1_3')" @click="onDelete(item)" size="small">删除</el-button>
               </div>
             </div>
             <div></div>
           </template>
           <div></div>
-          <div class="more-company-info" v-if="moreThan100">结果超过100个，请修改条件进行更精确的查询</div>
+          <el-pagination
+            @current-change="handleCurrentChange"
+            :current-page.sync="currentPage"
+            :page-size="100"
+            layout="total, prev, pager, next"
+            :total="curSearchCount">
+          </el-pagination>
         </div>
       </vue-scroll>
     </div>
@@ -97,11 +105,12 @@
 const preCls = "company";
 import mixin from "$mixin/mixin.js";
 import TypeSelect from '$packages/others/searchType.vue'
+import ICountUp from "vue-countup-v2";
 export default {
   name: 'company',
   mixins: [mixin],
   components: {
-    TypeSelect
+    TypeSelect, ICountUp
   },
   data() {
     var NameCheck = (rule, value, callback) => {
@@ -126,7 +135,18 @@ export default {
       companyList: [],
       isSearched: false,
       isEdit: false,
-      moreThan100: false,
+      TotalCompanyCount: 0,
+      curSearchCount: 0,
+      currentPage: 1,
+      options: {
+        useEasing: true,
+        useGrouping: true,
+        separator: ",",
+        decimal: ".",
+        prefix: "",
+        suffix: "",
+        duration: 2
+      },
       addCompanyForm: {
         Name: '',
         CompanyNumber:'',
@@ -150,6 +170,14 @@ export default {
       curSearchType: "FuzzyName",
       searchPlaceholder: '请输入企业名称',
     };
+  },
+  mounted() {
+    let _ = this
+    _.http.get(`${_.preApiName}/financial/statistics/company-count`).then(res => {
+      if(res.status === 200) {
+        _.TotalCompanyCount = res.data.Count
+      }
+    })
   },
   methods: {
     suggestionSearch(qString, cb) {
@@ -185,12 +213,7 @@ export default {
       if (!!item.id && item.id != "") {
         _.$router.push(`${_.preName}/company/companyEdit?companyId=${item.id}`);
       } else {
-        _.http.get(`${_.preApiName}/financial/company-manage/companies/detail?${this.curSearchType}=${item.value}&Page=1&PerPage=100`)
-          .then(res => {
-            _.companyList = res.status == 200 ? res.data.data : [];
-            this.moreThan100 = res.data.totalCount > 100
-            _.isSearched = true;
-          });
+        _.getCompaniesByPage(1, this.curSearchType, item.value)
       }
     },
     onAddCompany(){
@@ -229,6 +252,7 @@ export default {
             _.addCompanyWndVisible = false
             this.$router.push(`${this.preName}/company/companyEdit?companyId=${_.addCompanyForm.CompanyNumber}`)
             _.isSearched = true;
+            _.TotalCompanyCount++
           }
         })
         .catch(err => {
@@ -261,13 +285,17 @@ export default {
       this.$refs.searchInput.focus()
     },
     onFresh() {
-      let _ = this
-      _.http.get(`${_.preApiName}/financial/company-manage/companies/detail?Page=1&PerPage=100`)
-          .then(res => {
-            _.companyList = res.status == 200 ? res.data.data : [];
-            this.moreThan100 = res.data.totalCount > 100
-            _.isSearched = true;
-          })
+      this.getCompaniesByPage(1)
+    },
+    getCompaniesByPage(page, searchType = undefined, queryString = undefined) {
+      let _ = this,
+          query = searchType == undefined ? `?Page=${page}&PerPage=100` : `?${searchType}=${queryString}&Page=${page}&PerPage=100`
+      _.http.get(`${_.preApiName}/financial/company-manage/companies/detail${query}`)
+        .then(res => {
+          _.companyList = res.status == 200 ? res.data.data : [];
+          this.curSearchCount = res.data.totalCount
+          _.isSearched = true;
+        })
     },
     onEdit(item) {
       this.isEdit = true
@@ -286,12 +314,16 @@ export default {
                 return v.CompanyNumber == item.CompanyNumber
               })
               idx >= 0 && this.companyList.splice(idx, 1)
+              this.TotalCompanyCount--
               this.showMessage(`删除企业成功！`, 'success')
             } else {
               this.showMessage('删除企业失败！', 'error', 5000)
             }
           })
         })
+    },
+    handleCurrentChange() {
+      this.getCompaniesByPage(this.currentPage, this.curSearchType, this.queryString)
     },
   }
 };

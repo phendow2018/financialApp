@@ -58,7 +58,7 @@ OrderAssign.prototype.doCreate = async function() {
       result.Message = this.order.getLastError();
       result.Code = 301;
     } else {
-      await _this.writeDBLog(postData.Operator, `指派订单给${postData.Editor} 订单编号:${t.OrderNumber} 操作人:${postData.Operator}`);
+      await _this.writeDBLog(postData.Operator, `指派订单给${postData.Editor} 订单编号:${t.OrderNumber}`);
     }
     ret.Results.push(result);
   }
@@ -94,7 +94,7 @@ OrderAssign.prototype.doDelete = async function(){
       return false;
     }
   
-    await _this.writeDBLog(postData.Operator, `取消订单指派人 订单编号:${ret.OrderNumber} 操作人:${postData.Operator}`);
+    await _this.writeDBLog(postData.Operator, `取消订单指派人 订单编号:${ret.OrderNumber}`);
     return ret;
 }
 

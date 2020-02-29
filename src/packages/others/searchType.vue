@@ -68,6 +68,7 @@ export default {
     border: 1px solid #dcdfe6;
     border-radius: 0 0 5px 5px;
     z-index: 1000;
+    background: #fff;
 
     .select-item {
       height: 40px;

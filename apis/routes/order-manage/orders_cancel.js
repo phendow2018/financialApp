@@ -27,6 +27,11 @@ OrderCancel.prototype.check = async function(postData) {
     this.Code = 101;
     return false;
   }
+  if (!tools.isValidString(postData.Explain)) {
+    this.LastError = '取消操作需要说明取消原因';
+    this.Code = 101;
+    return false;
+  }
 
   let ret = await this.order.queryOrder({OrderNumber: postData.OrderNumber});
   if (ret === false) {
@@ -66,7 +71,8 @@ OrderCancel.prototype.doCreate = async function() {
 
   let data = {
     Status: -1,
-    LastModifyUser: postData.Operator
+    LastModifyUser: postData.Operator,
+    Explain: postData.Explain
   }
   let ret = await this.order.modifyOrder(postData.OrderNumber, data);
   if (ret === false) {
@@ -75,7 +81,7 @@ OrderCancel.prototype.doCreate = async function() {
     return false;
   }
 
-  await _this.writeDBLog(postData.Operator, `取消订单 订单编号:${ret.OrderNumber} 操作人:${postData.Operator}`);
+  await _this.writeDBLog(postData.Operator, `取消订单 订单编号:${ret.OrderNumber}`);
   return ret;
 }
 

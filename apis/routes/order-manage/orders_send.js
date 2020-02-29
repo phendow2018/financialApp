@@ -75,7 +75,7 @@ OrderSend.prototype.doCreate = async function() {
     return false;
   }
 
-  await _this.writeDBLog(postData.Operator, `发送订单 订单编号:${ret.OrderNumber} 操作人:${postData.Operator}`);
+  await _this.writeDBLog(postData.Operator, `发送订单 订单编号:${ret.OrderNumber}`);
   return ret;
 }
 
