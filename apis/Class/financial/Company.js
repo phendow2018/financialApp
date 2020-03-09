@@ -364,7 +364,11 @@ Company.prototype.getConfig = async function(CompanyNumber) {
   let sql = `SELECT Config FROM \`Company\` WHERE \`CompanyNumber\`=${tools.MysqlEscape(CompanyNumber)}`;
   let ret = await this.dbLink.query(sql);
   if (!(ret === false || ret.length <= 0)) {
-    try {config = JSON.parse(ret[0].Config);} catch(e) {}
+    if (ret[0].Config == null) {
+      config = {}
+    } else {
+      try {config = JSON.parse(ret[0].Config);} catch(e) {}
+    }
   }
   return config;
 }

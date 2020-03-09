@@ -32,7 +32,7 @@
                 
             <div></div>
         </div>
-        <div class="content-container">
+        <div class="content-container" v-loading="isLoading">
             <vue-scroll :ops="ops">
                 <el-table
                     :data="logData"
@@ -91,6 +91,7 @@ export default {
             curSearchType: 'FuzzyContent',
             currentPage: 1,
             curSearchCount: 0,
+            isLoading: false,
             searchPlaceholder: '请输入内容',
             menuList: [{
                 Id: 'FuzzyContent',
@@ -108,18 +109,23 @@ export default {
     },
     mounted() {
         this.getUserList()
+        let curtime = new Date()
+        let yesterday = this.addDays(new Date(), -1)
+
+        this.getLogDatas(1, `${this.formatNormalDate(yesterday.getFullYear(), yesterday.getMonth() + 1, yesterday.getDate())} 00:00:00`, `${this.formatNormalDate(curtime.getFullYear(), curtime.getMonth() + 1, curtime.getDate())} 23:59:59`)
     },
     methods: {
-        getLogDatas(page) {
-            if(this.range.length < 2) {
-                this.showMessage('请选择时间范围', 'warning')
-                return
-            }
-            this.http.get(`${this.preApiName}/financial/platform/logs?StartTime=${this.range[0]}&EndTime=${this.range[1]}&${this.curSearchType}=${this.queryString}&Page=${this.currentPage}&PerPage=${this.perPageCount}`).then(res => {
+        getLogDatas(page, start, end) {
+            
+            this.isLoading = true
+            this.http.get(`${this.preApiName}/financial/platform/logs?StartTime=${start}&EndTime=${end}&${this.curSearchType}=${this.queryString}&Page=${this.currentPage}&PerPage=${this.perPageCount}`).then(res => {
                 if(res.status === 200) {
                     this.logData = res.data.data
                     this.curSearchCount = res.data.totalCount
                 }
+                this.isLoading = false
+            }).catch(err => {
+                this.isLoading = false
             })
         },
         getUserList() {
@@ -134,10 +140,22 @@ export default {
             this.curSearchType = searchType
         },
         handleCurrentChange() {
-            this.getLogDatas(this.currentPage)
+            if(this.range.length < 2) {
+                this.showMessage('请选择时间范围', 'warning')
+                return
+            }
+            let start = this.range[0].split(' ')[0] + ' 00:00:00'
+            let end = this.range[1].split(' ')[0] + ' 23:59:59'
+            this.getLogDatas(this.currentPage, start, end)
         },
         onSearch() {
-            this.getLogDatas(1)
+            if(this.range.length < 2) {
+                this.showMessage('请选择时间范围', 'warning')
+                return
+            }
+            let start = this.range[0].split(' ')[0] + ' 00:00:00'
+            let end = this.range[1].split(' ')[0] + ' 23:59:59'
+            this.getLogDatas(1,start, end)
         },
     },
 }

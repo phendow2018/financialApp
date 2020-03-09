@@ -4,6 +4,8 @@ let   Base   = require('../../Common/Base')
 const tools = require('../../Common/tools');
 const Company = require('../../Class/financial/Company');
 const CompanyStatement = require('../../Class/financial/CompanyStatement');
+const Ratio = require('../../Class/statistics/Ratio');
+const RatiosOfChange = require('../../Class/statistics/RatiosOfChange');
 
 class statements extends Base{
   constructor(ctx){
@@ -151,6 +153,25 @@ statements.prototype.doRead = async function(){
       this.Code = 301;
       return false;
     }
+
+    //暂时先计算一下比率和变化率
+    let ratioDeal = new Ratio();
+    let ratiosOfChangeDeal = new RatiosOfChange();
+    for (let item of ret.data) {
+      let ratio = await ratioDeal.getRatio(item.CompanyNumber, item.Year, item.Type);
+      if (ratio !== false && typeof ratio == 'object') {
+        item.Statement.FinancialRatio = ratio;
+      } else {
+        item.Statement.FinancialRatio = {};
+      }
+      let ratiosOfChange = await ratiosOfChangeDeal.getRatiosOfChange(item.CompanyNumber, item.Year, item.Type);
+      if (ratiosOfChange === false || typeof ratiosOfChange.FinancialRatiosOfChange != 'object') {
+        item.Statement.FinancialRatiosOfChange = {};
+      } else {
+        item.Statement.FinancialRatiosOfChange = ratiosOfChange.FinancialRatiosOfChange;
+      }
+    }
+
     retData.data = ret.data;
 
     return retData;

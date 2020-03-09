@@ -1,0 +1,8 @@
+{
+  "qichacha": {
+    "url": "http://61.155.157.8:2380/ReceiveFinanceData/GetCallBackInfo",
+    "host": "61.155.157.8",
+    "port": 2380,
+    "uri": "/ReceiveFinanceData/GetCallBackInfo"
+  }
+}

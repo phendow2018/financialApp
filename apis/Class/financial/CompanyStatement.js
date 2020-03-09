@@ -211,6 +211,60 @@ class CompanyStatement {
       data: ret
     };
   }
+
+  /** 获取企业报表的主要数据 */
+  async getMainData(CompanyNumber, Year, Type) {
+    let sql = `SELECT \`Statement\` FROM \`company_statement\` 
+      WHERE \`CompanyNumber\`=${tools.MysqlEscape(CompanyNumber)} AND \`Year\`=${Year} 
+      AND \`Type\`=${Type}`;
+    let ret = await this.dbLink.query(sql);
+    if (ret === false || ret.length <= 0) {
+      return null;
+    }
+    let statement = {};
+    try{statement = JSON.parse(ret[0].Statement);} 
+    catch(e) {return null;}
+
+    let MainData = {
+      OperationRevenue: null,
+      NetProfit: null,
+      TotalAssets: null,
+      TotalLiabilities: null,
+      TotalOwnersEquity: null,
+      TotalCurrentAssets: null,
+      TotalCurrentLiability: null,
+      WorkingCapital: null,
+      FixedAssets: null
+    };
+    if (typeof statement.Income == 'object' && tools.isNumber(statement.Income.OperationRevenue)) {
+      MainData.OperationRevenue = statement.Income.OperationRevenue;
+    }
+    if (typeof statement.Income == 'object' && tools.isNumber(statement.Income.NetProfit)) {
+      MainData.NetProfit = statement.Income.NetProfit;
+    }
+    if (typeof statement.Asset == 'object' && tools.isNumber(statement.Asset.TotalAssets)) {
+      MainData.TotalAssets = statement.Asset.TotalAssets;
+    }
+    if (typeof statement.Liability == 'object' && tools.isNumber(statement.Liability.TotalLiabilities)) {
+      MainData.TotalLiabilities = statement.Liability.TotalLiabilities;
+    }
+    if (typeof statement.Liability == 'object' && tools.isNumber(statement.Liability.TotalEquity)) {
+      MainData.TotalOwnersEquity = statement.Liability.TotalEquity;
+    }
+    if (typeof statement.Asset == 'object' && tools.isNumber(statement.Asset.TotalCurrentAssets)) {
+      MainData.TotalCurrentAssets = statement.Asset.TotalCurrentAssets;
+    }
+    if (typeof statement.Liability == 'object' && tools.isNumber(statement.Liability.TotalCurrentLiability)) {
+      MainData.TotalCurrentLiability = statement.Liability.TotalCurrentLiability;
+    }
+    if (tools.isNumber(MainData.TotalCurrentAssets) && tools.isNumber(MainData.TotalCurrentLiability)) {
+      MainData.WorkingCapital = MainData.TotalCurrentAssets - MainData.TotalCurrentLiability;
+    }
+    if (typeof statement.Asset == 'object' && tools.isNumber(statement.Asset.FixedAssets)) {
+      MainData.FixedAssets = statement.Asset.FixedAssets;
+    }
+    return MainData;
+  }
 };
 
 CompanyStatement.NeedStringToArr = function(needStr) {

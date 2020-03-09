@@ -13,7 +13,7 @@
           <i class="header-icon el-icon-star-on"></i>主要财务数据比率
         </div>
         <div class="report-item-container" :class="layoutClass">
-          <div class="report-item-name report-item">净资产收益率：</div>
+          <div class="report-item-name report-item">净资产收益率(%)：</div>
           <div class="report-item" v-for="(item, index) in reportList" :key="index">
             <el-input-number
               v-model="item.Statement.FinancialRatio.ReturnOnEquity"
@@ -25,7 +25,7 @@
           </div>
         </div>
         <div class="report-item-container" :class="layoutClass">
-          <div class="report-item-name report-item">资产回报率：</div>
+          <div class="report-item-name report-item">资产回报率(%)：</div>
           <div class="report-item" v-for="(item, index) in reportList" :key="index">
             <el-input-number
               v-model="item.Statement.FinancialRatio.ReturnOnAssets"
@@ -37,7 +37,7 @@
           </div>
         </div>
         <div class="report-item-container" :class="layoutClass">
-          <div class="report-item-name report-item">毛利率：</div>
+          <div class="report-item-name report-item">毛利率(%)：</div>
           <div class="report-item" v-for="(item, index) in reportList" :key="index">
             <el-input-number
               v-model="item.Statement.FinancialRatio.GrossProfitRate"
@@ -49,7 +49,7 @@
           </div>
         </div>
         <div class="report-item-container" :class="layoutClass">
-          <div class="report-item-name report-item">净利润率：</div>
+          <div class="report-item-name report-item">净利润率(%)：</div>
           <div class="report-item" v-for="(item, index) in reportList" :key="index">
             <el-input-number
               v-model="item.Statement.FinancialRatio.NetSalesRate"
@@ -97,7 +97,7 @@
           </div>
         </div>
         <div class="report-item-container" :class="layoutClass">
-          <div class="report-item-name report-item">资产负债率：</div>
+          <div class="report-item-name report-item">资产负债率(%)：</div>
           <div class="report-item" v-for="(item, index) in reportList" :key="index">
             <el-input-number
               v-model="item.Statement.FinancialRatio.AssetLiabilityRatio"

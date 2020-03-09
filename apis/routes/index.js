@@ -61,12 +61,16 @@ const so_count_by_yearstatus = require('./statistics/order_count-by-year_status'
 const so_count_by_quarterstatus = require('./statistics/order_count-by-quarter_status');
 const so_count_by_monthstatus = require('./statistics/order_count-by-month_status');
 const so_count_by_datestatus = require('./statistics/order_count-by-date_status');
+const so_ratio = require('./statistics/ratio');
+const so_ratios_of_change = require('./statistics/ratios_of_change');
 router.use('/financial-management/api/v1/statistics/company-count', sc_count.routes(), sc_count.allowedMethods());
 router.use('/financial-management/api/v1/statistics/order-count', so_count_by_status.routes(), so_count_by_status.allowedMethods());
 router.use('/financial-management/api/v1/statistics/order-count/groupby-year', so_count_by_yearstatus.routes(), so_count_by_yearstatus.allowedMethods());
 router.use('/financial-management/api/v1/statistics/order-count/groupby-quarter', so_count_by_quarterstatus.routes(), so_count_by_quarterstatus.allowedMethods());
 router.use('/financial-management/api/v1/statistics/order-count/groupby-month', so_count_by_monthstatus.routes(), so_count_by_monthstatus.allowedMethods());
 router.use('/financial-management/api/v1/statistics/order-count/groupby-date', so_count_by_datestatus.routes(), so_count_by_datestatus.allowedMethods());
+router.use('/financial-management/api/v1/statistics/financial-ratios-of-change', so_ratios_of_change.routes(), so_ratios_of_change.allowedMethods());
+router.use('/financial-management/api/v1/statistics/financial-ratio', so_ratio.routes(), so_ratio.allowedMethods());
 
 //apis
 // const test = require('./apis/common/test');

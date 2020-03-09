@@ -22,6 +22,12 @@
               <el-collapse-item title="简略信息" name="1">
                 <div class="statistic-item summary" isLoading="summaryLoading">
                   <div class="summary-item">
+                    <div class="summary-title">总企业数</div>
+                    <div class="summary-value">
+                      <ICountUp :delay="delay" :endVal="TotalCompanyCount" :options="options" @ready="onReady"/>
+                    </div>
+                  </div>
+                  <div class="summary-item">
                     <div class="summary-title">总订单数</div>
                     <div class="summary-value">
                       <ICountUp :delay="delay" :endVal="TotalOrderCount" :options="options" @ready="onReady"/>
@@ -34,17 +40,12 @@
                     </div>
                   </div>
                   <div class="summary-item">
-                    <div class="summary-title">未发送订单数</div>
-                    <div class="summary-value">
-                      <ICountUp :delay="delay" :endVal="UnSendOrderCount" :options="options" @ready="onReady"/>
-                    </div>
-                  </div>
-                  <div class="summary-item">
                     <div class="summary-title">已取消订单数</div>
                     <div class="summary-value">
                       <ICountUp :delay="delay" :endVal="CanceledOrderCount"  :options="options" @ready="onReady"/>
                     </div>
                   </div>
+                  
                 </div>
               </el-collapse-item>
             </el-collapse>
@@ -126,6 +127,7 @@ export default {
       SendOrderCount: 0,
       UnSendOrderCount: 0,
       CanceledOrderCount: 0,
+      TotalCompanyCount: 0,
       modeType: 'chart',
       options: {
         useEasing: true,
@@ -149,7 +151,8 @@ export default {
   },
   methods: {
     getSummay() {
-      this.http.get(`${this.preApiName}/financial/statistics/order-count`).then(res => {
+      let _ = this
+      _.http.get(`${this.preApiName}/financial/statistics/order-count`).then(res => {
         if(res.status == 200) {
           this.TotalOrderCount = res.data.Count
           this.SendOrderCount = res.data.SendCount
@@ -164,6 +167,12 @@ export default {
           this.showMessage(`获取信息失败，请联系管理员`)
         }
       })
+
+      _.http.get(`${_.preApiName}/financial/statistics/company-count`).then(res => {
+      if(res.status === 200) {
+        _.TotalCompanyCount = res.data.Count
+      }
+    })
     },
     getOrdersByDate(month) {
       let _ = this

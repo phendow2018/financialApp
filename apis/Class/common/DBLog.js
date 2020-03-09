@@ -10,6 +10,29 @@ class DBLog {
     return this.LastError;
   }
 
+  async writeAllField(UserAccount='', UserName='', Position='', Module='', Content='') {
+    let id = tools.createUuid();
+    let time = new Date();
+
+    let sql = this.makeInsertSql(id, time, UserAccount, UserName, Position, Module, Content);
+    if (!tools.isValidString(sql)) { 
+      this.LastError = `无效的sql语句`;
+      return false;
+    }
+
+    let ret = await this.dbLink.query(sql);
+    let logContent = `[User:${UserAccount} Position:${Position} Module:${Module}] => ${Content}`;
+    if (ret === false) {
+      this.LastError = this.dbLink.getLastError();
+      global.log.writeLog(`写入数据库日志失败，内容信息{${logContent}}`);
+      return false;
+    } else {
+      // global.log.writeLog(logContent);
+    }
+
+    return {Id: id};
+  }
+
   async writeLog(user='', position='', module='', content='') { 
     let id = tools.createUuid();
     let time = new Date();

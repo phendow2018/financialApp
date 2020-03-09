@@ -3,6 +3,8 @@ let   global = require('../../../Common/Global');
 let   Base   = require('../../../Common/Base')
 const tools = require('../../../Common/tools');
 const Order = require('../../../Class/financial/Order');
+const DBLog = require('../../../Class/common/DBLog');
+let dbLog = new DBLog();
 
 const CUSTOMER_FLAG = require('../../../Class/reports/QichachaReport').CUSTOMER_FLAG;
 
@@ -79,7 +81,8 @@ orders.prototype.doCreate = async function() {
     return false;
   }
 
-  await _this.writeDBLog('', `企查查建立订单 订单编号:${ret.OrderNumber} 企查查订单号:${postData.orderNumber}`);
+  await dbLog.writeAllField('system', "系统", '', '系统接口', `企查查建立订单 订单编号:${ret.OrderNumber} 企查查订单号:${postData.orderNumber}`);
+  // await _this.writeDBLog('系统', `企查查建立订单 订单编号:${ret.OrderNumber} 企查查订单号:${postData.orderNumber}`);
   return ret;
 }
 

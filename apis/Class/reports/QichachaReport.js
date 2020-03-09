@@ -3,6 +3,9 @@ const tools = require('../../Common/tools');
 const Order = require('../financial/Order');
 const qichachaConfig = require('./common.json').qichacha;
 const CompanyStatement = require('../financial/CompanyStatement');
+const Ratio = require('../statistics/Ratio');
+const RatiosOfChange = require('../statistics/RatiosOfChange');
+
 
 class QichachaReport {
   constructor() {
@@ -45,7 +48,7 @@ class QichachaReport {
     if (orderInfo.Type == 1) {
       return this.makeLargeNumberReport(orderInfo, retData.data);
     } else {
-      return this.makeFianacialDetailReport(orderInfo, retData.data);
+      return await this.makeFianacialDetailReport(orderInfo, retData.data);
     }
   }
 
@@ -269,13 +272,13 @@ QichachaReport.prototype.makeLargeNumberReport = function(orderInfo, statements)
   return Report;
 }
 
-QichachaReport.prototype.makeFianacialDetailReport = function(orderInfo, statements) {
+QichachaReport.prototype.makeFianacialDetailReport = async function(orderInfo, statements) {
   let Report = this.makeReportStruct(orderInfo);
 
   Report.resultBalance = this.makeFianacialDetailResultBalance(orderInfo, statements);
   Report.incomeStatement = this.makeFianacialDetailIncomeStatement(orderInfo, statements);
-  Report.financialRatiosOfChange = this.makeFianacialDetailFinancialRatiosOfChange(orderInfo, statements);
-  Report.financialRatios = this.makeFianacialDetailFinancialRatios(orderInfo, statements);
+  Report.financialRatiosOfChange = await this.makeFianacialDetailFinancialRatiosOfChange(orderInfo, statements);
+  Report.financialRatios = await this.makeFianacialDetailFinancialRatios(orderInfo, statements);
 
   return Report;
 }
@@ -497,78 +500,185 @@ QichachaReport.prototype.makeFianacialDetailIncomeStatement = function(orderInfo
   }
   return incomeStatement; 
 }
-QichachaReport.prototype.makeFianacialDetailFinancialRatiosOfChange = function(orderInfo, statements) {
+QichachaReport.prototype.makeFianacialDetailFinancialRatiosOfChange = async function(orderInfo, statements) {
+  let ratiosOfChangeDeal = new RatiosOfChange();
+
   financialRatiosOfChange = [];
   for (let item of statements) {
     let b = this.financialRatiosOfChangeDefault();
     if (tools.isNumber(item.Year)) 
       b.annual = `${item.Year}`;
   
-    let statement = item.Statement;
-
-    if (typeof statement.FinancialRatiosOfChange == 'object' && tools.isNumber(statement.FinancialRatiosOfChange.OperationRevenue))
-      b.operationRevenue = `${statement.FinancialRatiosOfChange.OperationRevenue}`;
-    if (typeof statement.FinancialRatiosOfChange == 'object' && tools.isNumber(statement.FinancialRatiosOfChange.NetProfit))
-      b.NetProfit = `${statement.FinancialRatiosOfChange.NetProfit}`;
-    if (typeof statement.FinancialRatiosOfChange == 'object' && tools.isNumber(statement.FinancialRatiosOfChange.TotalAssets))
-      b.totalAssets = `${statement.FinancialRatiosOfChange.TotalAssets}`;
-    if (typeof statement.FinancialRatiosOfChange == 'object' && tools.isNumber(statement.FinancialRatiosOfChange.TotalLiabilities))
-      b.totalLiabilities = `${statement.FinancialRatiosOfChange.TotalLiabilities}`;
-    if (typeof statement.FinancialRatiosOfChange == 'object' && tools.isNumber(statement.FinancialRatiosOfChange.TotalOwnersEquity))
-      b.totalOwnersEquity = `${statement.FinancialRatiosOfChange.TotalOwnersEquity}`;
-    if (typeof statement.FinancialRatiosOfChange == 'object' && tools.isNumber(statement.FinancialRatiosOfChange.TotalCurrentAssets))
-      b.totalCurrentAssets = `${statement.FinancialRatiosOfChange.TotalCurrentAssets}`;
-    if (typeof statement.FinancialRatiosOfChange == 'object' && tools.isNumber(statement.FinancialRatiosOfChange.TotalCurrentLiability))
-      b.totalCurrentLiability = `${statement.FinancialRatiosOfChange.TotalCurrentLiability}`;
-    if (typeof statement.FinancialRatiosOfChange == 'object' && tools.isNumber(statement.FinancialRatiosOfChange.WorkingCapital))
-      b.workingCapital = `${statement.FinancialRatiosOfChange.WorkingCapital}`;
-    if (typeof statement.FinancialRatiosOfChange == 'object' && tools.isNumber(statement.FinancialRatiosOfChange.FixedAssets))
-      b.fixedAssets = `${statement.FinancialRatiosOfChange.FixedAssets}`;
+    let ratios = await ratiosOfChangeDeal.getRatiosOfChange(item.CompanyNumber, item.Year, item.Type);
+    if (ratios !== false) {
+      let ratiosOfChangeData = ratios.FinancialRatiosOfChange;
+      if (typeof ratiosOfChangeData == 'object') {
+        if (tools.isNumber(ratiosOfChangeData.OperationRevenue)) {
+          b.operationRevenue = `${ratiosOfChangeData.OperationRevenue}`;
+        }
+        if (tools.isNumber(ratiosOfChangeData.NetProfit)) {
+          b.netProfit = `${ratiosOfChangeData.NetProfit}`;
+        }
+        if (tools.isNumber(ratiosOfChangeData.TotalAssets)) {
+          b.totalAssets = `${ratiosOfChangeData.TotalAssets}`;
+        }
+        if (tools.isNumber(ratiosOfChangeData.TotalLiabilities)) {
+          b.totalLiabilities = `${ratiosOfChangeData.TotalLiabilities}`;
+        }
+        if (tools.isNumber(ratiosOfChangeData.TotalOwnersEquity)) {
+          b.totalOwnersEquity = `${ratiosOfChangeData.TotalOwnersEquity}`;
+        }
+        if (tools.isNumber(ratiosOfChangeData.TotalCurrentAssets)) {
+          b.totalCurrentAssets = `${ratiosOfChangeData.TotalCurrentAssets}`;
+        }
+        if (tools.isNumber(ratiosOfChangeData.TotalCurrentLiability)) {
+          b.totalCurrentLiability = `${ratiosOfChangeData.TotalCurrentLiability}`;
+        }
+        if (tools.isNumber(ratiosOfChangeData.WorkingCapital)) {
+          b.workingCapital = `${ratiosOfChangeData.WorkingCapital}`;
+        }
+        if (tools.isNumber(ratiosOfChangeData.FixedAssets)) {
+          b.fixedAssets = `${ratiosOfChangeData.FixedAssets}`;
+        }
+      }
+    }
     
     financialRatiosOfChange.push(b);
   }
   return financialRatiosOfChange; 
 }
-QichachaReport.prototype.makeFianacialDetailFinancialRatios = function(orderInfo, statements) {
+QichachaReport.prototype.makeFianacialDetailFinancialRatios = async function(orderInfo, statements) {
+  let ratio = new Ratio();  
   financialRatios = [];
   for (let item of statements) {
     let b = this.financialRatiosDefault();
     if (tools.isNumber(item.Year)) 
       b.annual = `${item.Year}`;
   
-    let statement = item.Statement;
+    let ratioData = await ratio.getRatio(item.CompanyNumber, item.Year, item.Type);
+    if (ratioData !== false) {
+      if (typeof ratioData == 'object') {
+        if (tools.isNumber(ratioData.ReturnOnEquity)) {
+          b.returnOnEquity = `${ratioData.ReturnOnEquity}`;
+        }
+        if (tools.isNumber(ratioData.ReturnOnAssets)) {
+          b.returnOnAssets = `${ratioData.ReturnOnAssets}`;
+        }
+        if (tools.isNumber(ratioData.GrossProfitRate)) {
+          b.grossProfitRate = `${ratioData.GrossProfitRate}`;
+        }
+        if (tools.isNumber(ratioData.NetSalesRate)) {
+          b.netSalesRate = `${ratioData.NetSalesRate}`;
+        }
 
-    if (typeof statement.FinancialRatios == 'object' && tools.isNumber(statement.FinancialRatios.ReturnOnEquity))
-      b.returnOnEquity = `${statement.FinancialRatios.ReturnOnEquity}`;
-    if (typeof statement.FinancialRatios == 'object' && tools.isNumber(statement.FinancialRatios.ReturnOnAssets))
-      b.returnOnAssets = `${statement.FinancialRatios.ReturnOnAssets}`;    
-    if (typeof statement.FinancialRatios == 'object' && tools.isNumber(statement.FinancialRatios.GrossProfitRate))
-      b.grossProfitRate = `${statement.FinancialRatios.GrossProfitRate}`;      
-    if (typeof statement.FinancialRatios == 'object' && tools.isNumber(statement.FinancialRatios.NetSalesRate))
-      b.netSalesRate = `${statement.FinancialRatios.NetSalesRate}`;
-    if (typeof statement.FinancialRatios == 'object' && tools.isNumber(statement.FinancialRatios.TotalAssetsTurnover))
-      b.totalAssetsTurnover = `${statement.FinancialRatios.TotalAssetsTurnover}`;
+        if (tools.isNumber(ratioData.TotalAssetsTurnover)) {
+          b.totalAssetsTurnover = `${ratioData.TotalAssetsTurnover}`;
+        }
+        if (tools.isNumber(ratioData.CurrentAssetsTurnover)) {
+          b.currentAssetsTurnover = `${ratioData.CurrentAssetsTurnover}`;
+        }
+        if (tools.isNumber(ratioData.AccountsReceivableTurnover)) {
+          b.accountsReceivableTurnover = `${ratioData.AccountsReceivableTurnover}`;
+        }
 
-    if (typeof statement.FinancialRatios == 'object' && tools.isNumber(statement.FinancialRatios.CurrentAssetsTurnover))
-      b.currentAssetsTurnover = `${statement.FinancialRatios.CurrentAssetsTurnover}`;
-    if (typeof statement.FinancialRatios == 'object' && tools.isNumber(statement.FinancialRatios.AccountsReceivableTurnover))
-      b.accountsReceivableTurnover = `${statement.FinancialRatios.AccountsReceivableTurnover}`;
-    if (typeof statement.FinancialRatios == 'object' && tools.isNumber(statement.FinancialRatios.AssetLiabilityRatio))
-      b.assetLiabilityRatio = `${statement.FinancialRatios.AssetLiabilityRatio}`;      
-    if (typeof statement.FinancialRatios == 'object' && tools.isNumber(statement.FinancialRatios.CurrentRatio))
-      b.currentRatio = `${statement.FinancialRatios.CurrentRatio}`;    
-    if (typeof statement.FinancialRatios == 'object' && tools.isNumber(statement.FinancialRatios.QuickRatio))
-      b.quickRatio = `${statement.FinancialRatios.QuickRatio}`;
+        if (tools.isNumber(ratioData.AssetLiabilityRatio)) {
+          b.assetLiabilityRatio = `${ratioData.AssetLiabilityRatio}`;
+        }
+        if (tools.isNumber(ratioData.CurrentRatio)) {
+          b.currentRatio = `${ratioData.CurrentRatio}`;
+        }
+        if (tools.isNumber(ratioData.QuickRatio)) {
+          b.quickRatio = `${ratioData.QuickRatio}`;
+        }
 
-    if (typeof statement.FinancialRatios == 'object' && tools.isNumber(statement.FinancialRatios.RevenueGrowthRate))
-      b.revenueGrowthRate = `${statement.FinancialRatios.RevenueGrowthRate}`;
-    if (typeof statement.FinancialRatios == 'object' && tools.isNumber(statement.FinancialRatios.GrossProfitGrowthRate))
-      b.grossProfitGrowthRate = `${statement.FinancialRatios.GrossProfitGrowthRate}`;
-    if (typeof statement.FinancialRatios == 'object' && tools.isNumber(statement.FinancialRatios.GrowthRateOfTotalAssets))
-      b.growthRateOfTotalAssets = `${statement.FinancialRatios.GrowthRateOfTotalAssets}`; 
+        if (tools.isNumber(ratioData.RevenueGrowthRate)) {
+          b.revenueGrowthRate = `${ratioData.RevenueGrowthRate}`;
+        }
+        if (tools.isNumber(ratioData.GrossProfitGrowthRate)) {
+          b.grossProfitGrowthRate = `${ratioData.GrossProfitGrowthRate}`;
+        }
+        if (tools.isNumber(ratioData.GrowthRateOfTotalAssets)) {
+          b.growthRateOfTotalAssets = `${ratioData.GrowthRateOfTotalAssets}`;
+        }
+      }
+    }
 
     financialRatios.push(b);
   }
   return financialRatios; 
 }
+// QichachaReport.prototype.makeFianacialDetailFinancialRatiosOfChange = function(orderInfo, statements) {
+//   financialRatiosOfChange = [];
+//   for (let item of statements) {
+//     let b = this.financialRatiosOfChangeDefault();
+//     if (tools.isNumber(item.Year)) 
+//       b.annual = `${item.Year}`;
+  
+//     let statement = item.Statement;
+
+//     if (typeof statement.FinancialRatiosOfChange == 'object' && tools.isNumber(statement.FinancialRatiosOfChange.OperationRevenue))
+//       b.operationRevenue = `${statement.FinancialRatiosOfChange.OperationRevenue}`;
+//     if (typeof statement.FinancialRatiosOfChange == 'object' && tools.isNumber(statement.FinancialRatiosOfChange.NetProfit))
+//       b.netProfit = `${statement.FinancialRatiosOfChange.NetProfit}`;
+//     if (typeof statement.FinancialRatiosOfChange == 'object' && tools.isNumber(statement.FinancialRatiosOfChange.TotalAssets))
+//       b.totalAssets = `${statement.FinancialRatiosOfChange.TotalAssets}`;
+//     if (typeof statement.FinancialRatiosOfChange == 'object' && tools.isNumber(statement.FinancialRatiosOfChange.TotalLiabilities))
+//       b.totalLiabilities = `${statement.FinancialRatiosOfChange.TotalLiabilities}`;
+//     if (typeof statement.FinancialRatiosOfChange == 'object' && tools.isNumber(statement.FinancialRatiosOfChange.TotalOwnersEquity))
+//       b.totalOwnersEquity = `${statement.FinancialRatiosOfChange.TotalOwnersEquity}`;
+//     if (typeof statement.FinancialRatiosOfChange == 'object' && tools.isNumber(statement.FinancialRatiosOfChange.TotalCurrentAssets))
+//       b.totalCurrentAssets = `${statement.FinancialRatiosOfChange.TotalCurrentAssets}`;
+//     if (typeof statement.FinancialRatiosOfChange == 'object' && tools.isNumber(statement.FinancialRatiosOfChange.TotalCurrentLiability))
+//       b.totalCurrentLiability = `${statement.FinancialRatiosOfChange.TotalCurrentLiability}`;
+//     if (typeof statement.FinancialRatiosOfChange == 'object' && tools.isNumber(statement.FinancialRatiosOfChange.WorkingCapital))
+//       b.workingCapital = `${statement.FinancialRatiosOfChange.WorkingCapital}`;
+//     if (typeof statement.FinancialRatiosOfChange == 'object' && tools.isNumber(statement.FinancialRatiosOfChange.FixedAssets))
+//       b.fixedAssets = `${statement.FinancialRatiosOfChange.FixedAssets}`;
+    
+//     financialRatiosOfChange.push(b);
+//   }
+//   return financialRatiosOfChange; 
+// }
+// QichachaReport.prototype.makeFianacialDetailFinancialRatios = function(orderInfo, statements) {
+//   financialRatios = [];
+//   for (let item of statements) {
+//     let b = this.financialRatiosDefault();
+//     if (tools.isNumber(item.Year)) 
+//       b.annual = `${item.Year}`;
+  
+//     let statement = item.Statement;
+
+//     if (typeof statement.FinancialRatio == 'object' && tools.isNumber(statement.FinancialRatio.ReturnOnEquity))
+//       b.returnOnEquity = `${statement.FinancialRatio.ReturnOnEquity}`;
+//     if (typeof statement.FinancialRatio == 'object' && tools.isNumber(statement.FinancialRatio.ReturnOnAssets))
+//       b.returnOnAssets = `${statement.FinancialRatio.ReturnOnAssets}`;    
+//     if (typeof statement.FinancialRatio == 'object' && tools.isNumber(statement.FinancialRatio.GrossProfitRate))
+//       b.grossProfitRate = `${statement.FinancialRatio.GrossProfitRate}`;      
+//     if (typeof statement.FinancialRatio == 'object' && tools.isNumber(statement.FinancialRatio.NetSalesRate))
+//       b.netSalesRate = `${statement.FinancialRatio.NetSalesRate}`;
+//     if (typeof statement.FinancialRatio == 'object' && tools.isNumber(statement.FinancialRatio.TotalAssetsTurnover))
+//       b.totalAssetsTurnover = `${statement.FinancialRatio.TotalAssetsTurnover}`;
+
+//     if (typeof statement.FinancialRatio == 'object' && tools.isNumber(statement.FinancialRatio.CurrentAssetsTurnover))
+//       b.currentAssetsTurnover = `${statement.FinancialRatio.CurrentAssetsTurnover}`;
+//     if (typeof statement.FinancialRatio == 'object' && tools.isNumber(statement.FinancialRatio.AccountsReceivableTurnover))
+//       b.accountsReceivableTurnover = `${statement.FinancialRatio.AccountsReceivableTurnover}`;
+//     if (typeof statement.FinancialRatio == 'object' && tools.isNumber(statement.FinancialRatio.AssetLiabilityRatio))
+//       b.assetLiabilityRatio = `${statement.FinancialRatio.AssetLiabilityRatio}`;      
+//     if (typeof statement.FinancialRatio == 'object' && tools.isNumber(statement.FinancialRatio.CurrentRatio))
+//       b.currentRatio = `${statement.FinancialRatio.CurrentRatio}`;    
+//     if (typeof statement.FinancialRatio == 'object' && tools.isNumber(statement.FinancialRatio.QuickRatio))
+//       b.quickRatio = `${statement.FinancialRatio.QuickRatio}`;
+
+//     if (typeof statement.FinancialRatio == 'object' && tools.isNumber(statement.FinancialRatio.RevenueGrowthRate))
+//       b.revenueGrowthRate = `${statement.FinancialRatio.RevenueGrowthRate}`;
+//     if (typeof statement.FinancialRatio == 'object' && tools.isNumber(statement.FinancialRatio.GrossProfitGrowthRate))
+//       b.grossProfitGrowthRate = `${statement.FinancialRatio.GrossProfitGrowthRate}`;
+//     if (typeof statement.FinancialRatio == 'object' && tools.isNumber(statement.FinancialRatio.GrowthRateOfTotalAssets))
+//       b.growthRateOfTotalAssets = `${statement.FinancialRatio.GrowthRateOfTotalAssets}`; 
+
+//     financialRatios.push(b);
+//   }
+//   return financialRatios; 
+// }
 module.exports = QichachaReport;
