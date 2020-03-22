@@ -827,6 +827,9 @@ export default {
       } else if(value == 4) {
         this.$alert('当前同时预览的报表数目不能超过4个！', '警告')
         return
+      } else if(value == 5) {
+        this.$alert('请选择相同类型的报表！', '警告')
+        return
       }
       this.tempReportList = items
       this.displayReport = true
@@ -839,6 +842,14 @@ export default {
           return {value: 0, items: []}
         } else if(list.length > 4) {
           return {value: 4, items: []}
+        } else {
+          let type = list[0].Type
+
+          for(let i = 1; i < list.length; ++i) {
+            if(type != list[i].Type) {
+              return {value: 5}
+            }
+          }
         }
 
         let validList = this.sortReportList(list)
