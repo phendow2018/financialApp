@@ -293,7 +293,6 @@ export default {
     },
     modifyCompanyNumberAction() {
       let _ = this
-      if(!_.getValidateStatus()) return
       
       _.http.put(`${this.preApiName}/financial/company-manage/company-number?CompanyNumber=${_.modifyCompanyNumber.OldCompanyNumber}`, {
         CompanyNumber: _.modifyCompanyNumber.CompanyNumber,
