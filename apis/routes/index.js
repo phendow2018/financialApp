@@ -48,11 +48,13 @@ const companies_detail = require('./company-manage/companies_detail');
 const cm_statements = require('./company-manage/statements');
 const cm_statements_batch = require('./company-manage/statements_batch');
 const cm_company_explain = require('./company-manage/company-explain');
+const cm_company_number = require('./company-manage/company-number');
 router.use('/financial-management/api/v1/company-manage/companies', cm_companies.routes(), cm_companies.allowedMethods());
 router.use('/financial-management/api/v1/company-manage/companies/detail', companies_detail.routes(), companies_detail.allowedMethods());
 router.use('/financial-management/api/v1/company-manage/statements', cm_statements.routes(), cm_statements.allowedMethods());
 router.use('/financial-management/api/v1/company-manage/statements/batch-operation', cm_statements_batch.routes(), cm_statements_batch.allowedMethods());
 router.use('/financial-management/api/v1/company-manage/company-explain', cm_company_explain.routes(), cm_company_explain.allowedMethods());
+router.use('/financial-management/api/v1/company-manage/company-number', cm_company_number.routes(), cm_company_number.allowedMethods());
 
 //statistics
 const sc_count = require('./statistics/company_count');

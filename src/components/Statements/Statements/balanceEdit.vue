@@ -445,14 +445,21 @@
           </div>
           <div class="report-item-container" :class="layoutClass">
             <div class="report-item-name report-item report-small-item">负债和所有者权益（或股东权益）总计：</div>
-            <div class="report-item" v-for="item in reportList">
+            <div class="report-item" v-for="(item, index) in reportList">
               <el-input-number
                 v-model="item.Statement.Liability.TotalLiabilitiesOwnersEquity"
                 :precision="2"
                 :controls="false"
                 @focus="onInputFucus"
+                @change="onValueChanged('TotalAssets', $event, index)"
                 @blur="onInputBlur"
               ></el-input-number>
+            </div>
+          </div>
+          <div class="report-item-container" :class="layoutClass">
+            <div class="report-item-name report-item"></div>
+            <div class="report-item" v-for="item in reportList">
+              <span>{{item.Statement.isEqual ? '' : '资产与权益不一致'}}</span>
             </div>
           </div>
           <div class="report-item-container report-item-container-suggestion" :class="layoutClass">
@@ -511,8 +518,8 @@ export default {
         .parents(".report-item-container")
         .removeClass("assets-container-focus");
     },
-    onValueChanged(prop, val) {
-      this.$emit('on-value-changed')
+    onValueChanged(prop, val, index) {
+      this.$emit('on-value-changed', index)
       this.reportList.map(item => {
         let Liability = item.Statement.Liability
 

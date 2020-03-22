@@ -1,26 +1,22 @@
 <template>
     <div class="view-container">
-        <!-- <div class="header">
-            财务状况
-        </div> -->
-        <!-- <div class="header-desc">
-            资产负债表（单位：人民币元）
-        </div> -->
-
         <div class="view-item-header view-items-container " :class="`view-items-container${headList.length}`" :style="{width: `${headList.length * 180 + 149}px`}" style="background: #fff;text-align:right;">
-            <div v-for="header in headList" :key="header">{{header}}</div>
+            <div v-for="header in headList" :key="header.Desc">{{header.Desc}}</div>
         </div>
         <vue-scroll :ops="ops">
-        <template v-for="item in reportList">
-            <div class="view-item view-item-header" :style="{width: `${headList.length * 180 + 144}px`}">
-                {{item.title}}
-            </div>
-            <div :style="{width: `${headList.length * 180 + 149}px`}"> 
-                <div v-for="sub in item.items" class="view-items-container" :class="`view-items-container${headList.length}`">
-                    <div class="view-item" v-for="(vv, idx) in sub" :class="[idx == 0 ? '' : 'right-text']">{{vv}}</div>
+            <template v-for="item in reportList">
+                <div class="view-item view-item-header" :style="{width: `${headList.length * 180 + 144}px`}">
+                    {{item.title}}
                 </div>
+                <div :style="{width: `${headList.length * 180 + 149}px`}"> 
+                    <div v-for="sub in item.items" class="view-items-container" :class="`view-items-container${headList.length}`">
+                        <div class="view-item" v-for="(vv, idx) in sub" :class="[idx == 0 ? '' : 'right-text']">{{vv}}</div>
+                    </div>
+                </div>
+            </template>
+            <div class="rate-of-container">
+                
             </div>
-        </template>
         </vue-scroll>
     </div>
 </template>
@@ -45,14 +41,48 @@ export default {
     },
     data() {
         return {
-            
+            ratioList: [],
+            ratioChangeList: [],
         }
     },
     created() {
+        
     },
     methods: {
         
     },
+    watch: {
+        headList: {
+            deep: true,
+            handler(value) {
+                let _ = this
+                let param = {}
+
+                param.Statements = _.headList.map(item => {
+                    return {
+                        CompanyNumber:item.CompanyNumber,
+                        Year: item.Year,
+                        Type: item.Type
+                    }
+                }).splice(1)
+                _.http.post(`${_.preApiName}/financial/statistics/financial-ratio`, param).then(res => {
+                    
+                }).catch(err => {
+
+                })
+
+                _.http.post(`${_.preApiName}/financial/statistics/financial-ratios-of-change`, param).then(res => {
+                    let changes = res.status == 201 ? res.data.data : []
+
+                    _.ratioChangeList = changes.filter(item => {
+                        return !!item.BaseData
+                    })
+                }).catch(err => {
+
+                })
+            }
+        }
+    }
 }
 </script>
 

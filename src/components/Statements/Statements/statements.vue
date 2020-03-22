@@ -31,6 +31,8 @@
           <div class="name header-item">
             <span class="name-label">下单时间：</span>
             <span class="name-value">{{orderData.CreateTime}}</span>
+            <span class="name-label" v-show="orderData.LastModifyTime != null"> | {{getTimeLabel(orderData.Status)}}：</span>
+            <span class="name-value" v-show="orderData.LastModifyTime != null">{{orderData.LastModifyTime}}</span>
           </div>
           <div style="text-align:right;color:#aaa;">
             <a @click="onReturn" v-show="(orderData.Status == 10 || orderData.Status == -1) && $root.rights.includes('order_2_6')" class="small-btn">撤销</a>
@@ -237,6 +239,7 @@ let initReportData = {
   Checked: false,
   Statement: {
     Version: '1.0',
+    isEqual: true,
     Asset: {
       MonetaryResources: undefined,
       ShortTermInvestments: undefined,
@@ -698,9 +701,6 @@ export default {
           }).catch(err => {
             this.showMessage(`取消订单失败, ${err.response.data.Message}`, 'error')
           })
-          // this.updateOrderStatus(-1, () => {
-          //   this.showMessage(`取消订单成功！`,'success')
-          // })
         })
     },
     updateOrderStatus(status, callback) {
@@ -760,6 +760,24 @@ export default {
         default: return ''
       }
     },
+    getTimeLabel(status) {
+      switch(status) {
+        case 1:
+        case '1':
+          return '指派时间';
+        case 5:
+        case '5':
+          return '保存时间'
+        case 10:
+        case '10':
+          return '提交时间'
+        case 20:
+        case '20':
+          return '发送时间'
+        default:
+          return '最后时间'
+      }
+    },
     onDeleteStatement(report) {
       let _ = this
       this.$confirm(`删除报表可能会导致相关联的订单不完整，确定删除报表[${report.Year}${_.getLabel(report.Type)}]吗?`, '提示', {
@@ -791,8 +809,14 @@ export default {
     backPath() {
       this.reportType == "order" ? this.$router.push(`${this.preName}/order`) : this.$router.push(`${this.preName}/company`)
     },
-    onValueChanged() {
+    onValueChanged(index) {
       this.isDirty = true
+      if(index != undefined && index >= 0) {
+        this.reportList[index].Statement.isEqual =  this.reportList[index].Statement.Asset.TotalAssets != undefined && 
+                                                    this.reportList[index].Statement.Liability.TotalLiabilitiesOwnersEquity != undefined &&
+                                                    this.reportList[index].Statement.Asset.TotalAssets == this.reportList[index].Statement.Liability.TotalLiabilitiesOwnersEquity
+      }
+      
     },
     onDisplay() {
       let {value, items} = this.getViewReportList()
@@ -819,7 +843,12 @@ export default {
 
         let validList = this.sortReportList(list)
 
-        this.headList = ['']
+        this.headList = [{
+            CompanyNumber: '',
+            Year: 2010,
+            Type: 1,
+            Desc: ``
+          }]
 
         let FlowAsset = {}
         // FlowAsset.title = '流动资产'
@@ -831,7 +860,13 @@ export default {
         // totalAsset.title = '总额'
 
         validList.forEach((item, index, array) => {
-            this.headList.push(`${item.Year}${this.getLabel(item.Type)}`)
+          let head = {
+            CompanyNumber: item.CompanyNumber,
+            Year: item.Year,
+            Type: item.Type,
+            Desc: `${item.Year}${this.getLabel(item.Type)}`
+          }
+          this.headList.push(head)
         })
 
         Object.keys(initReportData.Statement.Asset).forEach((key, idx) => {
@@ -1271,6 +1306,11 @@ export default {
       return {
         'border-left': `15px solid ${color}`
       }
+    }
+  },
+  watch: {
+    activeName(n) {
+      this.reportList = this.deepCopy(this.reportList)
     }
   },
   beforeRouteLeave(to, from, next) {

@@ -101,7 +101,8 @@
           <div class="list-header-item list-header-item5" title="企业名称">企业名称</div>
           <div class="list-header-item list-header-item6" title="制单人">制单人</div>
           <div class="list-header-item list-header-item6" title="下单时间">下单时间</div>
-          <div class="list-header-item list-header-item7">操作</div>
+          <div class="list-header-item list-header-item7" title="修改时间">修改时间</div>
+          <div class="list-header-item list-header-item8">操作</div>
         </div>
         <div class="infinite-list-wrapper" style="overflow:auto">
           <div
@@ -131,6 +132,7 @@
               </div>
               <div class="list-content-item" :title="item.Editor">{{item.Editor}}</div>
               <div class="list-content-item" :title="item.CreateTime">{{item.CreateTime}}</div>
+              <div class="list-content-item" :title="item.LastModifyTime">{{item.LastModifyTime}}</div>
               <div class="list-content-item" >
                 <!-- <el-button
                   type="text"

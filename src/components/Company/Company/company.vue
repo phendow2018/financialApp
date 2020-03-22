@@ -60,8 +60,10 @@
                 </div> 
               </div>
               <div>
-                <el-button type="default" v-show="$root.rights.includes('company_1_2')" @click="onEdit(item)" size="small">编辑</el-button>
-                <el-button type="danger" v-show="$root.rights.includes('company_1_3')" @click="onDelete(item)" size="small">删除</el-button>
+                <!-- <a href="javascript:void(0);" @click="onEdit(item)">编辑</a> -->
+                <el-button type="text" v-show="$root.rights.includes('company_1_2')" @click="onEdit(item)" size="small">编辑</el-button>
+                <el-button type="text" v-show="$root.rights.includes('company_1_2')" @click="onEditNumber(item)" size="small">代码</el-button>
+                <el-button type="text" v-show="$root.rights.includes('company_1_3')" @click="onDelete(item)" size="small"><span style="color:rgb(255, 73, 73);">删除</span></el-button>
               </div>
             </div>
             <div></div>
@@ -96,6 +98,25 @@
       <span slot="footer" class="dialog-footer">
         <el-button type="primary" @click="addCompanyAction">确 定</el-button>
         <el-button @click="addCompanyWndVisible = false;errOccured = false">取 消</el-button>
+      </span>
+    </el-dialog>
+    <el-dialog title="统一社会信用代码修改" :visible.sync="modifyCompanyWndVisible" width="500px" @opened="$refs['Number'].focus();">
+      <el-form
+        :model="modifyCompanyNumber"
+        label-width="110px"
+        class="demo-dynamic"
+      >
+        <el-form-item label="新统一信用代码" prop="Number">
+          <el-input v-model="modifyCompanyNumber.CompanyNumber" ref="Number"></el-input>
+        </el-form-item>
+        <el-form-item label="原统一信用代码">
+          <el-input v-model="modifyCompanyNumber.OldCompanyNumber" :disabled="true"></el-input>
+        </el-form-item>
+      </el-form>
+      <div class="error" style="color: red; padding-left: 30px;"  v-show="errOccured1">{{ErrMsg1}}</div>
+      <span slot="footer" class="dialog-footer">
+        <el-button type="primary" @click="modifyCompanyNumberAction">确 定</el-button>
+        <el-button @click="modifyCompanyWndVisible = false;errOccured1 = false">取 消</el-button>
       </span>
     </el-dialog>
   </div>
@@ -153,13 +174,21 @@ export default {
         Description: '',
         Operator: '',
       },
+      modifyCompanyNumber: {
+        OldCompanyNumber: '',
+        CompanyNumber: '',
+        Operator: '',
+      },
       addCompanyWndVisible: false,
+      modifyCompanyWndVisible: false,
       rules: {
         Name: [{ required: true, validator: NameCheck, trigger: "blur" }],
         CompanyNumber: [{ required: true, validator: NumberCheck, trigger: "blur" }],
       },
       errOccured: true,
+      errOccured1: true,
       ErrMsg: '',
+      ErrMsg1: '',
       menuList: [{
         Id: 'FuzzyName',
         Name: '企业名称'
@@ -258,9 +287,35 @@ export default {
         .catch(err => {
           if(err.response.status == 422) {
             _.errOccured = true
-            _.ErrMsg = err.response.data.Message
+            _.ErrMsg = err.response.data.Error.Message
           }
         });
+    },
+    modifyCompanyNumberAction() {
+      let _ = this
+      if(!_.getValidateStatus()) return
+      
+      _.http.put(`${this.preApiName}/financial/company-manage/company-number?CompanyNumber=${_.modifyCompanyNumber.OldCompanyNumber}`, {
+        CompanyNumber: _.modifyCompanyNumber.CompanyNumber,
+        Operator: localStorage.getItem('UserName'),
+      }).then(res => {
+        if(res.status == 201) {
+          _.errOccured1 = false
+          _.modifyCompanyWndVisible = false
+          _.companyList.map(v => {
+            if(v.CompanyNumber == _.modifyCompanyNumber.OldCompanyNumber) {
+              v.CompanyNumber = _.modifyCompanyNumber.CompanyNumber
+            }
+          })
+          _.showMessage(`修改企业信用代码成功！`, 'success')
+        } else {
+          _.errOccured1 = true
+          _.ErrMsg1 = err.response.data.Error.Message
+        }
+      }).catch(err => {
+        _.errOccured1 = true
+        _.ErrMsg1 = err.response.data.Error.Message
+      })
     },
     getValidateStatus() {
       let validStatus = false
@@ -301,6 +356,11 @@ export default {
       this.isEdit = true
       this.addCompanyWndVisible = true
       this.addCompanyForm = this.deepCopy(item)
+    },
+    onEditNumber(item) {
+      this.modifyCompanyWndVisible = true
+      this.modifyCompanyNumber.OldCompanyNumber = item.CompanyNumber
+      this.modifyCompanyNumber.CompanyNumber = item.CompanyNumber
     },
     onDelete(item) {
       this.$confirm(`将删除企业的所有财务信息，确定删除企业[${item.Name}]吗?`, '提示', {
