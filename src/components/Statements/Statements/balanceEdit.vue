@@ -451,7 +451,7 @@
                 :precision="2"
                 :controls="false"
                 @focus="onInputFucus"
-                @change="onValueChanged('TotalAssets', $event, index)"
+                @change="onValueChanged('TotalLiabilitiesOwnersEquity', $event, index)"
                 @blur="onInputBlur"
               ></el-input-number>
             </div>

@@ -593,6 +593,11 @@ export default {
             if(!vv.Statement.Version) {
               vv.Statement.Version = '1.0'
             }
+            if(!vv.Statement.isEqual) {
+              vv.Statement.isEqual = vv.Statement.Asset.TotalAssets != undefined && 
+                                      vv.Statement.Liability.TotalLiabilitiesOwnersEquity != undefined &&
+                                      vv.Statement.Asset.TotalAssets == vv.Statement.Liability.TotalLiabilitiesOwnersEquity
+            }
           })
           this.initShow = true
         });
